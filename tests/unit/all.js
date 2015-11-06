@@ -1,0 +1,3 @@
+define([
+	'./tasks/rename'
+], function () {});

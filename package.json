@@ -1,14 +1,32 @@
 {
-  "name": "dojo2-grunt",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "BSD 3-Clause",
-  "dependencies": {
-    "glob": "^5.0.14"
-  }
+	"name": "grunt-dojo2",
+	"version": "2.0.0-alpha.1",
+	"description": "A package of Grunt tasks to use with Dojo 2 Packages",
+	"homepage": "http://dojotoolkit.org",
+	"keywords": [ "dojo2", "gruntplugin" ],
+	"bugs": {
+		"url": "https://github.com/dojo/grunt-dojo2/issues"
+	},
+	"main": "index.js",
+	"scripts": {
+		"test": "tests/run.sh"
+	},
+	"author": "Bryan Forbes <bryan@reigndropsfall.net>",
+	"contributors": [ {
+		"name": "Kitson Kelly",
+		"email": "me@kitsonkelly.com"
+	} ],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dojo/grunt-dojo2.git"
+	},
+	"license": "BSD-3-Clause",
+	"dependencies": {
+		"glob": "^5.0.14"
+	},
+	"devDependencies": {
+		"codecov.io": "0.1.6",
+		"grunt": "~0.4.5",
+		"intern": "^3.0.6"
+	}
 }
