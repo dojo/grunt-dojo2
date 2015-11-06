@@ -23,15 +23,12 @@ define([
 	}
 
 	registerSuite({
-		name: 'tasks/rename',
+		name: 'tasks/rewriteSourceMaps',
 		setup: function () {
 			grunt.initConfig({
-				rename: {
-					sourceMaps: {
-						expand: true,
-						cwd: 'dist/',
-						src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
-						dest: 'dist/_debug/'
+				rewriteSourceMaps: {
+					dist: {
+						src: [ 'dist/_debug/**/*.js.map' ]
 					}
 				}
 			});

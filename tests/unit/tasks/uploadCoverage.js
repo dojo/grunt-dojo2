@@ -23,18 +23,9 @@ define([
 	}
 
 	registerSuite({
-		name: 'tasks/rename',
+		name: 'tasks/uploadCoverage',
 		setup: function () {
-			grunt.initConfig({
-				rename: {
-					sourceMaps: {
-						expand: true,
-						cwd: 'dist/',
-						src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
-						dest: 'dist/_debug/'
-					}
-				}
-			});
+			grunt.initConfig({});
 			grunt.loadTasks('tasks');
 		},
 		basic: function () {

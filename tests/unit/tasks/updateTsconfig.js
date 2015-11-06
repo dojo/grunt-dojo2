@@ -23,17 +23,10 @@ define([
 	}
 
 	registerSuite({
-		name: 'tasks/rename',
+		name: 'tasks/updateTsconfig',
 		setup: function () {
 			grunt.initConfig({
-				rename: {
-					sourceMaps: {
-						expand: true,
-						cwd: 'dist/',
-						src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
-						dest: 'dist/_debug/'
-					}
-				}
+				tsconfigContent: {}
 			});
 			grunt.loadTasks('tasks');
 		},
