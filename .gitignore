@@ -1,3 +1,4 @@
 /node_modules/
 *.js
+lcov.info
 !/tests/**/*.js

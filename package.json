@@ -9,8 +9,8 @@
 	},
 	"main": "index.js",
 	"scripts": {
-		"test": "tests/run.sh",
-		"build": "tsc -p ."
+		"prepublish": "shx rm -rf ./typings && typings install && tsc -p .",
+		"test": "tests/run.sh"
 	},
 	"author": "Bryan Forbes <bryan@reigndropsfall.net>",
 	"contributors": [ {
@@ -23,15 +23,13 @@
 	},
 	"license": "BSD-3-Clause",
 	"dependencies": {
-		"glob": "^5.0.14"
-	},
-	"peerDependencies": {
+		"glob": "^5.0.14",
 		"codecov.io": "0.1.6"
 	},
 	"devDependencies": {
 		"grunt": "^1.0.1",
-		"grunt-contrib-clean": "^1.0.0",
 		"intern": "^3.2.0",
+		"shx": ">=0.1.2",
 		"tslint": "^3.10.1",
 		"typescript": "^1.8.10"
 	}

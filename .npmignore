@@ -1,5 +1,10 @@
+.editorconfig
+.gitattributes
+.travis.yml
 /tests
-*.ts
-tsconfig.json
-Gruntfile.js
 /typings
+*.ts
+lcov.info
+tsconfig.json
+tslint.json
+typings.json

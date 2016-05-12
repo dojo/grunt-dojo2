@@ -1,5 +1,7 @@
 {
 	"compilerOptions": {
+		"inlineSourceMap": true,
+		"inlineSources": true,
 		"listFiles": true,
 		"module": "commonjs",
 		"noImplicitAny": true,
