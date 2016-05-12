@@ -1,11 +1,10 @@
-var fs = require('fs');
-var path = require('path');
-var glob = require('glob');
+import * as path from 'path';
+import * as glob from 'glob';
 
-exports.initConfig = function (grunt, otherOptions) {
-	var tsconfigContent = grunt.file.read('tsconfig.json');
-	var tsconfig = JSON.parse(tsconfigContent);
-	tsconfig.filesGlob = tsconfig.filesGlob.map(function (glob) {
+exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
+	const tsconfigContent = grunt.file.read('tsconfig.json');
+	const tsconfig = JSON.parse(tsconfigContent);
+	tsconfig.filesGlob = tsconfig.filesGlob.map(function (glob: string) {
 		if (/^\.\//.test(glob)) {
 			// Remove the leading './' from the glob because grunt-ts
 			// sees it and thinks it needs to create a .baseDir.ts which
@@ -14,7 +13,7 @@ exports.initConfig = function (grunt, otherOptions) {
 		}
 		return glob;
 	});
-	var packageJson = grunt.file.readJSON('package.json');
+	const packageJson = grunt.file.readJSON('package.json');
 
 	grunt.initConfig({
 		name: packageJson.name,
@@ -42,32 +41,33 @@ exports.initConfig = function (grunt, otherOptions) {
 		]
 	});
 
-	var options = {};
+	const options: { [option: string]: any } = {};
 	glob.sync('*.js', {
 		cwd: path.join(__dirname, 'options')
 	}).forEach(function (filename) {
-		var optName = path.basename(filename, '.js');
+		const optName = path.basename(filename, '.js');
 		options[optName] = require('./options/' + optName)(grunt);
 	});
 	grunt.config.merge(options);
 
 	require('./tasks/updateTsconfig')(grunt);
-	
+
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
 	}
 
 	// Set some Intern-specific options if specified on the command line.
 	[ 'suites', 'functionalSuites', 'grep' ].forEach(function (option) {
-		var value = grunt.option(option);
+		const value = grunt.option<string>(option);
+		let splitValue: string[];
 		if (value) {
 			if (option !== 'grep') {
-				value = value.split(',').map(function (string) { return string.trim(); });
+				splitValue = value.split(',').map(function (string) { return string.trim(); });
 			}
-			grunt.config('intern.options.' + option, value);
+			grunt.config('intern.options.' + option, splitValue || value);
 		}
 	});
 
-	grunt.registerTask('dev', grunt.config.get('devTasks'));
-	grunt.registerTask('dist', grunt.config.get('distTasks'));
+	grunt.registerTask('dev', grunt.config.get<string[]>('devTasks'));
+	grunt.registerTask('dist', grunt.config.get<string[]>('distTasks'));
 };
