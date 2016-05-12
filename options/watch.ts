@@ -1,6 +1,4 @@
-/* jshint node:true */
-
-module.exports = function (grunt) {
+export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-ts');
 
 	return {

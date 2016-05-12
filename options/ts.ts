@@ -1,17 +1,25 @@
-/* jshint node:true */
+import { CompilerOptions } from 'typescript';
 
-function mixin(destination, source) {
+interface GenericObject {
+	[ key: string ]: any;
+}
+
+function mixin<T extends GenericObject, U extends GenericObject>(destination: T, source: U): T & U {
 	for (var key in source) {
 		destination[key] = source[key];
 	}
-	return destination;
+	return <T & U> destination;
+}
+
+interface GruntTSOptions extends CompilerOptions {
+	additionalFlags?: string;
 }
 
 /**
  * A work-around for grunt-ts 4.2.0-beta not handling experimentalDecorators
  * and improperly handling the source map options
  */
-function getTsOptions(baseOptions, overrides) {
+function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
 	var options = mixin({}, baseOptions);
 	if (overrides) {
 		options = mixin(options, overrides);
@@ -26,6 +34,10 @@ function getTsOptions(baseOptions, overrides) {
 	if (options.sourceMap) {
 		additionalFlags.push('--sourceMap');
 	}
+	/* Supported in TypeScript 2.0 */
+	if (options['strictNullChecks']) {
+		additionalFlags.push('--strictNullChecks');
+	}
 	options.inlineSources = options.inlineSourceMap = options.sourceMap = false;
 
 	options.additionalFlags = additionalFlags.join(' ');
@@ -33,10 +45,10 @@ function getTsOptions(baseOptions, overrides) {
 	return options;
 }
 
-module.exports = function (grunt) {
+export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-ts');
 
-	var compilerOptions = grunt.config.get('tsconfig').compilerOptions;
+	var compilerOptions = grunt.config.get<any>('tsconfig').compilerOptions;
 	var tsOptions = getTsOptions(compilerOptions, {
 		failOnTypeErrors: true,
 		fast: 'never'

@@ -1,8 +1,6 @@
-/* jshint node:true */
-
-module.exports = function (grunt) {
-	grunt.registerTask('updateTsconfig', function () {
-		var tsconfigContent = grunt.config.get('tsconfigContent');
+export = function (grunt: IGrunt) {
+	grunt.registerTask('updateTsconfig', <any> function () {
+		var tsconfigContent = grunt.config.get<any>('tsconfigContent');
 		var tsconfig = JSON.parse(tsconfigContent);
 		tsconfig.files = grunt.file.expand(tsconfig.filesGlob);
 

@@ -1,6 +1,4 @@
-/* jshint node:true */
-
-module.exports = function (grunt) {
+export = function (grunt: IGrunt) {
 	require('../tasks/rewriteSourceMaps')(grunt);
 
 	return {

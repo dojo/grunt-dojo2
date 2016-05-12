@@ -1,12 +1,10 @@
-/* jshint node:true */
+import * as path from 'path';
 
-var path = require('path');
-
-module.exports = function (grunt) {
+export = function (grunt: IGrunt) {
 	grunt.registerMultiTask('rewriteSourceMaps', function () {
-		this.filesSrc.forEach(function (file) {
+		this.filesSrc.forEach(function (file: string) {
 			var map = JSON.parse(grunt.file.read(file));
-			map.sources = map.sources.map(function (source) {
+			map.sources = map.sources.map(function (source: string) {
 				return path.basename(source);
 			});
 			grunt.file.write(file, JSON.stringify(map));

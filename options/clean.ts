@@ -1,6 +1,4 @@
-/* jshint node:true */
-
-module.exports = function (grunt) {
+export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	return {
@@ -12,7 +10,7 @@ module.exports = function (grunt) {
 		},
 		src: {
 			src: [ '{src,tests}/**/*.js' ],
-			filter: function (path) {
+			filter: function (path: string) {
 				// Only clean the .js file if a .js.map file also exists
 				var mapPath = path + '.map';
 				if (grunt.file.exists(mapPath)) {

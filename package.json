@@ -9,7 +9,8 @@
 	},
 	"main": "index.js",
 	"scripts": {
-		"test": "tests/run.sh"
+		"test": "tests/run.sh",
+		"build": "tsc -p ."
 	},
 	"author": "Bryan Forbes <bryan@reigndropsfall.net>",
 	"contributors": [ {
@@ -30,9 +31,8 @@
 	"devDependencies": {
 		"grunt": "^1.0.1",
 		"grunt-contrib-clean": "^1.0.0",
-		"grunt-ts": "^5.4.0",
-		"grunt-tslint": "^3.0.3",
 		"intern": "^3.2.0",
+		"tslint": "^3.10.1",
 		"typescript": "^1.8.10"
 	}
 }

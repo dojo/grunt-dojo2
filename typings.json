@@ -1,0 +1,9 @@
+{
+  "ambientDependencies": {
+    "gruntjs": "registry:dt/gruntjs#0.4.0+20160316171810",
+    "node": "registry:dt/node#4.0.0+20160509154515"
+  },
+  "dependencies": {
+    "glob": "registry:npm/glob#6.0.0+20160211003958"
+  }
+}
