@@ -1,6 +1,6 @@
 {
 	"name": "grunt-dojo2",
-	"version": "2.0.0-alpha.2",
+	"version": "2.0.0-pre",
 	"description": "A package of Grunt tasks to use with Dojo 2 Packages",
 	"homepage": "http://dojotoolkit.org",
 	"keywords": [ "dojo2", "gruntplugin" ],
@@ -24,9 +24,15 @@
 	"dependencies": {
 		"glob": "^5.0.14"
 	},
+	"peerDependencies": {
+		"codecov.io": "0.1.6"
+	},
 	"devDependencies": {
-		"codecov.io": "0.1.6",
-		"grunt": "~0.4.5",
-		"intern": "^3.0.6"
+		"grunt": "^1.0.1",
+		"grunt-contrib-clean": "^1.0.0",
+		"grunt-ts": "^5.4.0",
+		"grunt-tslint": "^3.0.3",
+		"intern": "^3.2.0",
+		"typescript": "^1.8.10"
 	}
 }
