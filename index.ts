@@ -33,9 +33,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	];
 
 	const distESMTasks = [
-		'ts:dist_esm',
-		'rename:sourceMaps_esm',
-		'rewriteSourceMaps:dist_esm'
+		'ts:dist_esm'
 	];
 
 	grunt.initConfig({

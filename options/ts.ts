@@ -70,7 +70,10 @@ export = function (grunt: IGrunt) {
 		dist_esm: {
 			options: getTsOptions(tsOptions, {
 				target: 'es6',
-				module: 'es6'
+				module: 'es6',
+				sourceMap: false,
+				inlineSourceMap: true,
+				inlineSources: true,
 			}),
 			outDir: 'dist/esm',
 			src: [ '<%= skipTests %>' ]
