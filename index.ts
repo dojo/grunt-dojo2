@@ -15,12 +15,21 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	});
 	const packageJson = grunt.file.readJSON('package.json');
 
+	const devTasks = [
+		'tslint',
+		'clean:dev',
+		'ts:dev',
+		'copy:staticTestFiles',
+		'updateTsconfig'
+	];
+
 	const distTasks = [
+		'tslint',
 		'clean:dist',
 		'ts:dist',
 		'rename:sourceMaps',
 		'rewriteSourceMaps:dist',
-		'dtsGenerator:dist'
+		'dtsGenerator:dist',
 	];
 
 	const distESMTasks = [
@@ -39,12 +48,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		staticTestFiles: 'tests/**/*.{html,css,json,xml}',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',
 
-		devTasks: [
-			'ts:dev',
-			'copy:staticTestFiles',
-			'replace:addIstanbulIgnore',
-			'updateTsconfig'
-		],
+		devTasks,
 		distTasks,
 		distESMTasks
 	});
@@ -75,6 +79,34 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 			grunt.config('intern.options.' + option, splitValue || value);
 		}
 	});
+
+	function setCombined(combined: boolean) {
+		if (combined) {
+			grunt.config('intern.options.reporters', [
+				/* TODO: Migrate the reporter to this package */
+				{ id: 'tests/support/Reporter', file: 'coverage-unmapped.json' }
+			]);
+		}
+	}
+	setCombined(grunt.option<boolean>('combined'));
+
+	grunt.registerTask('test', <any> (function () {
+		const flags = Object.keys(this.flags);
+
+		if (!flags.length) {
+			flags.push('node');
+		}
+
+		grunt.option('force', true);
+		grunt.task.run('clean:coverage');
+		grunt.task.run('dev');
+		setCombined(true);
+		flags.forEach((flag) => {
+			grunt.task.run('intern:' + flag);
+		});
+		grunt.task.run('remapIstanbul:coverage');
+		grunt.task.run('clean:coverage');
+	}));
 
 	grunt.registerTask('dev', grunt.config.get<string[]>('devTasks'));
 	grunt.registerTask('dist', grunt.config.get<string[]>('distTasks'));

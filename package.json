@@ -23,7 +23,7 @@
 	},
 	"license": "BSD-3-Clause",
 	"dependencies": {
-		"glob": "^5.0.14"
+		"glob": "^7.0.0"
 	},
 	"peerDependencies": {
 		"codecov.io": ">=0.1.6",
@@ -32,7 +32,9 @@
 		"grunt-contrib-copy": ">=1.0.0",
 		"grunt-contrib-watch": ">=1.0.0",
 		"grunt-text-replace": ">=0.4.0",
-		"remap-istanbul": ">0.6.3"
+		"grunt-ts": ">=5.0.0",
+		"grunt-tslint": ">=3.0.0",
+		"remap-istanbul": ">=0.6.3"
 	},
 	"devDependencies": {
 		"codecov.io": "0.1.6",

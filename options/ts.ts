@@ -63,18 +63,12 @@ export = function (grunt: IGrunt) {
 			src: [ '<%= all %>' ]
 		},
 		dist: {
-			options: getTsOptions(tsOptions, {
-				mapRoot: '../dist/umd/_debug',
-				sourceMap: true,
-			}),
+			options: tsOptions,
 			outDir: 'dist/umd',
 			src: [ '<%= skipTests %>' ]
 		},
 		dist_esm: {
 			options: getTsOptions(tsOptions, {
-				mapRoot: '../dist/esm/_debug',
-				sourceMap: true,
-				inlineSources: true,
 				target: 'es6',
 				module: 'es6'
 			}),

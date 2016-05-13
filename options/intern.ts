@@ -4,23 +4,18 @@ export = function (grunt: IGrunt) {
 	return {
 		options: {
 			runType: 'runner',
-			config: '<%= devDirectory %>/tests/intern'
+			config: '<%= devDirectory %>/tests/intern',
+			reporters: [ 'Runner' ]
 		},
-		runner: {
-			options: {
-				reporters: [ 'runner', 'lcovhtml' ]
-			}
-		},
+		remote: {},
 		local: {
 			options: {
 				config: '<%= devDirectory %>/tests/intern-local',
-				reporters: [ 'runner', 'lcovhtml' ]
 			}
 		},
-		client: {
+		node: {
 			options: {
-				runType: 'client',
-				reporters: [ 'console', 'lcovhtml' ]
+				runType: 'client'
 			}
 		},
 		proxy: {
