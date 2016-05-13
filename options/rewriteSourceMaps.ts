@@ -3,7 +3,10 @@ export = function (grunt: IGrunt) {
 
 	return {
 		dist: {
-			src: [ 'dist/_debug/**/*.js.map' ]
+			src: [ 'dist/umd/_debug/**/*.js.map' ]
+		},
+		dist_esm: {
+			src: [ 'dist/esm/_debug/**/*.js.map' ]
 		}
 	};
 };

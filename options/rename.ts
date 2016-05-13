@@ -4,9 +4,15 @@ export = function (grunt: IGrunt) {
 	return {
 		sourceMaps: {
 			expand: true,
-			cwd: 'dist/',
+			cwd: 'dist/umd',
 			src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
-			dest: 'dist/_debug/'
+			dest: 'dist/umd/_debug/'
+		},
+		sourceMaps_esm: {
+			expand: true,
+			cwd: 'dist/esm',
+			src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
+			dest: 'dist/esm/_debug/'
 		}
 	};
 };

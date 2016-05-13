@@ -1,5 +1,3 @@
-import { CompilerOptions } from 'typescript';
-
 interface GenericObject {
 	[ key: string ]: any;
 }
@@ -11,7 +9,12 @@ function mixin<T extends GenericObject, U extends GenericObject>(destination: T,
 	return <T & U> destination;
 }
 
-interface GruntTSOptions extends CompilerOptions {
+interface GruntTSOptions {
+	[ option: string ]: string | number | boolean;
+	experimentalDecorators?: boolean;
+	inlineSources?: boolean;
+	inlineSourceMap?: boolean;
+	sourceMap?: boolean;
 	additionalFlags?: string;
 }
 
@@ -61,12 +64,21 @@ export = function (grunt: IGrunt) {
 		},
 		dist: {
 			options: getTsOptions(tsOptions, {
-				mapRoot: '../dist/_debug',
+				mapRoot: '../dist/umd/_debug',
 				sourceMap: true,
-				inlineSourceMap: false,
-				inlineSources: true
 			}),
-			outDir: 'dist',
+			outDir: 'dist/umd',
+			src: [ '<%= skipTests %>' ]
+		},
+		dist_esm: {
+			options: getTsOptions(tsOptions, {
+				mapRoot: '../dist/esm/_debug',
+				sourceMap: true,
+				inlineSources: true,
+				target: 'es6',
+				module: 'es6'
+			}),
+			outDir: 'dist/esm',
 			src: [ '<%= skipTests %>' ]
 		}
 	};

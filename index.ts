@@ -15,6 +15,20 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	});
 	const packageJson = grunt.file.readJSON('package.json');
 
+	const distTasks = [
+		'clean:dist',
+		'ts:dist',
+		'rename:sourceMaps',
+		'rewriteSourceMaps:dist',
+		'dtsGenerator:dist'
+	];
+
+	const distESMTasks = [
+		'ts:dist_esm',
+		'rename:sourceMaps_esm',
+		'rewriteSourceMaps:dist_esm'
+	];
+
 	grunt.initConfig({
 		name: packageJson.name,
 		version: packageJson.version,
@@ -31,14 +45,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 			'replace:addIstanbulIgnore',
 			'updateTsconfig'
 		],
-		distTasks: [
-			'ts:dist',
-			'rename:sourceMaps',
-			'rewriteSourceMaps',
-			'copy:typings',
-			'copy:staticFiles',
-			'dtsGenerator:dist'
-		]
+		distTasks,
+		distESMTasks
 	});
 
 	const options: { [option: string]: any } = {};
@@ -70,4 +78,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 
 	grunt.registerTask('dev', grunt.config.get<string[]>('devTasks'));
 	grunt.registerTask('dist', grunt.config.get<string[]>('distTasks'));
+	grunt.registerTask('dist_esm', grunt.config.get<string[]>('distESMTasks'));
+
+	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };

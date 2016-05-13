@@ -8,7 +8,7 @@ export = function (grunt: IGrunt) {
 		},
 		dist: {
 			options: {
-				out: 'dist/_typings/<%= name %>/<%= name %>-<%= version %>.d.ts'
+				out: 'dist/umd/<%= name %>.d.ts'
 			},
 			src: [ '<%= skipTests %>' ]
 		}

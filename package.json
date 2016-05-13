@@ -23,10 +23,19 @@
 	},
 	"license": "BSD-3-Clause",
 	"dependencies": {
-		"glob": "^5.0.14",
-		"codecov.io": "0.1.6"
+		"glob": "^5.0.14"
+	},
+	"peerDependencies": {
+		"codecov.io": ">=0.1.6",
+		"dts-generator": ">=1.7.0",
+		"grunt-contrib-clean": ">=1.0.0",
+		"grunt-contrib-copy": ">=1.0.0",
+		"grunt-contrib-watch": ">=1.0.0",
+		"grunt-text-replace": ">=0.4.0",
+		"remap-istanbul": ">0.6.3"
 	},
 	"devDependencies": {
+		"codecov.io": "0.1.6",
 		"grunt": "^1.0.1",
 		"intern": "^3.2.0",
 		"shx": ">=0.1.2",
