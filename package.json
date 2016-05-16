@@ -32,6 +32,7 @@
 		"grunt-contrib-copy": ">=1.0.0",
 		"grunt-contrib-watch": ">=1.0.0",
 		"grunt-text-replace": ">=0.4.0",
+		"grunt-typings": ">=0.1.4",
 		"grunt-ts": ">=5.0.0",
 		"grunt-tslint": ">=3.0.0",
 		"remap-istanbul": ">=0.6.3"

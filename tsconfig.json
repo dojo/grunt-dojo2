@@ -26,6 +26,7 @@
 		"./options/rewriteSourceMaps.ts",
 		"./options/ts.ts",
 		"./options/tslint.ts",
+		"./options/typings.ts",
 		"./options/watch.ts",
 		"./tasks/rename.ts",
 		"./tasks/rewriteSourceMaps.ts",
