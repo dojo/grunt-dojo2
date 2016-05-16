@@ -1,5 +1,5 @@
 export = function (grunt: IGrunt) {
-	grunt.loadNpmTasks('grunt-tslint');
+	grunt.loadNpmTasks('grunt-typings');
 
 	return {
 		install: {}
