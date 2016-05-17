@@ -13,6 +13,7 @@ export = function (grunt: IGrunt) {
 				config: '<%= devDirectory %>/tests/intern-saucelabs'
 			}
 		},
+		remote: {},
 		local: {
 			options: {
 				config: '<%= devDirectory %>/tests/intern-local',
