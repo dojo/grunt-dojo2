@@ -7,7 +7,12 @@ export = function (grunt: IGrunt) {
 			config: '<%= devDirectory %>/tests/intern',
 			reporters: [ 'Runner' ]
 		},
-		remote: {},
+		browserstack: {},
+		saucelabs: {
+			options: {
+				config: '<%= devDirectory %>/tests/intern-saucelabs'
+			}
+		},
 		local: {
 			options: {
 				config: '<%= devDirectory %>/tests/intern-local',
