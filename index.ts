@@ -63,6 +63,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	grunt.config.merge(options);
 
 	require('./tasks/updateTsconfig')(grunt);
+	require('./tasks/uploadCoverage')(grunt);
 
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
