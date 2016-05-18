@@ -21,7 +21,7 @@ export = function (grunt: IGrunt) {
 			}
 		},
 		coverage: {
-			src: [ 'coverage-final.json', 'html-report/' ]
+			src: [ 'coverage-unmapped.json' ]
 		}
 	};
 };
