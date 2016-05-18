@@ -4,6 +4,7 @@
 /tests
 /typings
 *.ts
+!/index.d.ts
 lcov.info
 tsconfig.json
 tslint.json

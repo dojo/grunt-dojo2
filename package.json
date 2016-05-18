@@ -22,6 +22,7 @@
 		"url": "https://github.com/dojo/grunt-dojo2.git"
 	},
 	"license": "BSD-3-Clause",
+	"typings": "index.d.ts",
 	"dependencies": {
 		"glob": "^7.0.0",
 		"grunt-typings": "kitsonk/grunt-typings#452cf5f29a6070965f85d0dcae48abbd75939179"

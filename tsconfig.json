@@ -10,12 +10,14 @@
 	},
 	"filesGlob": [
 		"./index.ts",
+		"./index.d.ts",
 		"./options/**/*.ts",
 		"./tasks/**/*.ts",
 		"./typings/index.d.ts"
 	],
 	"files": [
 		"./index.ts",
+		"./index.d.ts",
 		"./options/clean.ts",
 		"./options/copy.ts",
 		"./options/dtsGenerator.ts",
