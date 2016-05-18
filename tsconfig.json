@@ -12,7 +12,7 @@
 		"./index.ts",
 		"./options/**/*.ts",
 		"./tasks/**/*.ts",
-		"./typings/main.d.ts"
+		"./typings/index.d.ts"
 	],
 	"files": [
 		"./index.ts",
@@ -32,6 +32,6 @@
 		"./tasks/rewriteSourceMaps.ts",
 		"./tasks/updateTsconfig.ts",
 		"./tasks/uploadCoverage.ts",
-		"./typings/main.d.ts"
+		"./typings/index.d.ts"
 	]
 }
