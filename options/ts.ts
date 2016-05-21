@@ -3,7 +3,7 @@ interface GenericObject {
 }
 
 function mixin<T extends GenericObject, U extends GenericObject>(destination: T, source: U): T & U {
-	for (var key in source) {
+	for (let key in source) {
 		destination[key] = source[key];
 	}
 	return <T & U> destination;
@@ -23,11 +23,11 @@ interface GruntTSOptions {
  * and improperly handling the source map options
  */
 function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
-	var options = mixin({}, baseOptions);
+	let options = mixin({}, baseOptions);
 	if (overrides) {
 		options = mixin(options, overrides);
 	}
-	var additionalFlags = options.experimentalDecorators ? [ '--experimentalDecorators' ] : [];
+	const additionalFlags = options.experimentalDecorators ? [ '--experimentalDecorators' ] : [];
 	if (options.inlineSources) {
 		additionalFlags.push('--inlineSources');
 	}
@@ -51,8 +51,8 @@ function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
 export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-ts');
 
-	var compilerOptions = grunt.config.get<any>('tsconfig').compilerOptions;
-	var tsOptions = getTsOptions(compilerOptions, {
+	const compilerOptions = grunt.config.get<any>('tsconfig').compilerOptions;
+	const tsOptions = getTsOptions(compilerOptions, {
 		failOnTypeErrors: true,
 		fast: 'never'
 	});
@@ -63,7 +63,10 @@ export = function (grunt: IGrunt) {
 			src: [ '<%= all %>' ]
 		},
 		dist: {
-			options: tsOptions,
+			options: getTsOptions(tsOptions, {
+				mapRoot: '../dist/umd/_debug',
+				inlineSources: true
+			}),
 			outDir: 'dist/umd',
 			src: [ '<%= skipTests %>' ]
 		},
@@ -73,7 +76,7 @@ export = function (grunt: IGrunt) {
 				module: 'es6',
 				sourceMap: false,
 				inlineSourceMap: true,
-				inlineSources: true,
+				inlineSources: true
 			}),
 			outDir: 'dist/esm',
 			src: [ '<%= skipTests %>' ]
