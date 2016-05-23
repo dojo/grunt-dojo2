@@ -16,6 +16,8 @@ interface GruntTSOptions {
 	inlineSourceMap?: boolean;
 	sourceMap?: boolean;
 	additionalFlags?: string;
+	strictNullChecks?: boolean;
+	mapRoot?: string;
 }
 
 /**
@@ -27,7 +29,9 @@ function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
 	if (overrides) {
 		options = mixin(options, overrides);
 	}
+
 	const additionalFlags = options.experimentalDecorators ? [ '--experimentalDecorators' ] : [];
+
 	if (options.inlineSources) {
 		additionalFlags.push('--inlineSources');
 	}
@@ -37,11 +41,16 @@ function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
 	if (options.sourceMap) {
 		additionalFlags.push('--sourceMap');
 	}
+	options.inlineSources = options.inlineSourceMap = options.sourceMap = false;
+	if (options.mapRoot) {
+		additionalFlags.push('--mapRoot', options.mapRoot);
+		delete options.mapRoot;
+	}
 	/* Supported in TypeScript 2.0 */
 	if (options['strictNullChecks']) {
 		additionalFlags.push('--strictNullChecks');
+		options.strictNullChecks = false;
 	}
-	options.inlineSources = options.inlineSourceMap = options.sourceMap = false;
 
 	options.additionalFlags = additionalFlags.join(' ');
 
@@ -65,6 +74,7 @@ export = function (grunt: IGrunt) {
 		dist: {
 			options: getTsOptions(tsOptions, {
 				mapRoot: '../dist/umd/_debug',
+				sourceMap: true,
 				inlineSources: true
 			}),
 			outDir: 'dist/umd',
