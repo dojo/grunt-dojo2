@@ -80,6 +80,13 @@ export = function (grunt: IGrunt) {
 			outDir: 'dist/umd',
 			src: [ '<%= skipTests %>' ]
 		},
+		dts: {
+			options: getTsOptions(tsOptions, {
+				declaration: true
+			}),
+			outDir: 'dist/umd',
+			src: [ '<%= skipTests %>' ]
+		},
 		dist_esm: {
 			options: getTsOptions(tsOptions, {
 				target: 'es6',

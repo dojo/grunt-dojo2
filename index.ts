@@ -45,7 +45,9 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		all: [ '<%= tsconfig.filesGlob %>' ],
 		skipTests: [ '<%= all %>' , '!tests/**/*.ts' ],
 		staticTestFiles: 'tests/**/*.{html,css,json,xml,js,txt}',
+		staticDefinitionFiles: '**/*.d.ts',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',
+		distDirectory: 'dist/umd/',
 
 		devTasks,
 		distTasks,

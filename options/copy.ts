@@ -7,6 +7,12 @@ export = function (grunt: IGrunt) {
 			cwd: '.',
 			src: [ '<%= staticTestFiles %>' ],
 			dest: '<%= devDirectory %>'
+		},
+		staticDefinitionFiles: {
+			expand: true,
+			cwd: 'src',
+			src: [ '<%= staticDefinitionFiles %>' ],
+			dest: '<%= distDirectory %>'
 		}
 	};
 };
