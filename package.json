@@ -25,7 +25,7 @@
 	"typings": "index.d.ts",
 	"dependencies": {
 		"glob": "^7.0.0",
-		"grunt-typings": "kitsonk/grunt-typings#452cf5f29a6070965f85d0dcae48abbd75939179"
+		"grunt-typings": ">=0.1.5"
 	},
 	"peerDependencies": {
 		"codecov.io": ">=0.1.6",
