@@ -5,9 +5,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 		const peerDeps = packageJson.peerDependencies;
 
 		for (let name in peerDeps) {
-			grunt.log.write('installing peer dependency ' + name + ' with version ' + peerDeps[name] + '...');
+			grunt.log.write(`installing peer dependency ${name} with version ${peerDeps[name]}...`);
 			try {
-				let cmd = 'npm install ' + name + '@"' + peerDeps[name] + '"';
+				let cmd = `npm install ${name}@"${peerDeps[name]}"`;
 				exec(cmd, { stdio: 'ignore' });
 				grunt.log.ok('complete.');
 			} catch (error) {
