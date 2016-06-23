@@ -32,6 +32,7 @@
 		"./tasks/rename.ts",
 		"./tasks/updateTsconfig.ts",
 		"./tasks/uploadCoverage.ts",
+		"./tasks/installPeerDependencies.ts",
 		"./typings/index.d.ts"
 	]
 }
