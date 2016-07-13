@@ -17,6 +17,7 @@ interface GruntTSOptions {
 	sourceMap?: boolean;
 	additionalFlags?: string;
 	strictNullChecks?: boolean;
+	noImplicitThis?: boolean;
 	mapRoot?: string;
 }
 
@@ -50,6 +51,10 @@ function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
 	if (options['strictNullChecks']) {
 		additionalFlags.push('--strictNullChecks');
 		options.strictNullChecks = false;
+	}
+	if (options['noImplicitThis']) {
+		additionalFlags.push('--noImplicitThis');
+		options.noImplicitThis = false;
 	}
 
 	options.additionalFlags = additionalFlags.join(' ');
