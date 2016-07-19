@@ -30,7 +30,8 @@
   "typings": "index.d.ts",
   "dependencies": {
     "glob": "^7.0.0",
-    "grunt-typings": ">=0.1.5"
+    "grunt-typings": ">=0.1.5",
+    "resolve-from": "^2.0.0"
   },
   "peerDependencies": {
     "codecov.io": ">=0.1.6",
