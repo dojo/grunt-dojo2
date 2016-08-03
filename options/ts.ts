@@ -76,6 +76,7 @@ function getTsTaskOptionsLegacy(compilerOptions: any): any {
 		dist: {
 			options: getTsOptions(tsOptions, {
 				mapRoot: '../dist/umd/_debug',
+				declaration: true,
 				sourceMap: true,
 				inlineSources: true
 			}),
