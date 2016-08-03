@@ -6,7 +6,7 @@
 		"module": "commonjs",
 		"noImplicitAny": true,
 		"pretty": true,
-		"target": "es5"
+		"target": "es6"
 	},
 	"filesGlob": [
 		"./index.ts",
