@@ -1,12 +1,15 @@
 sudo: false
 language: node_js
 node_js:
-  - "6"
+- '6'
 cache:
   directories:
-    - node_modules
+  - node_modules
 install:
-  - "travis_retry npm install typings --global"
-  - "travis_retry npm install"
+- travis_retry npm install typings --global
+- travis_retry npm install
 script:
-  - "tests/run_ci.sh"
+- tests/run_ci.sh
+notifications:
+  slack:
+    secure: dBTe5XpEQKQHNHKHxac6YuhUlFaNBf4l/qK+RGuTfJSgwL/MleAwNfgrgz5nOS5mBGXkLMbEx++21GeJDIPevnfwDLvMh+OlU5w3909i3Xa17gN9yo7vi6Q+nrXL0NvOgOdUuExj5dWGpkquUN2yBIIycSWk5806Qxvp+6Q1EtPvR2VPMMnEhH7zjOJQu0HgeXhaBliEtaMEsQSX6ZZv2aZimll9TddBNhwRxAg28VnkeYAu7f4GZ1h/ktQLATfe2wpx76wp7FZ08R/xJZP/RReiXu6PqvlOEgPa4TZBvD/71JMuXxgS6+q2enkwthmMn7380kDFLDbNW4/jB8WTsyKTxMu2smkuufxzQpgr+RnWJE+ULDBmq/woeAUmMXFdVRJU2QXGbIMK61rphoWq9d016KHsQP9zZIF9pUD/oSPSAnFQdD9+HJnOh5qQ/DgJSIDyDN3KMcK5zGPXttMKrByUaJ3Du22WnpsurQqm0E3dj/mFEB3g1BTO4vpKXDVpBSPJzRDUaDY+MbwY5VSj8w0WnUnXSf9ZvUs/sFQrroY17p+XOe1tgWcZ8kaA0LTIATLHYQyJJIGNImcwfY665AL/fbzbRJyP2u4fUekM1PQdQ976OjqLAnnnHBuShe6HRRs2hFLrg3Pk/SHux9GVAeKD73dIixsdY0b7jfiI8ts=
