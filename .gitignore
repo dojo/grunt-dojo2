@@ -3,3 +3,4 @@
 *.js
 lcov.info
 !/tests/**/*.js
+.tsConfig*.json

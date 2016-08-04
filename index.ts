@@ -1,10 +1,8 @@
 import * as path from 'path';
 import * as glob from 'glob';
 
-exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
-	const tsconfigContent = grunt.file.read('tsconfig.json');
-	const tsconfig = JSON.parse(tsconfigContent);
-	tsconfig.filesGlob = tsconfig.filesGlob.map(function (glob: string) {
+function formatGlob(tsconfigGlob: string[]): string[] {
+	return tsconfigGlob.map(function (glob: string) {
 		if (/^\.\//.test(glob)) {
 			// Remove the leading './' from the glob because grunt-ts
 			// sees it and thinks it needs to create a .baseDir.ts which
@@ -13,6 +11,16 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 		return glob;
 	});
+}
+
+exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
+	const tsconfigContent = grunt.file.read('tsconfig.json');
+	const tsconfig = JSON.parse(tsconfigContent);
+	if (tsconfig.filesGlob) {
+		tsconfig.filesGlob = formatGlob(tsconfig.filesGlob);
+	} else {
+		tsconfig.include = formatGlob(tsconfig.include);
+	}
 	const packageJson = grunt.file.readJSON('package.json');
 
 	const devTasks = [
@@ -42,8 +50,10 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		version: packageJson.version,
 		tsconfig: tsconfig,
 		tsconfigContent: tsconfigContent,
-		all: [ '<%= tsconfig.filesGlob %>' ],
+		filesGlob: tsconfig.filesGlob || tsconfig.include,
+		all: [ '<%= filesGlob %>' ],
 		skipTests: [ '<%= all %>' , '!tests/**/*.ts' ],
+		testsGlob: ['./tests/**/*.ts', 'tests/**/*.ts'],
 		staticTestFiles: 'tests/**/*.{html,css,json,xml,js,txt}',
 		staticDefinitionFiles: '**/*.d.ts',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',

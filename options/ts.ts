@@ -62,10 +62,7 @@ function getTsOptions(baseOptions: GruntTSOptions, overrides: GruntTSOptions) {
 	return options;
 }
 
-export = function (grunt: IGrunt) {
-	grunt.loadNpmTasks('grunt-ts');
-
-	const compilerOptions = grunt.config.get<any>('tsconfig').compilerOptions;
+function getTsTaskOptionsLegacy(compilerOptions: any): any {
 	const tsOptions = getTsOptions(compilerOptions, {
 		failOnTypeErrors: true,
 		fast: 'never'
@@ -79,6 +76,7 @@ export = function (grunt: IGrunt) {
 		dist: {
 			options: getTsOptions(tsOptions, {
 				mapRoot: '../dist/umd/_debug',
+				declaration: true,
 				sourceMap: true,
 				inlineSources: true
 			}),
@@ -104,4 +102,77 @@ export = function (grunt: IGrunt) {
 			src: [ '<%= skipTests %>' ]
 		}
 	};
+}
+
+function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
+	const writeOptions = {
+		encoding: 'UTF8'
+	};
+	const distDir = grunt.config.get<any>('distDirectory');
+	const skipTests = grunt.config.get<string[]>('testsGlob');
+	const includeGlob: string[] = tsconfig.include || [];
+
+	const tsconfigDist = Object.assign({}, tsconfig, {
+		include: includeGlob.filter((item: string) => skipTests.indexOf(item) === -1)
+	});
+	Object.assign(tsconfigDist.compilerOptions, {
+		outDir: distDir,
+		declaration: true
+	});
+
+	const tsconfigDistEsm = Object.assign({}, tsconfig, {
+		include: includeGlob.filter((item: string) => skipTests.indexOf(item) === -1)
+	});
+	Object.assign(tsconfigDistEsm.compilerOptions, {
+		target: 'es6',
+		module: 'es6',
+		sourceMap: false,
+		outDir: 'dist/esm',
+		inlineSourceMap: true,
+		inlineSources: true
+	});
+
+	grunt.file.write('.tsconfigDist.json', JSON.stringify(tsconfigDist), writeOptions);
+	grunt.file.write('.tsconfigEsm.json', JSON.stringify(tsconfigDistEsm), writeOptions);
+
+	return {
+		options: {
+			failOnTypeErrors: true,
+			fast: 'never'
+		},
+		dev: {
+			tsconfig: {
+				passThrough: true
+			}
+		},
+		dist: {
+			tsconfig: {
+				tsconfig: '.tsconfigDist.json',
+				passThrough: true
+			}
+		},
+		dts: {
+			tsconfig: {
+				tsconfig: '.tsconfigDist.json',
+				passThrough: true
+			}
+		},
+		dist_esm: {
+			tsconfig: {
+				tsconfig: '.tsconfigEsm.json',
+				passThrough: true
+			}
+		}
+	};
+}
+
+export = function (grunt: IGrunt) {
+	grunt.loadNpmTasks('grunt-ts');
+
+	const tsconfig = grunt.config.get<any>('tsconfig');
+	if (tsconfig.compilerOptions.paths) {
+		return getTsTaskOptions(grunt, tsconfig);
+	}
+
+	return getTsTaskOptionsLegacy(tsconfig.compilerOptions);
 };
