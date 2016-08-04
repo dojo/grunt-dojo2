@@ -8,31 +8,11 @@
 		"pretty": true,
 		"target": "es6"
 	},
-	"filesGlob": [
+	"include": [
 		"./index.ts",
 		"./index.d.ts",
 		"./options/**/*.ts",
 		"./tasks/**/*.ts",
-		"./typings/index.d.ts"
-	],
-	"files": [
-		"./index.ts",
-		"./index.d.ts",
-		"./options/clean.ts",
-		"./options/copy.ts",
-		"./options/dtsGenerator.ts",
-		"./options/intern.ts",
-		"./options/remapIstanbul.ts",
-		"./options/rename.ts",
-		"./options/replace.ts",
-		"./options/ts.ts",
-		"./options/tslint.ts",
-		"./options/typings.ts",
-		"./options/watch.ts",
-		"./tasks/rename.ts",
-		"./tasks/updateTsconfig.ts",
-		"./tasks/uploadCoverage.ts",
-		"./tasks/installPeerDependencies.ts",
 		"./typings/index.d.ts"
 	]
 }
