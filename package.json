@@ -1,6 +1,6 @@
 {
   "name": "grunt-dojo2",
-  "version": "2.0.0-pre",
+  "version": "2.0.0-beta.11",
   "description": "A package of Grunt tasks to use with Dojo 2 Packages",
   "homepage": "http://dojotoolkit.org",
   "keywords": [
