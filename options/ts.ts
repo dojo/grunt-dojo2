@@ -115,7 +115,7 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 	const tsconfigDist = Object.assign({}, tsconfig, {
 		include: includeGlob.filter((item: string) => skipTests.indexOf(item) === -1)
 	});
-	Object.assign(tsconfigDist.compilerOptions, {
+	tsconfigDist.compilerOptions = Object.assign({}, tsconfig.compilerOptions, {
 		outDir: distDir,
 		declaration: true
 	});
@@ -123,7 +123,7 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 	const tsconfigDistEsm = Object.assign({}, tsconfig, {
 		include: includeGlob.filter((item: string) => skipTests.indexOf(item) === -1)
 	});
-	Object.assign(tsconfigDistEsm.compilerOptions, {
+	tsconfigDistEsm.compilerOptions = Object.assign({}, tsconfig.compilerOptions, {
 		target: 'es6',
 		module: 'es6',
 		sourceMap: false,
