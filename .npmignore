@@ -5,6 +5,7 @@
 /typings
 *.ts
 !/index.d.ts
+codecov.yml
 lcov.info
 tsconfig.json
 tslint.json

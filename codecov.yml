@@ -1,0 +1,6 @@
+coverage:
+  notify:
+    slack:
+      default:
+        url: "secret:NUFAEX7ci5jrJ/71os9sTZf3xgqsp9l4TZdS21r1u/nuRS036/0XCbunjw2QOeZvMnLgi0bgTd9JrVj0KoGFD9Xg9dOb7P+ICp94y15XaTrevcbpyiCSkLU4PC69PoXNigt/hW1V+pPM//lYaaJcnaw9hF6ZFNnA0eb1J1s+nBI="
+        attachments: "sunburst, diff"
