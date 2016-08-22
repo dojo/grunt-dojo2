@@ -143,14 +143,14 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 	Object.keys(tsOverrides).forEach((target) => {
 		if (target !== 'dist' && target !== 'esm' && target !== 'dev') {
 			const customTarget = tsOverrides[target];
-			const customTargetInclude: { include?: string[] } = {};
+			const customTargetOptions: { include?: string[], exclude?: string[] } = {};
 			if (customTarget.include) {
-				customTargetInclude.include = customTarget.include;
+				customTargetOptions.include = customTarget.include;
 			}
-			else if (customTarget.filterInclude) {
-				customTargetInclude.include = includeGlob.filter((item: string) => customTarget.filterInclude.indexOf(item) === -1);
+			if (customTarget.exclude) {
+				customTargetOptions.exclude = customTarget.exclude;
 			}
-			const customTsconfig = Object.assign({}, tsconfig, customTargetInclude);
+			const customTsconfig = Object.assign({}, tsconfig, customTargetOptions);
 			const customCompilerOptions = customTarget.compilerOptions ? customTarget.compilerOptions : {};
 
 			customTsconfig.compilerOptions = Object.assign({}, tsconfig.compilerOptions, customCompilerOptions);
