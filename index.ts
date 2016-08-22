@@ -24,6 +24,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	const packageJson = grunt.file.readJSON('package.json');
 
 	const devTasks = [
+		'clean:typings',
 		'typings',
 		'tslint',
 		'clean:dev',
@@ -33,6 +34,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	];
 
 	const distTasks = [
+		'clean:typings',
 		'typings',
 		'tslint',
 		'clean:dist',

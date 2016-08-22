@@ -2,6 +2,9 @@ export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	return {
+		typings: {
+			src: [ 'typings/' ]
+		},
 		dist: {
 			src: [ 'dist/' ]
 		},
