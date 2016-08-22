@@ -155,7 +155,7 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 
 			customTsconfig.compilerOptions = Object.assign({}, tsconfig.compilerOptions, customCompilerOptions);
 
-			grunt.file.write('.tsconfig' + target + '.json', JSON.stringify(tsconfigDistEsm), writeOptions);
+			grunt.file.write('.tsconfig' + target + '.json', JSON.stringify(customTsconfig), writeOptions);
 			customTargets[target] = {
 				tsconfig: {
 					tsconfig: '.tsconfig' + target + '.json',
