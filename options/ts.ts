@@ -12,11 +12,13 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 	const tsconfigDist = Object.assign({}, tsconfig, {
 		include: includeGlob.filter((item: string) => skipTests.indexOf(item) === -1)
 	});
+	const distCompilerOptionsOverride = tsOverrides && tsOverrides.dist && tsOverrides.dist.compilerOptions ? tsOverrides.dist.compilerOptions : {};
 	tsconfigDist.compilerOptions = Object.assign({}, tsconfig.compilerOptions, {
 		outDir: distDir,
 		declaration: true
-	}, tsOverrides.dist);
+	}, distCompilerOptionsOverride);
 
+	const distEsmCompilerOptionsOverride = tsOverrides && tsOverrides.esm && tsOverrides.esm.compilerOptions ? tsOverrides.esm.compilerOptions : {};
 	const tsconfigDistEsm = Object.assign({}, tsconfig, {
 		include: includeGlob.filter((item: string) => skipTests.indexOf(item) === -1)
 	});
@@ -27,7 +29,7 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 		outDir: 'dist/esm',
 		inlineSourceMap: true,
 		inlineSources: true
-	}, tsOverrides.esm);
+	}, distEsmCompilerOptionsOverride);
 
 	grunt.file.write('.tsconfigDist.json', JSON.stringify(tsconfigDist), writeOptions);
 	grunt.file.write('.tsconfigEsm.json', JSON.stringify(tsconfigDistEsm), writeOptions);
