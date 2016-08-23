@@ -58,7 +58,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		staticDefinitionFiles: '**/*.d.ts',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',
 		distDirectory: 'dist/umd/',
-
+		otherOptions: otherOptions,
 		devTasks,
 		distTasks,
 		distESMTasks
