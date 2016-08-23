@@ -29,8 +29,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'tslint',
 		'clean:dev',
 		'ts:dev',
-		'copy:staticTestFiles',
-		'updateTsconfig'
+		'copy:staticTestFiles'
 	];
 
 	const distTasks = [
@@ -39,8 +38,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'tslint',
 		'clean:dist',
 		'ts:dist',
-		'rename:sourceMaps',
-		'dtsGenerator:dist'
+		'rename:sourceMaps'
 	];
 
 	const distESMTasks = [
@@ -75,7 +73,6 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	});
 	grunt.config.merge(options);
 
-	require('./tasks/updateTsconfig')(grunt);
 	require('./tasks/uploadCoverage')(grunt);
 	require('./tasks/installPeerDependencies')(grunt, packageJson);
 	require('./tasks/repl')(grunt, packageJson);
