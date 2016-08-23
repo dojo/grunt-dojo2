@@ -4,7 +4,7 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 	};
 	const distDir = grunt.config.get<any>('distDirectory');
 	const skipTests = grunt.config.get<string[]>('testsGlob');
-	const otherOptions = grunt.config.get<any>('otherOptions');
+	const otherOptions = grunt.config.get<any>('otherOptions') || {};
 	const tsOverrides = otherOptions.ts ? otherOptions.ts : {};
 
 	const includeGlob: string[] = tsconfig.include || [];
