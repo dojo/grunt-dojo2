@@ -46,11 +46,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 		if (dryRun && !executeOnDryRun) {
 			grunt.log.subhead('dry-run (not running)');
 		}
-		grunt.log.ok(`path: ${path}`);
-		grunt.log.ok(`args: ${args}`);
-		grunt.log.ok(`options: ${JSON.stringify(options)}`);
 
 		path = `${path} ${args.join(' ')}`;
+		grunt.log.ok(path);
 
 		if (!dryRun || executeOnDryRun) {
 			return execa.shell(path, args, options);
