@@ -58,6 +58,26 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.resolve({});
 	}
 
+	grunt.registerTask('can-publish-check', 'check whether author can publish', function () {
+		const done = this.async();
+		const whoamiPromise = command(npmBin, ['whoami'], {}, true).then(
+			(result: any) => result.stdout,
+			(err: any) => grunt.fail.fatal('not logged into npm')
+		);
+		const maintainersPromise = command(npmBin, ['view', '.', '--json'], {}, true)
+			.then((result: any) => <string[]> JSON.parse(result.stdout).maintainers)
+			.then((maintainers: string[]) => maintainers.map((maintainer) => maintainer.replace(/\s<.*/, '')));
+
+		return Promise.all([whoamiPromise, maintainersPromise]).then((results) => {
+			const user = results[0];
+			const maintainers = results[1];
+			const isMaintainer = maintainers.indexOf(user) === 0;
+			if (!isMaintainer) {
+				grunt.fail.fatal(`cannot publish this package with user ${user}`);
+			}
+		}).then(done);
+	});
+
 	grunt.registerTask('release-publish', 'publish the package to npm', function () {
 		const done = this.async();
 		const args = ['publish', '.'];
@@ -130,6 +150,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	grunt.registerTask('release', 'release', function () {
 		const tasks = ['dist'];
+		if (!dryRun) {
+			tasks.unshift('can-publish-check');
+		}
+
 		if (preReleaseTag && preReleaseTags.indexOf(preReleaseTag) > -1) {
 			tasks.push('release-version-pre-release-tag');
 		} else if (releaseVersion && nextVersion) {
