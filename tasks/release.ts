@@ -1,5 +1,9 @@
 export = function(grunt: IGrunt, packageJson: any) {
 	const execa = require('execa');
+	const path = require('path');
+	const pkgDir = require('pkg-dir');
+
+	const packagePath = pkgDir.sync(process.cwd());
 	const npmBin = 'npm';
 	const gitBin = 'git';
 	const temp = 'temp/';
@@ -42,16 +46,16 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return packageJson;
 	}
 
-	function command(path: string, args: string[], options: any, executeOnDryRun?: boolean): Promise<any> {
+	function command(bin: string, args: string[], options: any, executeOnDryRun?: boolean): Promise<any> {
 		if (dryRun && !executeOnDryRun) {
 			grunt.log.subhead('dry-run (not running)');
 		}
 
-		path = `${path} ${args.join(' ')}`;
-		grunt.log.ok(path);
+		bin = `${bin} ${args.join(' ')}`;
+		grunt.log.ok(bin);
 
 		if (!dryRun || executeOnDryRun) {
-			return execa.shell(path, args, options);
+			return execa.shell(bin, options);
 		}
 		return Promise.resolve({});
 	}
@@ -126,14 +130,14 @@ export = function(grunt: IGrunt, packageJson: any) {
 		if (nextVersion) {
 			packageJson.version = nextVersion;
 		}
-		grunt.file.write('package.json', JSON.stringify(packageJson, null, '  '));
+		grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
 		grunt.log.subhead(`version of package.json to commit: ${packageJson.version}`);
 		command(gitBin, ['commit', '-am', commitMsg], false);
 	});
 
 	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
 		grunt.log.subhead('making flat package...');
-		const pkg = grunt.file.readJSON(process.cwd() + '/package.json');
+		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 		const dist = grunt.config('copy.staticDefinitionFiles.dest');
 		const tasks = ['copy:temp', 'release-publish', 'clean:temp'];
 
@@ -142,7 +146,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			clean: { temp: [ temp ] }
 		});
 
-		grunt.file.write(temp + 'package.json', JSON.stringify(preparePackageJson(pkg), null, '  '));
+		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(preparePackageJson(pkg), null, '  ') + '\n');
 		grunt.task.run(tasks);
 	});
 
