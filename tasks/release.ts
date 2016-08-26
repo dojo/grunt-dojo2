@@ -15,7 +15,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const dryRun = grunt.option<boolean>('dry-run');
 	const tag = grunt.option<string>('tag');
 
-	const initialPackageJson = grunt.file.readJSON(process.cwd() + '/package.json');
+	const initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 	const commitMsg = '"Update package metadata"';
 
 	function matchesPreReleaseTag(preReleaseTag: string, version: string): string[] {
@@ -78,6 +78,17 @@ export = function(grunt: IGrunt, packageJson: any) {
 				grunt.fail.fatal(`cannot publish this package with user ${user}`);
 			}
 		}).then(done);
+	});
+
+	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function () {
+		const done = this.async();
+		command(gitBin, ['status', '--porcelain'], {}, true)
+			.then((result: any) => {
+				if (result.stdout) {
+					grunt.fail.fatal('repo is not clean');
+				}
+			})
+			.then(done);
 	});
 
 	grunt.registerTask('release-publish', 'publish the package to npm', function () {
@@ -151,7 +162,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	});
 
 	grunt.registerTask('release', 'release', function () {
-		const tasks = ['dist'];
+		const tasks = ['repo-is-clean-check', 'dist'];
 		if (!dryRun) {
 			tasks.unshift('can-publish-check');
 		}
