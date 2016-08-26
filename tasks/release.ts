@@ -53,7 +53,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 
 		bin = `${bin} ${args.join(' ')}`;
-		grunt.log.ok(bin);
+		grunt.log.ok(`${bin} - ${JSON.stringify(options)}`);
 
 		if (!dryRun || executeOnDryRun) {
 			return execa.shell(bin, options);
@@ -101,15 +101,15 @@ export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('release-publish', 'publish the package to npm', function () {
 		const done = this.async();
 		const args = ['publish', '.'];
+		const promises = [command(npmBin, args, { cwd: temp }, false)];
 		if (tag) {
 			args.push('--tag', tag);
 		}
 		grunt.log.subhead('publishing to npm...');
 		if (dryRun) {
-			command(npmBin, ['pack', temp], {}, true).then(done);
-		} else {
-			command(npmBin, args, { cwd: temp }, false).then(done);
+			promises.push(command(npmBin, ['pack', '../' + temp], { cwd: 'dist' }, true));
 		}
+		Promise.all(promises).then(done);
 	});
 
 	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function () {
