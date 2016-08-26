@@ -7,6 +7,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const npmBin = 'npm';
 	const gitBin = 'git';
 	const temp = 'temp/';
+	const defaultBranch = 'master';
 	const preReleaseTags = ['alpha', 'beta', 'rc'];
 
 	const releaseVersion = grunt.option<string>('release-version');
@@ -85,7 +86,13 @@ export = function(grunt: IGrunt, packageJson: any) {
 		command(gitBin, ['status', '--porcelain'], {}, true)
 			.then((result: any) => {
 				if (result.stdout) {
-					grunt.fail.fatal('repo is not clean');
+					grunt.fail.fatal('there are changes in the working tree');
+				}
+			})
+			.then(() => command(gitBin, ['rev-parse', '--abbrev-ref', 'HEAD'], {}, true))
+			.then((result: any) => {
+				if (result.stdout !== defaultBranch) {
+					grunt.fail.fatal(`not on ${defaultBranch} branch`);
 				}
 			})
 			.then(done);
