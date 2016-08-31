@@ -15,6 +15,7 @@ function getTsTaskOptions(grunt: IGrunt, tsconfig: any): any {
 	const distCompilerOptionsOverride = tsOverrides && tsOverrides.dist && tsOverrides.dist.compilerOptions ? tsOverrides.dist.compilerOptions : {};
 	tsconfigDist.compilerOptions = Object.assign({}, tsconfig.compilerOptions, {
 		outDir: distDir,
+		mapRoot: '../dist/umd/_debug',
 		declaration: true
 	}, distCompilerOptionsOverride);
 
