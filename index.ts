@@ -37,8 +37,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings',
 		'tslint',
 		'clean:dist',
-		'ts:dist',
-		'rename:sourceMaps'
+		'ts:dist'
 	];
 
 	const distESMTasks = [
