@@ -144,13 +144,16 @@ export = function(grunt: IGrunt, packageJson: any) {
 	});
 
 	grunt.registerTask('post-release-version', 'update the version post release', function () {
+		const done = this.async();
 		const packageJson = Object.assign({}, initialPackageJson);
 		if (nextVersion) {
 			packageJson.version = nextVersion;
 		}
 		grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
 		grunt.log.subhead(`version of package.json to commit: ${packageJson.version}`);
-		command(gitBin, ['commit', '-am', commitMsg], false);
+		command(gitBin, ['commit', '-am', commitMsg], false)
+			.then(() => grunt.log.subhead('release completed, remember to push back to remote'))
+			.then(done);
 	});
 
 	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
