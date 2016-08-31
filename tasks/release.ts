@@ -172,6 +172,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	});
 
 	grunt.registerTask('release', 'release', function () {
+		grunt.option('remove-links', true);
 		const tasks = ['repo-is-clean-check', 'dist'];
 		if (!dryRun) {
 			tasks.unshift('can-publish-check');

@@ -6,7 +6,10 @@ export = function (grunt: IGrunt) {
 			src: [ 'typings/' ]
 		},
 		dist: {
-			src: [ 'dist/' ]
+			src: [ 'dist/umd/*' ],
+			filter: function (path: string) {
+				return grunt.option('remove-links') ? true : !grunt.file.isLink(path);
+			}
 		},
 		dev: {
 			src: [ '<%= devDirectory %>' ]
@@ -15,7 +18,7 @@ export = function (grunt: IGrunt) {
 			src: [ '{src,tests}/**/*.js' ],
 			filter: function (path: string) {
 				// Only clean the .js file if a .js.map file also exists
-				var mapPath = path + '.map';
+				const mapPath = path + '.map';
 				if (grunt.file.exists(mapPath)) {
 					grunt.file.delete(mapPath);
 					return true;
