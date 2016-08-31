@@ -76,6 +76,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/installPeerDependencies')(grunt, packageJson);
 	require('./tasks/repl')(grunt, packageJson);
 	require('./tasks/run')(grunt, packageJson);
+	require('./tasks/release')(grunt, packageJson);
 
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
