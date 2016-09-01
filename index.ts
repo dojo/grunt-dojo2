@@ -82,6 +82,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		grunt.config.merge(otherOptions);
 	}
 
+	require('./tasks/ts')(grunt);
+
 	// Set some Intern-specific options if specified on the command line.
 	[ 'suites', 'functionalSuites', 'grep' ].forEach(function (option) {
 		const value = grunt.option<string>(option);

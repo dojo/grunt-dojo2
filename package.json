@@ -40,6 +40,7 @@
     "grunt-tslint": ">=3.0.0",
     "grunt-typings": "^0.1.5",
     "pkg-dir": "^1.0.0",
+    "lodash": "^4.15.0",
     "remap-istanbul": ">=0.6.3",
     "resolve-from": "^2.0.0"
   },
