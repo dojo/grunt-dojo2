@@ -17,6 +17,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const preReleaseTag = grunt.option<string>('pre-release-tag');
 	const dryRun = grunt.option<boolean>('dry-run');
 	const tag = grunt.option<string>('tag');
+	const pushBack = grunt.option<boolean>('push-back');
 
 	const initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 	const commitMsg = '"Update package metadata"';
@@ -165,6 +166,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 		grunt.log.subhead(`version of package.json to commit: ${packageJson.version}`);
 		command(gitBin, ['commit', '-am', commitMsg], {}, false)
 			.then(() => {
+				if (!pushBack) {
+					return;
+				}
 				const remote = getGitRemote();
 				if (remote) {
 					return Promise.all([
@@ -172,9 +176,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 						command(gitBin, ['push', <string> remote, '--tags'], {}, false)
 					]);
 				} else {
-					grunt.log.subhead('release completed, but could not find remote to push back to. please manually push the changes.');
+					grunt.log.subhead('could not find remote to push back to. please manually push the changes.');
 				}
 			})
+			.then(() => grunt.log.subhead('release completed'))
 			.then(done);
 	});
 
