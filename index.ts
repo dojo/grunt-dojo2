@@ -77,6 +77,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/repl')(grunt, packageJson);
 	require('./tasks/run')(grunt, packageJson);
 	require('./tasks/release')(grunt, packageJson);
+	require('./tasks/link')(grunt, packageJson);
 
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
