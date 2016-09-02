@@ -42,6 +42,7 @@
     "grunt-typings": "^0.1.5",
     "parse-git-config": "^0.4.2",
     "pkg-dir": "^1.0.0",
+    "lodash": "^4.15.0",
     "remap-istanbul": ">=0.6.3",
     "resolve-from": "^2.0.0"
   },

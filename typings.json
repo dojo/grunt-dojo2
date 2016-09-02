@@ -2,7 +2,8 @@
 	"name": "grunt-dojo2",
 	"main": "index.d.ts",
 	"dependencies": {
-		"chai": "registry:npm/chai#3.5.0+20160415060238"
+		"chai": "registry:npm/chai#3.5.0+20160415060238",
+		"lodash": "registry:npm/lodash#4.0.0+20160723033700"
 	},
 	"globalDependencies": {
 		"digdug": "github:dojo/typings/custom/digdug/digdug.d.ts#a62873258aa1deed48f9882c193c335436100d4b",
