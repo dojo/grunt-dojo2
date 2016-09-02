@@ -46,7 +46,7 @@ export = function(grunt: IGrunt) {
 				const targetDefaultOptions = defaultOptions[target] || {};
 				const targetTsOptions = tsOptions[target] || {};
 
-				_.merge(targetTsconfig, [targetDefaultOptions, targetTsOptions]);
+				_.merge(targetTsconfig, targetDefaultOptions, targetTsOptions);
 				tsconfigFileName = `.tsconfig${target}.json`;
 
 				grunt.file.write(tsconfigFileName, JSON.stringify(targetTsconfig));
