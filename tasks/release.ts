@@ -2,6 +2,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const execa = require('execa');
 	const path = require('path');
 	const pkgDir = require('pkg-dir');
+	const parse = require('parse-git-config');
 
 	const packagePath = pkgDir.sync(process.cwd());
 	const npmBin = 'npm';
@@ -9,12 +10,14 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const temp = 'temp/';
 	const defaultBranch = 'master';
 	const preReleaseTags = ['alpha', 'beta', 'rc'];
+	const gitBaseRemote = 'git@github.com:dojo/';
 
 	const releaseVersion = grunt.option<string>('release-version');
 	const nextVersion = grunt.option<string>('next-version');
 	const preReleaseTag = grunt.option<string>('pre-release-tag');
 	const dryRun = grunt.option<boolean>('dry-run');
 	const tag = grunt.option<string>('tag');
+	const pushBack = grunt.option<boolean>('push-back');
 
 	const initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 	const commitMsg = '"Update package metadata"';
@@ -45,6 +48,16 @@ export = function(grunt: IGrunt, packageJson: any) {
 		packageJson.typings = undefined;
 		packageJson.main = 'main.js';
 		return packageJson;
+	}
+
+	function getGitRemote(): string|boolean {
+		const gitConfig = parse.sync();
+		const remotes = Object.keys(gitConfig)
+			.filter((key) => key.indexOf('remote') === 0)
+			.filter((key) => gitConfig[key].url.indexOf(gitBaseRemote) === 0)
+			.map((key) => gitConfig[key].url);
+
+		return remotes.length ? remotes[0] : false;
 	}
 
 	function command(bin: string, args: string[], options: any, executeOnDryRun?: boolean): Promise<any> {
@@ -151,8 +164,22 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 		grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
 		grunt.log.subhead(`version of package.json to commit: ${packageJson.version}`);
-		command(gitBin, ['commit', '-am', commitMsg], false)
-			.then(() => grunt.log.subhead('release completed, remember to push back to remote'))
+		command(gitBin, ['commit', '-am', commitMsg], {}, false)
+			.then(() => {
+				if (!pushBack) {
+					return;
+				}
+				const remote = getGitRemote();
+				if (remote) {
+					return Promise.all([
+						command(gitBin, ['push', <string> remote, defaultBranch], {}, false),
+						command(gitBin, ['push', <string> remote, '--tags'], {}, false)
+					]);
+				} else {
+					grunt.log.subhead('could not find remote to push back to. please manually push the changes.');
+				}
+			})
+			.then(() => grunt.log.subhead('release completed'))
 			.then(done);
 	});
 
