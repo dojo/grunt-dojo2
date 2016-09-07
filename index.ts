@@ -41,7 +41,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	];
 
 	const distESMTasks = [
-		'ts:dist_esm'
+		'ts:esm'
 	];
 
 	grunt.initConfig({
