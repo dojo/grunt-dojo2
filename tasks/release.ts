@@ -171,15 +171,13 @@ export = function(grunt: IGrunt, packageJson: any) {
 				}
 				const remote = getGitRemote();
 				if (remote) {
-					return Promise.all([
-						command(gitBin, ['push', <string> remote, defaultBranch], {}, false),
-						command(gitBin, ['push', <string> remote, '--tags'], {}, false)
-					]);
+					return command(gitBin, ['push', <string> remote, defaultBranch], {}, false)
+						.then(() => command(gitBin, ['push', <string> remote, '--tags'], {}, false));
 				} else {
-					grunt.log.subhead('could not find remote to push back to. please manually push the changes.');
+					grunt.log.subhead('could not find remote to push back to. please push with tags back to remote');
 				}
 			})
-			.then(() => grunt.log.subhead('release completed'))
+			.then(() => grunt.log.subhead('release completed. please push with tags back to remote'))
 			.then(done);
 	});
 
