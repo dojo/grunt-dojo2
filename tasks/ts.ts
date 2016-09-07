@@ -7,7 +7,9 @@ export = function(grunt: IGrunt) {
 			exclude: ['tests/**/*.ts'],
 			compilerOptions: {
 				outDir: distDirectory,
-				declaration: true
+				declaration: true,
+				sourceMap: true,
+				inlineSources: true
 			}
 		},
 		esm: {
