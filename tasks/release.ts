@@ -12,6 +12,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const preReleaseTags = ['alpha', 'beta', 'rc'];
 	const gitBaseRemote = 'git@github.com:dojo/';
 	const defaultMaintainers = ['sitepen', 'dojotoolkit'];
+	const extraToCopy = ['README.md'];
 
 	const releaseVersion = grunt.option<string>('release-version');
 	const nextVersion = grunt.option<string>('next-version');
@@ -209,6 +210,12 @@ export = function(grunt: IGrunt, packageJson: any) {
 		});
 
 		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(preparePackageJson(pkg), null, '  ') + '\n');
+
+		extraToCopy.forEach((fileName) => {
+			if (grunt.file.exists(fileName)) {
+				grunt.file.copy(fileName, temp + '/' + fileName);
+			}
+		});
 		grunt.task.run(tasks);
 	});
 
