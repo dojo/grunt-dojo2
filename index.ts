@@ -37,7 +37,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings',
 		'tslint',
 		'clean:dist',
-		'ts:dist'
+		'ts:dist',
+		'fixSourceMaps'
 	];
 
 	const distESMTasks = [
@@ -78,6 +79,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/run')(grunt, packageJson);
 	require('./tasks/release')(grunt, packageJson);
 	require('./tasks/link')(grunt, packageJson);
+	require('./tasks/fixSourceMaps')(grunt, packageJson);
 
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
