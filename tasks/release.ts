@@ -11,6 +11,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const defaultBranch = 'master';
 	const preReleaseTags = ['alpha', 'beta', 'rc'];
 	const gitBaseRemote = 'git@github.com:dojo/';
+	const defaultMaintainers = ['sitepen', 'dojotoolkit'];
 
 	const releaseVersion = grunt.option<string>('release-version');
 	const nextVersion = grunt.option<string>('next-version');
@@ -18,6 +19,8 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const dryRun = grunt.option<boolean>('dry-run');
 	const tag = grunt.option<string>('tag');
 	const pushBack = grunt.option<boolean>('push-back');
+	const initial = grunt.option<boolean>('initial');
+	const skipChecks = grunt.option<boolean>('skip-checks');
 
 	const initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 	const commitMsg = '"Update package metadata"';
@@ -60,6 +63,18 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return remotes.length ? remotes[0] : false;
 	}
 
+	function npmPreReleaseVersion(versionInPackage: string, versions: string[]): Promise<any> {
+		const versionToRelease = getNextPreReleaseTagVersion(versionInPackage, versions);
+		const args = ['version', versionToRelease];
+
+		if (dryRun) {
+			args.unshift('--no-git-tag-version');
+		}
+
+		grunt.log.subhead(`version to release: ${versionToRelease}`);
+		return command(npmBin, args, {}, true);
+	}
+
 	function command(bin: string, args: string[], options: any, executeOnDryRun?: boolean): Promise<any> {
 		if (dryRun && !executeOnDryRun) {
 			grunt.log.subhead('dry-run (not running)');
@@ -80,9 +95,14 @@ export = function(grunt: IGrunt, packageJson: any) {
 			(result: any) => result.stdout,
 			(err: any) => grunt.fail.fatal('not logged into npm')
 		);
-		const maintainersPromise = command(npmBin, ['view', '.', '--json'], {}, true)
-			.then((result: any) => <string[]> JSON.parse(result.stdout).maintainers)
-			.then((maintainers: string[]) => maintainers.map((maintainer) => maintainer.replace(/\s<.*/, '')));
+		let maintainersPromise: Promise<string[]>;
+		if (initial) {
+			maintainersPromise = Promise.resolve(defaultMaintainers);
+		} else {
+			maintainersPromise = command(npmBin, ['view', '.', '--json'], {}, true)
+				.then((result: any) => <string[]> JSON.parse(result.stdout).maintainers)
+				.then((maintainers: string[]) => maintainers.map((maintainer) => maintainer.replace(/\s<.*/, '')));
+		}
 
 		return Promise.all([whoamiPromise, maintainersPromise]).then((results) => {
 			const user = results[0];
@@ -128,22 +148,18 @@ export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function () {
 		const done = this.async();
 		const versionInPackage = initialPackageJson.version.replace(/-.*/g, '');
-		command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
-			if (result.stdout) {
-				const versions = <string[]> JSON.parse(result.stdout).versions;
-				const versionToRelease = getNextPreReleaseTagVersion(versionInPackage, versions);
-				const args = ['version', versionToRelease];
-
-				if (dryRun) {
-					args.unshift('--no-git-tag-version');
+		if (initial) {
+			npmPreReleaseVersion(versionInPackage, []).then(done);
+		} else {
+			command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
+				if (result.stdout) {
+					const versions = <string[]> JSON.parse(result.stdout).versions;
+					npmPreReleaseVersion(versionInPackage, versions).then(done);
+				} else {
+					grunt.fail.fatal('failed to fetch versions from npm');
 				}
-
-				grunt.log.subhead(`version to release: ${versionToRelease}`);
-				return command(npmBin, args, {}, true).then(done);
-			} else {
-				grunt.fail.fatal('failed to fetch versions from npm');
-			}
-		});
+			});
+		}
 	});
 
 	grunt.registerTask('release-version-specific', 'set the version manually', function () {
@@ -198,9 +214,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	grunt.registerTask('release', 'release', function () {
 		grunt.option('remove-links', true);
-		const tasks = ['repo-is-clean-check', 'dist'];
-		if (!dryRun) {
-			tasks.unshift('can-publish-check');
+		const tasks = ['dist'];
+
+		if (!skipChecks) {
+			tasks.unshift('can-publish-check', 'repo-is-clean-check');
 		}
 
 		if (preReleaseTag && preReleaseTags.indexOf(preReleaseTag) > -1) {
