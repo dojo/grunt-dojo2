@@ -154,7 +154,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 		} else {
 			command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
 				if (result.stdout) {
-					const versions = <string[]> JSON.parse(result.stdout).versions;
+					const time = JSON.parse(result.stdout).time;
+					const versions = Object.keys(time).filter((key) => {
+						return ['created', 'modified'].indexOf(key) < 0;
+					});
 					npmPreReleaseVersion(versionInPackage, versions).then(done);
 				} else {
 					grunt.fail.fatal('failed to fetch versions from npm');
