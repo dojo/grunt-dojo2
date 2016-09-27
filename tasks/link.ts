@@ -23,7 +23,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			() => {}
 		);
 
-		execa.shell(`npm link ${targetPath}`)
+		execa.shell('npm link', { cwd: targetPath })
 			.then((result: any) => grunt.log.ok(result.stdout))
 			.then(done);
 	});
