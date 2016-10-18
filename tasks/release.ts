@@ -226,6 +226,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 		grunt.option('remove-links', true);
 		const tasks = ['dist'];
 
+		if (skipChecks && !dryRun) {
+			grunt.fail.fatal('you can only skip-checks on a dry-run!');
+		}
+
 		if (!skipChecks) {
 			tasks.unshift('can-publish-check', 'repo-is-clean-check');
 		}
