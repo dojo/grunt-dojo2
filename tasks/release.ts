@@ -108,7 +108,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.all([whoamiPromise, maintainersPromise]).then((results) => {
 			const user = results[0];
 			const maintainers = results[1];
-			const isMaintainer = maintainers.indexOf(user) === 0;
+			const isMaintainer = maintainers.indexOf(user) > -1;
 			if (!isMaintainer) {
 				grunt.fail.fatal(`cannot publish this package with user ${user}`);
 			}
