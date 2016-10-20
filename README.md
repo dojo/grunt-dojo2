@@ -99,7 +99,7 @@ src: {
 
 The `grunt ts` task is preconfigured with to targets, `dev` and `dist`. The tasks both use the a projects `tsconfig.json` but the `dist` task applies the following specific overrides:
 
-```json
+```
 {
 	compilerOptions: {
 		outDir: distDirectory,
