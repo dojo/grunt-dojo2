@@ -72,25 +72,23 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return packageJson;
 	}
 
-	function remapDependencies(packageJson: any): any {
-		if (packageJson.dependencies) {
-			Object.keys(packageJson.dependencies).forEach((dependency) => {
-				const esmDependency = umdToEsmMap[dependency];
-				if (esmDependency) {
-					packageJson.dependencies[esmDependency] = packageJson.dependencies[dependency];
-					delete packageJson.dependencies[dependency];
+	function remapDependencies(packageJson: any, key: string): void {
+		if (packageJson[key]) {
+			Object.keys(packageJson[key]).forEach((dependencyName) => {
+				const esmDependencyName = umdToEsmMap[dependencyName];
+				if (esmDependencyName) {
+					packageJson[key][esmDependencyName] = packageJson[key][dependencyName];
+					delete packageJson[key][dependencyName];
 				}
 			});
 		}
-		if (packageJson.peerDependencies) {
-			Object.keys(packageJson.peerDependencies).forEach((dependency) => {
-				const esmDependency = umdToEsmMap[dependency];
-				if (esmDependency) {
-					packageJson.peerDependencies[esmDependency] = packageJson.peerDependencies[dependency];
-					delete packageJson.peerDependencies[dependency];
-				}
-			});
-		}
+	}
+
+	function preparePackageJsonForEsm(packageJson: any): any {
+		preparePackageJson(packageJson);
+		packageJson.name = `${packageJson.name}-esm`;
+		remapDependencies(packageJson, 'dependencies');
+		remapDependencies(packageJson, 'peerDependencies');
 		return packageJson;
 	}
 
@@ -277,7 +275,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			clean: { temp: [ temp ] }
 		});
 
-		const packageJson = remapDependencies(preparePackageJson(pkg));
+		const packageJson = preparePackageJsonForEsm(pkg);
 		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(packageJson, null, '  ') + '\n');
 		grunt.task.run(tasks);
 	});
