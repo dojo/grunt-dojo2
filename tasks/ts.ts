@@ -19,7 +19,6 @@ export = function(grunt: IGrunt) {
 				module: 'es6',
 				outDir: 'dist/esm',
 				sourceMap: true,
-				inlineSourceMap: true,
 				inlineSources: true
 			}
 		}
