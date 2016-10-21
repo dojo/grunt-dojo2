@@ -17,8 +17,8 @@ export = function(grunt: IGrunt) {
 			compilerOptions: {
 				target: 'es5',
 				module: 'es6',
-				sourceMap: false,
 				outDir: 'dist/esm',
+				sourceMap: true,
 				inlineSourceMap: true,
 				inlineSources: true
 			}
