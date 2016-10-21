@@ -15,9 +15,10 @@ export = function(grunt: IGrunt) {
 		esm: {
 			exclude: ['tests/**/*.ts'],
 			compilerOptions: {
+				outDir: 'dist/esm',
+				declaration: true,
 				target: 'es5',
 				module: 'es6',
-				outDir: 'dist/esm',
 				sourceMap: true,
 				inlineSources: true
 			}
