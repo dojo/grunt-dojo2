@@ -241,28 +241,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
-	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
-		grunt.log.subhead('making flat package...');
-		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
-		const dist = grunt.config('copy.staticDefinitionFiles.dest');
-		const tasks = ['copy:temp', 'release-publish', 'clean:temp'];
-
-		grunt.config.merge({
-			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
-			clean: { temp: [ temp ] }
-		});
-
-		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(preparePackageJson(pkg), null, '  ') + '\n');
-
-		extraToCopy.forEach((fileName) => {
-			if (grunt.file.exists(fileName)) {
-				grunt.file.copy(fileName, temp + '/' + fileName);
-			}
-		});
-		grunt.task.run(tasks);
-	});
-
-	grunt.registerTask('rewrite-paths', 'rewrite paths to point to esm pacakges', function () {
+	grunt.registerTask('esm-rewrite-paths', 'rewrite paths to point to esm pacakges', function () {
 		const src = [ `${temp}/**/*.js` ];
 		grunt.file.expand({}, src).forEach(function(path) {
 			const contents = babel.transformFileSync(path, {
@@ -276,13 +255,22 @@ export = function(grunt: IGrunt, packageJson: any) {
 			}).code;
 			grunt.file.write(path, contents);
 		});
+
+	});
+
+	grunt.registerTask('copy-extras', 'copy any additional files as part of the release', function () {
+		extraToCopy.forEach((fileName) => {
+			if (grunt.file.exists(fileName)) {
+				grunt.file.copy(fileName, temp + '/' + fileName);
+			}
+		});
 	});
 
 	grunt.registerTask('release-publish-esm', 'publish the esm package', function () {
 		grunt.log.subhead('making esm package...');
 		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 		const dist = 'dist/esm';
-		const tasks = ['copy:temp', 'rewrite-paths', 'release-publish', 'clean:temp'];
+		const tasks = ['copy-extras', 'copy:temp', 'esm-rewrite-paths', 'release-publish', 'clean:temp'];
 
 		grunt.config.merge({
 			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
@@ -291,12 +279,21 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 		const packageJson = remapDependencies(preparePackageJson(pkg));
 		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(packageJson, null, '  ') + '\n');
+		grunt.task.run(tasks);
+	});
 
-		extraToCopy.forEach((fileName) => {
-			if (grunt.file.exists(fileName)) {
-				grunt.file.copy(fileName, temp + '/' + fileName);
-			}
+	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
+		grunt.log.subhead('making flat package...');
+		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
+		const dist = 'dist/umd';
+		const tasks = ['copy-extras', 'copy:temp', 'release-publish', 'clean:temp'];
+
+		grunt.config.merge({
+			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
+			clean: { temp: [ temp ] }
 		});
+
+		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(preparePackageJson(pkg), null, '  ') + '\n');
 		grunt.task.run(tasks);
 	});
 
