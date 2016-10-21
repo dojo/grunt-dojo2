@@ -42,7 +42,12 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	];
 
 	const distESMTasks = [
-		'ts:esm'
+		'clean:typings',
+		'typings',
+		'tslint',
+		'clean:dist_esm',
+		'ts:esm',
+		'fixSourceMaps'
 	];
 
 	grunt.initConfig({

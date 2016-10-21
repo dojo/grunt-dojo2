@@ -11,6 +11,12 @@ export = function (grunt: IGrunt) {
 				return grunt.option('remove-links') ? true : !grunt.file.isLink(path);
 			}
 		},
+		dist_esm: {
+			src: [ 'dist/esm/*' ],
+			filter: function (path: string) {
+				return grunt.option('remove-links') ? true : !grunt.file.isLink(path);
+			}
+		},
 		dev: {
 			src: [ '<%= devDirectory %>' ]
 		},

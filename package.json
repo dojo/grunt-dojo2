@@ -29,6 +29,8 @@
   "license": "BSD-3-Clause",
   "typings": "index.d.ts",
   "dependencies": {
+    "babel-core": "^6.17.0",
+    "babel-plugin-module-resolver": "^2.2.0",
     "codecov.io": ">=0.1.6",
     "dts-generator": ">=1.7.0",
     "execa": "^0.4.0",
@@ -40,9 +42,9 @@
     "grunt-ts": ">=5.0.0",
     "grunt-tslint": ">=3.0.0",
     "grunt-typings": "^0.1.5",
+    "lodash": "^4.15.0",
     "parse-git-config": "^0.4.2",
     "pkg-dir": "^1.0.0",
-    "lodash": "^4.15.0",
     "remap-istanbul": ">=0.6.3",
     "resolve-from": "^2.0.0"
   },
