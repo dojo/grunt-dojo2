@@ -75,29 +75,165 @@ module.exports = function (grunt) {
 };
 ```
 
-### Usage
+### Tasks
 
-Once configured, there are several Grunt commands that are available.  The default task
-will do a development build, including the tests:
+#### grunt tslint
 
-```
-$ grunt
-```
-
-This is also available as `grunt dev`.
-
-To test locally:
+The `grunt tslint` task, runs tslint with the following configuration.
 
 ```
-$ grunt test
+options: {
+	configuration: grunt.file.readJSON('tslint.json')
+},
+src: {
+	src: [
+		'<%= all %>',
+		'!typings/**/*.ts',
+		'!tests/typings/**/*.ts',
+		'!node_modules/**/*.ts'
+	]
+}
 ```
 
-To build a distribution, there are currently two tasks:
+#### grunt ts
+
+The `grunt ts` task is preconfigured with to targets, `dev` and `dist`. The tasks both use the a projects `tsconfig.json` but the `dist` task applies the following specific overrides:
 
 ```
-$ grunt dist
-$ grunt dist_esm
+{
+	compilerOptions: {
+		outDir: distDirectory,
+		declaration: true
+	},
+	exclude: ['tests/**/*.ts']
+}
 ```
 
-The second one should be run after the first one and compiles the package to ES6 modules with
-an ES6+ target for TypeScript.
+Where the `distDirectory` is defaulted to `dist/umd`.
+
+It is possible to create custom targets for the `ts` by adding an entry to the grunt config, such as:
+
+```
+"ts": {
+	"custom": {
+		"compilerOptions": {
+			"target": "es6",
+			"module": "commonjs"
+		}
+	}
+}
+```
+
+The custom ts config can be run using `grunt ts:custom`.
+
+#### grunt intern
+
+The intern task provides multiple preconfigured targets
+
+```
+options: {
+	runType: 'runner',
+	config: '<%= devDirectory %>/tests/intern',
+	reporters: [ 'Runner' ]
+},
+browserstack: {},
+	saucelabs: {
+		options: {
+			config: '<%= devDirectory %>/tests/intern-saucelabs'
+		}
+	},
+remote: {},
+local: {
+	options: {
+		config: '<%= devDirectory %>/tests/intern-local',
+	}
+},
+node: {
+	options: {
+		runType: 'client'
+	}
+},
+proxy: {
+	options: {
+		proxyOnly: true
+	}
+}
+```
+
+#### grunt link
+
+The link task it designed to ease the local development and testing of changes that span multiple packages. Traditionally `npm link` can be used but this assumes that project structure is the same as the distrubtion, which for dojo2 projects is not the case. 
+
+This command emulates the behaviour of `npm link` but with some additional steps to ensure that the linked structure matches that of the distrubuted package.
+
+Once `grunt link` has been run within a dojo2 package, `npm link` can be used as normal to created the linked package depedency.
+
+*Example*
+
+```shell
+npm link dojo-widgets
+```
+
+#### grunt release
+
+The release task automates all the steps involved in building, tagging and publishing a dojo2 package.
+
+```shell
+grunt release --pre-release-tag=alpha
+```
+
+**note:** 
+
+1. Task runs the `dist` pipelines as a prequisite.
+2. Requires being logged into NPM unless using the `dry-run` options
+
+#####Options
+
+The `pre-release-tag` is required, the other options are all optional.
+
+- `pre-release-tag`- determines the pre-release tag used for the published version (usually `alpha`, `beta` or `rc`)
+- `dry-run` - performs the release in dry run mode, no commits, tags or publishing occur. The generated package is built into the `dist` directory.
+- `initial` - indicates that it is an initial release of an asset and therefore assumes the version rather than using `npm veiw`.
+- `skip-checks` - skips checks against the registered maintainers, only available with `dry-run`
+- `push-back` - automatically pushes back to github (tags and commits)
+
+### Pipelines
+
+#### dev
+
+The running `grunt dev` will execute the dev pipeline which as follows:
+
+- `clean:typings`
+- `typings`
+- `tslint`
+- `clean:dev`
+- `ts:dev`
+- `copy:staticTestFiles`
+
+#### dist
+
+The running `grunt dist` will execute the dist pipeline which as follows:
+
+- `clean:typings`
+- `typings`
+- `tslint`
+- `clean:dist`
+- `ts:dist`
+
+#### test
+
+The running `grunt test` will execute the test pipeline which as follows:
+
+- `clean:coverage`
+- `dev`
+- `intern:node`
+- `remapIstanbul:coverage`
+- `clean:coverage`
+
+#### Default (grunt)
+
+Running `grunt` will execute the default pipeline which as follows:
+
+- `clean`
+- `dev`
+
