@@ -37,6 +37,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings',
 		'tslint',
 		'clean:dist',
+		'copy:staticDefinitionFiles',
 		'ts:dist',
 		'fixSourceMaps'
 	];
