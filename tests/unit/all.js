@@ -1,4 +1,12 @@
 define([
+	'./tasks/fixSourceMaps',
+	'./tasks/installPeerDependencies',
+	'./tasks/link',
+	'./tasks/release',
 	'./tasks/rename',
-	'./tasks/uploadCoverage'
+	'./tasks/repl',
+	'./tasks/run',
+	'./tasks/ts',
+	'./tasks/uploadCoverage',
+	'./lib/load-dojo-loader'
 ], function () {});

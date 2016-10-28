@@ -4,3 +4,4 @@
 lcov.info
 !/tests/**/*.js
 .tsConfig*.json
+html-report

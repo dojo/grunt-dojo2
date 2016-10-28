@@ -1,35 +1,43 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!grunt'
-], function (registerSuite, assert, grunt) {
+	'intern/dojo/node!grunt',
+	'../util'
+], function(registerSuite, assert, grunt, util) {
 
-	/* creating a mock for logging */
-	var logStack = [];
-	var log = function log() {
-		logStack.push(arguments);
-	};
-	log.logStack = logStack;
+	var coverageFileName = 'coverage-final.lcov';
+	var coverageDataSent = '';
 
-	function runGruntTask(taskName, callback) {
-		var task = grunt.task._taskPlusArgs(taskName);
-		task.task.fn.apply({
-			nameArgs: task.nameArgs,
-			name: task.task.name,
-			args: task.args,
-			flags: task.flags,
-			async: function() { return callback; }
-		}, task.args);
+	function sendCodeCov(contents, callback) {
+		coverageDataSent = contents;
+		callback('error');
 	}
 
 	registerSuite({
 		name: 'tasks/uploadCoverage',
-		setup: function () {
+		setup() {
 			grunt.initConfig({});
-			grunt.loadTasks('tasks');
+
+			util.loadTasks({
+				'codecov.io/lib/sendToCodeCov.io': sendCodeCov
+			});
+
+			grunt.file.write(coverageFileName, JSON.stringify({
+				hello: 'world'
+			}));
 		},
-		basic: function () {
-			console.log('stub test');
+		teardown() {
+			util.unloadTasks();
+
+			grunt.file.delete(coverageFileName);
+		},
+		propagatesReturnValue() {
+			var dfd = this.async();
+
+			util.runGruntTask('uploadCoverage', dfd.callback((error) => {
+				assert.strictEqual(error, 'error');
+				assert.deepEqual(JSON.parse(coverageDataSent), { hello: 'world' });
+			}));
 		}
 	});
 });

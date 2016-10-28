@@ -1,44 +1,57 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!grunt'
-], function (registerSuite, assert, grunt) {
+	'intern/dojo/node!grunt',
+	'../util'
+], function(registerSuite, assert, grunt, util) {
 
-	/* creating a mock for logging */
-	var logStack = [];
-	var log = function log() {
-		logStack.push(arguments);
-	};
-	log.logStack = logStack;
-
-	function runGruntTask(taskName, callback) {
-		var task = grunt.task._taskPlusArgs(taskName);
-		task.task.fn.apply({
-			nameArgs: task.nameArgs,
-			name: task.task.name,
-			args: task.args,
-			flags: task.flags,
-			async: function() { return callback; }
-		}, task.args);
-	}
+	var inputDirectory = util.getInputDirectory();
+	var outputPath = util.getOutputDirectory();
 
 	registerSuite({
 		name: 'tasks/rename',
-		setup: function () {
+		setup() {
 			grunt.initConfig({
 				rename: {
-					sourceMaps: {
+					textFiles: {
 						expand: true,
-						cwd: 'dist/',
-						src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
-						dest: 'dist/_debug/'
+						cwd: inputDirectory,
+						src: ['**/*.txt'],
+						dest: outputPath
 					}
 				}
 			});
-			grunt.loadTasks('tasks');
+
+			util.loadTasks();
 		},
-		basic: function () {
-			console.log('stub test');
+		teardown() {
+			util.unloadTasks();
+		},
+		basic: {
+			beforeEach() {
+				util.prepareInputDirectory();
+				util.prepareOutputDirectory();
+			},
+
+			afterEach() {
+				util.cleanInputDirectory();
+				util.cleanOutputDirectory();
+			},
+
+			textFilesOnly() {
+				util.createDummyFile('file1.txt');
+				util.createDummyFile('file2');
+				util.createDummyDirectory('dir.txt');
+
+				util.runGruntTask('rename:textFiles');
+
+				assert.isFalse(util.fileExistsInInputDirectory('file1.txt'), 'file1.txt should not be in input directory');
+				assert.isTrue(util.fileExistsInOutputDirectory('file1.txt'), 'file1.txt should have been moved to output directory');
+				assert.isTrue(util.fileExistsInInputDirectory('file2'), 'file2 should still be in input directory');
+				assert.isFalse(util.fileExistsInOutputDirectory('file2'), 'file2 should not be in output directory');
+				assert.isFalse(util.fileExistsInInputDirectory('dir.txt'), 'dir.txt directory should not be in input directory');
+				assert.isTrue(util.fileExistsInOutputDirectory('dir.txt'), 'dir.txt directory should be in output directory');
+			}
 		}
 	});
 });

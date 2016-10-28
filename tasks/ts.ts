@@ -27,6 +27,7 @@ export = function(grunt: IGrunt) {
 
 	grunt.registerTask('ts', <any> function () {
 		grunt.loadNpmTasks('grunt-ts');
+
 		const flags = this.args && this.args.length ? this.args : [ 'dev' ];
 		const tsconfig = grunt.config.get<any>('tsconfig');
 		const tsOptions = grunt.config.get<any>('ts') || {};
@@ -39,18 +40,17 @@ export = function(grunt: IGrunt) {
 
 		const tasks: string[] = [];
 		flags.forEach((target: string) => {
-			const targetTsconfig = _.cloneDeep(tsconfig);
 			let tsconfigFileName = 'tsconfig.json';
 
 			tasks.push(`ts:${target}`);
 			// dev task cannot be configured outside of projects tsconfig
 			if (target !== 'dev') {
+				const targetTsconfig = _.cloneDeep(tsconfig);
 				const targetDefaultOptions = defaultOptions[target] || {};
 				const targetTsOptions = tsOptions[target] || {};
 
 				_.merge(targetTsconfig, targetDefaultOptions, targetTsOptions);
 				tsconfigFileName = `.tsconfig${target}.json`;
-
 				grunt.file.write(tsconfigFileName, JSON.stringify(targetTsconfig));
 				grunt.config.set(`clean.${target}Tsconfig`, { src: tsconfigFileName});
 

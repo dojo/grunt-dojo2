@@ -117,7 +117,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function () {
 		const done = this.async();
-		command(gitBin, ['status', '--porcelain'], {}, true)
+		return command(gitBin, ['status', '--porcelain'], {}, true)
 			.then((result: any) => {
 				if (result.stdout) {
 					grunt.fail.fatal('there are changes in the working tree');
@@ -143,16 +143,16 @@ export = function(grunt: IGrunt, packageJson: any) {
 		if (dryRun) {
 			promises.push(command(npmBin, ['pack', '../' + temp], { cwd: 'dist' }, true));
 		}
-		Promise.all(promises).then(done);
+		return Promise.all(promises).then(done);
 	});
 
 	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function () {
 		const done = this.async();
 		const versionInPackage = initialPackageJson.version.replace(/-.*/g, '');
 		if (initial) {
-			npmPreReleaseVersion(versionInPackage, []).then(done);
+			return npmPreReleaseVersion(versionInPackage, []).then(done);
 		} else {
-			command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
+			return command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
 				if (result.stdout) {
 					const time = JSON.parse(result.stdout).time;
 					const versions = Object.keys(time).filter((key) => {
@@ -173,7 +173,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			args.unshift('--no-git-tag-version');
 		}
 		grunt.log.subhead(`version to release: ${releaseVersion}`);
-		command(npmBin, args, {}, true).then(done);
+		return command(npmBin, args, {}, true).then(done);
 	});
 
 	grunt.registerTask('post-release-version', 'update the version post release', function () {
@@ -184,7 +184,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 		grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
 		grunt.log.subhead(`version of package.json to commit: ${packageJson.version}`);
-		command(gitBin, ['commit', '-am', commitMsg], {}, false)
+		return command(gitBin, ['commit', '-am', commitMsg], {}, false)
 			.then(() => {
 				if (!pushBack) {
 					return;
