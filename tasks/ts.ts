@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import ITask = grunt.task.ITask;
 
 export = function(grunt: IGrunt) {
 	const distDirectory = grunt.config.get<string>('distDirectory');
@@ -25,7 +26,7 @@ export = function(grunt: IGrunt) {
 		}
 	};
 
-	grunt.registerTask('ts', <any> function () {
+	grunt.registerTask('ts', <any> function (this: ITask) {
 		grunt.loadNpmTasks('grunt-ts');
 
 		const flags = this.args && this.args.length ? this.args : [ 'dev' ];

@@ -1,3 +1,5 @@
+import ITask = grunt.task.ITask;
+
 export = function(grunt: IGrunt, packageJson: any) {
 	const execa = require('execa');
 	const path = require('path');
@@ -28,7 +30,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	function matchesPreReleaseTag(preReleaseTag: string, version: string): string[] {
 		const regexp = new RegExp(`(.*)-(${preReleaseTag})\\.(\\d+)`);
-		return regexp.exec(version);
+		return regexp.exec(version) || [];
 	}
 
 	function matchesVersion(version1: string, version2: string): boolean {
@@ -90,7 +92,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.resolve({});
 	}
 
-	grunt.registerTask('can-publish-check', 'check whether author can publish', function () {
+	grunt.registerTask('can-publish-check', 'check whether author can publish', function (this: ITask) {
 		const done = this.async();
 		const whoamiPromise = command(npmBin, ['whoami'], {}, true).then(
 			(result: any) => result.stdout,
@@ -115,7 +117,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}).then(done);
 	});
 
-	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function () {
+	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function (this: ITask) {
 		const done = this.async();
 		return command(gitBin, ['status', '--porcelain'], {}, true)
 			.then((result: any) => {
@@ -132,7 +134,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
-	grunt.registerTask('release-publish', 'publish the package to npm', function () {
+	grunt.registerTask('release-publish', 'publish the package to npm', function (this: ITask) {
 		const done = this.async();
 		const args = ['publish', '.'];
 		const promises = [command(npmBin, args, { cwd: temp }, false)];
@@ -146,7 +148,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.all(promises).then(done);
 	});
 
-	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function () {
+	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function (this: ITask) {
 		const done = this.async();
 		const versionInPackage = initialPackageJson.version.replace(/-.*/g, '');
 		if (initial) {
@@ -166,7 +168,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 	});
 
-	grunt.registerTask('release-version-specific', 'set the version manually', function () {
+	grunt.registerTask('release-version-specific', 'set the version manually', function (this: ITask) {
 		const done = this.async();
 		const args = ['version', releaseVersion];
 		if (dryRun) {
@@ -176,7 +178,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return command(npmBin, args, {}, true).then(done);
 	});
 
-	grunt.registerTask('post-release-version', 'update the version post release', function () {
+	grunt.registerTask('post-release-version', 'update the version post release', function (this: ITask) {
 		const done = this.async();
 		const packageJson = Object.assign({}, initialPackageJson);
 		if (nextVersion) {

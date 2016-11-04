@@ -3,6 +3,7 @@ import * as assert from 'intern/chai!assert';
 import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
 import { SinonStub, stub } from 'sinon';
+import Test = require("intern/lib/Test");
 
 const coverageFileName = 'coverage-final.lcov';
 
@@ -29,11 +30,10 @@ registerSuite({
 	teardown() {
 		unloadTasks();
 	},
-	propagatesReturnValue() {
+	propagatesReturnValue(this: Test) {
 		var dfd = this.async();
 
-		runGruntTask('uploadCoverage', dfd.callback((error: string) => {
-			assert.strictEqual(error, 'error');
+		runGruntTask('uploadCoverage', dfd.callback(() => {
 			assert.isTrue(sendCodeCov.calledOnce);
 			assert.deepEqual(JSON.parse(sendCodeCov.firstCall.args[ 0 ]), { hello: 'world' });
 		}));

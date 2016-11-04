@@ -4,6 +4,7 @@ import * as grunt from 'grunt';
 import { stub, SinonStub } from 'sinon';
 import * as path from 'path';
 import { unloadTasks, loadTasks, runGruntTask } from '../util';
+import Test = require("intern/lib/Test");
 
 let shell: SinonStub = stub();
 let originalOptions: {
@@ -55,7 +56,7 @@ registerSuite({
 				taskUnloader();
 			},
 
-			'logged out of npm'() {
+			'logged out of npm'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader();
@@ -78,7 +79,7 @@ registerSuite({
 				}));
 			},
 
-			'not a maintainer'() {
+			'not a maintainer'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader();
@@ -99,7 +100,7 @@ registerSuite({
 				}));
 			},
 
-			'dry run run commands anyways'() {
+			'dry run run commands anyways'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
@@ -124,7 +125,7 @@ registerSuite({
 				}));
 			},
 
-			'initial run uses default maintainers'() {
+			'initial run uses default maintainers'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
@@ -157,7 +158,7 @@ registerSuite({
 				failStub.restore();
 			},
 
-			'changes on working tree'() {
+			'changes on working tree'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader();
@@ -173,7 +174,7 @@ registerSuite({
 				}));
 			},
 
-			'not on default branch'() {
+			'not on default branch'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader();
@@ -191,7 +192,7 @@ registerSuite({
 				}));
 			},
 
-			'success'() {
+			'success'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader();
@@ -218,7 +219,7 @@ registerSuite({
 			taskUnloader();
 		},
 
-		'without a tag'() {
+		'without a tag'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader();
@@ -233,7 +234,7 @@ registerSuite({
 			}));
 		},
 
-		'with a tag'() {
+		'with a tag'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader(undefined, {
@@ -250,7 +251,7 @@ registerSuite({
 			}));
 		},
 
-		'dry run'() {
+		'dry run'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader(undefined, {
@@ -284,7 +285,7 @@ registerSuite({
 				taskUnloader();
 			},
 
-			'initial, no dry run'() {
+			'initial, no dry run'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
@@ -306,7 +307,7 @@ registerSuite({
 				}));
 			},
 
-			'initial, dry run'() {
+			'initial, dry run'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
@@ -328,7 +329,7 @@ registerSuite({
 					assert(false, 'should have succeeded');
 				}));
 			},
-			'regular w/ bad output'() {
+			'regular w/ bad output'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
@@ -344,7 +345,7 @@ registerSuite({
 					assert.isTrue(shell.calledOnce);
 				}));
 			},
-			'regular'() {
+			'regular'(this: Test) {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
@@ -384,7 +385,7 @@ registerSuite({
 		afterEach() {
 			taskUnloader();
 		},
-		'dry run'() {
+		'dry run'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader(undefined, {
@@ -399,7 +400,7 @@ registerSuite({
 				assert.isTrue(shell.calledOnce);
 			}));
 		},
-		'regular'() {
+		'regular'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader(undefined, {
@@ -430,7 +431,7 @@ registerSuite({
 			grunt.file.delete('package.json.bak');
 		},
 
-		'without next version, without push back'() {
+		'without next version, without push back'(this: Test) {
 			const dfd = this.async();
 
 			const originalPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
@@ -449,7 +450,7 @@ registerSuite({
 			}));
 		},
 
-		'without next version'() {
+		'without next version'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader(undefined, {
@@ -485,7 +486,7 @@ registerSuite({
 			}));
 		},
 
-		'no remotes'() {
+		'no remotes'(this: Test) {
 			const dfd = this.async();
 
 			taskLoader(undefined, {
@@ -513,7 +514,7 @@ registerSuite({
 			}));
 		},
 
-		'next version'() {
+		'next version'(this: Test) {
 			const dfd = this.async();
 
 			const originalPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
@@ -607,7 +608,7 @@ registerSuite({
 			},
 
 			'skipChecks on non dry run'() {
-				let caughtError: Error = null;
+				let caughtError: Error | null = null;
 
 				taskLoader(undefined, {
 					'dry-run': false,
@@ -625,7 +626,7 @@ registerSuite({
 			},
 
 			'run with no version'() {
-				let caughtError: Error = null;
+				let caughtError: Error | null = null;
 
 				taskLoader(undefined, {});
 

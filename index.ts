@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as glob from 'glob';
+import ITask = grunt.task.ITask;
 
 function formatGlob(tsconfigGlob: string[]): string[] {
 	return tsconfigGlob.map(function (glob: string) {
@@ -91,7 +92,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	// Set some Intern-specific options if specified on the command line.
 	[ 'suites', 'functionalSuites', 'grep' ].forEach(function (option) {
 		const value = grunt.option<string>(option);
-		let splitValue: string[];
+		let splitValue: string[] | undefined;
 		if (value) {
 			if (option !== 'grep') {
 				splitValue = value.split(',').map(function (string) { return string.trim(); });
@@ -110,7 +111,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	}
 	setCombined(grunt.option<boolean>('combined'));
 
-	grunt.registerTask('test', <any> (function () {
+	grunt.registerTask('test', <any> (function (this: ITask) {
 		const flags = Object.keys(this.flags);
 
 		if (!flags.length) {

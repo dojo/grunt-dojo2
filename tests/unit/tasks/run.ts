@@ -3,6 +3,7 @@ import * as assert from 'intern/chai!assert';
 import * as grunt from 'grunt';
 import { stub } from 'sinon';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
+import Test = require("intern/lib/Test");
 
 const requireStub = stub();
 
@@ -27,7 +28,7 @@ registerSuite({
 	beforeEach() {
 		requireStub.reset();
 	},
-	runsDefault() {
+	runsDefault(this: Test) {
 		var dfd = this.async(1000);
 
 		runGruntTask('run', () => {
@@ -38,7 +39,7 @@ registerSuite({
 			assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'src/main' ]);
 		}), 100);
 	},
-	runsArgument() {
+	runsArgument(this: Test) {
 		var dfd = this.async(1000);
 
 		grunt.option('main', 'my-main');

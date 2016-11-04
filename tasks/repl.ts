@@ -1,3 +1,5 @@
+import ITask = grunt.task.ITask;
+
 const repl = require('repl');
 
 import loadDojoLoader from '../lib/load-dojo-loader';
@@ -5,7 +7,7 @@ import loadDojoLoader from '../lib/load-dojo-loader';
 const resolveFrom = require('resolve-from');
 
 export = function(grunt: IGrunt, packageJson: any) {
-	grunt.registerTask('repl', 'Bootstrap dojo-loader and start a Node.js REPL', function () {
+	grunt.registerTask('repl', 'Bootstrap dojo-loader and start a Node.js REPL', function (this: ITask) {
 		this.async(); // Ensure Grunt doesn't exit the process.
 
 		const { baseUrl, packages, require: dojoRequire } = loadDojoLoader(packageJson);

@@ -2,6 +2,7 @@ import * as registerSuite from 'intern!object';
 import * as assert from 'intern/chai!assert';
 import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
+import Test = require("intern/lib/Test");
 
 let fakeRepl: any = {};
 const fakeDojoRequire = function () {
@@ -47,7 +48,7 @@ registerSuite({
 		unloadTasks();
 	},
 
-	repl() {
+	repl(this: Test) {
 		const dfd = this.async();
 
 		runGruntTask('repl');

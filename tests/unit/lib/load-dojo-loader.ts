@@ -20,11 +20,11 @@ registerSuite({
 			return '/' + mid;
 		});
 
-		let configBaseUrl: string;
+		let configBaseUrl: string = '';
 		let configPackages: {
 			name: string,
 			location: string
-		}[];
+		}[] = [];
 
 		let fakeRequire = {
 			require: function () {

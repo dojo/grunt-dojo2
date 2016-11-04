@@ -2,6 +2,7 @@ import * as grunt from 'grunt';
 import * as path from 'path';
 import * as mockery from 'mockery';
 import * as _ from 'lodash';
+import ITask = grunt.task.ITask;
 
 export interface MockList {
 	[key: string]: any;
@@ -89,7 +90,6 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 	}
 
 	grunt.registerTask('clean', 'Clean mock task', () => {
-		console.log('Cleaning ' + this.args[ 0 ] + '...');
 	});
 
 	var packageJson = grunt.file.readJSON('package.json');
