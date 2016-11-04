@@ -3,7 +3,7 @@
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"listFiles": true,
-		"module": "commonjs",
+		"module": "umd",
 		"noImplicitAny": true,
 		"pretty": true,
 		"target": "es6"
@@ -13,6 +13,7 @@
 		"./index.d.ts",
 		"./options/**/*.ts",
 		"./tasks/**/*.ts",
+		"./tests/**/*.ts",
 		"./typings/index.d.ts"
 	]
 }
