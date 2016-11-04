@@ -356,7 +356,7 @@ registerSuite({
 				const fullVersion = packageJson.version;
 				const justTheVersion = fullVersion.replace(/^([^\-]+).*$/g, '$1');
 
-				shell.withArgs('npm view . --json')
+				shell.onCall(0)
 					.returns(Promise.resolve({
 						stdout: JSON.stringify({
 							time: {
@@ -367,12 +367,15 @@ registerSuite({
 							}
 						})
 					}))
-					.withArgs(`npm version ${justTheVersion}-test.8`)
+					.onCall(1)
 					.returns(Promise.resolve({}));
 
 				runGruntTask('release-version-pre-release-tag', dfd.callback(() => {
 					assert.isTrue(shell.calledTwice);
-				})).catch(dfd.rejectOnError(() => {
+					assert.equal(shell.firstCall.args[ 0 ], 'npm view . --json');
+					assert.equal(shell.secondCall.args[ 0 ], `npm version ${justTheVersion}-test.8`);
+				})).catch(dfd.rejectOnError((error: any) => {
+					console.log('*** ERRROR *', error);
 					assert(false, 'should have succeeded');
 				}));
 			}

@@ -41,7 +41,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		const filteredVersions = existingVersions
 			.filter((v) => matchesVersion(versionInPackage, v))
 			.filter((v) => matchesPreReleaseTag(preReleaseTag, v))
-			.map((v) => parseInt(matchesPreReleaseTag(preReleaseTag, v)[3], 10));
+			.map((v) => parseInt(matchesPreReleaseTag(preReleaseTag, v)[3], 10) || 0);
 
 		const nextVersion = filteredVersions.length ? Math.max(...filteredVersions) + 1 : 1;
 		return `${versionInPackage}-${preReleaseTag}.${nextVersion}`;
