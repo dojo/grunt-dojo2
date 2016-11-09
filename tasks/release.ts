@@ -1,3 +1,5 @@
+import ITask = grunt.task.ITask;
+
 export = function(grunt: IGrunt, packageJson: any) {
 	const execa = require('execa');
 	const path = require('path');
@@ -28,7 +30,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	function matchesPreReleaseTag(preReleaseTag: string, version: string): string[] {
 		const regexp = new RegExp(`(.*)-(${preReleaseTag})\\.(\\d+)`);
-		return regexp.exec(version);
+		return regexp.exec(version) || [];
 	}
 
 	function matchesVersion(version1: string, version2: string): boolean {
@@ -39,7 +41,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		const filteredVersions = existingVersions
 			.filter((v) => matchesVersion(versionInPackage, v))
 			.filter((v) => matchesPreReleaseTag(preReleaseTag, v))
-			.map((v) => parseInt(matchesPreReleaseTag(preReleaseTag, v)[3], 10));
+			.map((v) => parseInt(matchesPreReleaseTag(preReleaseTag, v)[3], 10) || 0);
 
 		const nextVersion = filteredVersions.length ? Math.max(...filteredVersions) + 1 : 1;
 		return `${versionInPackage}-${preReleaseTag}.${nextVersion}`;
@@ -90,7 +92,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.resolve({});
 	}
 
-	grunt.registerTask('can-publish-check', 'check whether author can publish', function () {
+	grunt.registerTask('can-publish-check', 'check whether author can publish', function (this: ITask) {
 		const done = this.async();
 		const whoamiPromise = command(npmBin, ['whoami'], {}, true).then(
 			(result: any) => result.stdout,
@@ -115,9 +117,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}).then(done);
 	});
 
-	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function () {
+	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function (this: ITask) {
 		const done = this.async();
-		command(gitBin, ['status', '--porcelain'], {}, true)
+		return command(gitBin, ['status', '--porcelain'], {}, true)
 			.then((result: any) => {
 				if (result.stdout) {
 					grunt.fail.fatal('there are changes in the working tree');
@@ -132,7 +134,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
-	grunt.registerTask('release-publish', 'publish the package to npm', function () {
+	grunt.registerTask('release-publish', 'publish the package to npm', function (this: ITask) {
 		const done = this.async();
 		const args = ['publish', '.'];
 		const promises = [command(npmBin, args, { cwd: temp }, false)];
@@ -143,16 +145,16 @@ export = function(grunt: IGrunt, packageJson: any) {
 		if (dryRun) {
 			promises.push(command(npmBin, ['pack', '../' + temp], { cwd: 'dist' }, true));
 		}
-		Promise.all(promises).then(done);
+		return Promise.all(promises).then(done);
 	});
 
-	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function () {
+	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function (this: ITask) {
 		const done = this.async();
 		const versionInPackage = initialPackageJson.version.replace(/-.*/g, '');
 		if (initial) {
-			npmPreReleaseVersion(versionInPackage, []).then(done);
+			return npmPreReleaseVersion(versionInPackage, []).then(done);
 		} else {
-			command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
+			return command(npmBin, ['view', '.', '--json'], {}, true).then((result: any) => {
 				if (result.stdout) {
 					const time = JSON.parse(result.stdout).time;
 					const versions = Object.keys(time).filter((key) => {
@@ -166,17 +168,17 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 	});
 
-	grunt.registerTask('release-version-specific', 'set the version manually', function () {
+	grunt.registerTask('release-version-specific', 'set the version manually', function (this: ITask) {
 		const done = this.async();
 		const args = ['version', releaseVersion];
 		if (dryRun) {
 			args.unshift('--no-git-tag-version');
 		}
 		grunt.log.subhead(`version to release: ${releaseVersion}`);
-		command(npmBin, args, {}, true).then(done);
+		return command(npmBin, args, {}, true).then(done);
 	});
 
-	grunt.registerTask('post-release-version', 'update the version post release', function () {
+	grunt.registerTask('post-release-version', 'update the version post release', function (this: ITask) {
 		const done = this.async();
 		const packageJson = Object.assign({}, initialPackageJson);
 		if (nextVersion) {
@@ -184,7 +186,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 		grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
 		grunt.log.subhead(`version of package.json to commit: ${packageJson.version}`);
-		command(gitBin, ['commit', '-am', commitMsg], {}, false)
+		return command(gitBin, ['commit', '-am', commitMsg], {}, false)
 			.then(() => {
 				if (!pushBack) {
 					return;

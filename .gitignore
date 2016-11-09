@@ -2,5 +2,6 @@
 /typings
 *.js
 lcov.info
-!/tests/**/*.js
 .tsConfig*.json
+html-report
+coverage-final.json

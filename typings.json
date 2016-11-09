@@ -3,7 +3,8 @@
 	"main": "index.d.ts",
 	"dependencies": {
 		"chai": "registry:npm/chai#3.5.0+20160415060238",
-		"lodash": "registry:npm/lodash#4.0.0+20160723033700"
+		"lodash": "registry:npm/lodash#4.0.0+20160723033700",
+		"sinon": "registry:npm/sinon#1.16.0+20160723033700"
 	},
 	"globalDependencies": {
 		"digdug": "github:dojo/typings/custom/digdug/digdug.d.ts#a62873258aa1deed48f9882c193c335436100d4b",
@@ -12,6 +13,7 @@
 		"gruntjs": "registry:dt/gruntjs#0.4.0+20160316171810",
 		"intern": "github:dojo/typings/custom/intern/intern.d.ts#92fcf688c0982c1107fca278de52e4bfe23bd8af",
 		"leadfoot": "github:dojo/typings/custom/leadfoot/leadfoot.d.ts#a62873258aa1deed48f9882c193c335436100d4b",
+		"mockery": "registry:dt/mockery#1.4.0+20160316155526",
 		"nashorn": "github:dojo/typings/custom/nashorn/nashorn.d.ts#19d40cae45320285bea5aad1a40dedaf22eea648"
 	},
 	"devDependencies": {

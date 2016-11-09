@@ -1,3 +1,5 @@
+import ITask = grunt.task.ITask;
+
 export = function(grunt: IGrunt, packageJson: any) {
 	const execa = require('execa');
 	const fs = require('fs');
@@ -5,7 +7,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const process = require('process');
 	const pkgDir = require('pkg-dir');
 
-	grunt.registerTask('_link', '', function () {
+	grunt.registerTask('_link', '', function (this: ITask) {
 		const done = this.async();
 		const packagePath = pkgDir.sync(process.cwd());
 		const targetPath = grunt.config('distDirectory');

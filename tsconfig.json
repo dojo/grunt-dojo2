@@ -3,16 +3,19 @@
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"listFiles": true,
-		"module": "commonjs",
+		"module": "umd",
 		"noImplicitAny": true,
 		"pretty": true,
-		"target": "es6"
+		"target": "es6",
+		"strictNullChecks": true,
+		"noImplicitThis": true
 	},
 	"include": [
 		"./index.ts",
 		"./index.d.ts",
 		"./options/**/*.ts",
 		"./tasks/**/*.ts",
+		"./tests/**/*.ts",
 		"./typings/index.d.ts"
 	]
 }

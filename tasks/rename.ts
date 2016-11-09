@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import ITask = grunt.task.ITask;
+import IMultiTask = grunt.task.IMultiTask;
 
 export = function (grunt: IGrunt) {
-	grunt.registerMultiTask('rename', function () {
+	grunt.registerMultiTask('rename', function (this: IMultiTask<void>) {
 		this.files.forEach(function (file: grunt.file.IFileMap) {
 			if (grunt.file.isFile(file.src[0])) {
 				grunt.file.mkdir(path.dirname(file.dest));
