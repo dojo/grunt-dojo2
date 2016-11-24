@@ -4,6 +4,7 @@
 		"inlineSources": true,
 		"listFiles": true,
 		"module": "umd",
+		"moduleResolution": "node",
 		"noImplicitAny": true,
 		"pretty": true,
 		"target": "es6",

@@ -1,3 +1,5 @@
+import 'intern';
+
 export const loaderOptions = {
 	packages: [
 		{name: 'grunt-dojo2', location: '.'}
