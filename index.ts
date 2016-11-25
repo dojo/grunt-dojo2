@@ -26,7 +26,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 
 	const devTasks = [
 		'clean:typings',
-		'typings',
+		'typings:dev',
 		'tslint',
 		'clean:dev',
 		'ts:dev',
@@ -35,7 +35,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 
 	const distTasks = [
 		'clean:typings',
-		'typings',
+		'typings:dist',
 		'tslint',
 		'clean:dist',
 		'copy:staticDefinitionFiles',

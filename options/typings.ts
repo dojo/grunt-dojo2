@@ -2,6 +2,16 @@ export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-typings');
 
 	return {
-		install: {}
+		install: {},
+		dev: {
+			options: {
+				production: false
+			}
+		},
+		dist: {
+			options: {
+				production: true
+			}
+		}
 	};
 };
