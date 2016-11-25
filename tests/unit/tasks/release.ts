@@ -4,7 +4,7 @@ import * as grunt from 'grunt';
 import { stub, SinonStub } from 'sinon';
 import * as path from 'path';
 import { unloadTasks, loadTasks, runGruntTask } from '../util';
-import Test = require("intern/lib/Test");
+import Test = require('intern/lib/Test');
 
 let shell: SinonStub = stub();
 let originalOptions: {
@@ -66,8 +66,8 @@ registerSuite({
 					.withArgs('npm view . --json')
 					.returns(Promise.resolve(JSON.stringify({
 						maintainers: [
-							"dojotoolkit <kitsonk@dojotoolkit.org>",
-							"sitepen <labs@sitepen.com>"
+							'dojotoolkit <kitsonk@dojotoolkit.org>',
+							'sitepen <labs@sitepen.com>'
 						]
 					})));
 
@@ -299,7 +299,7 @@ registerSuite({
 				runGruntTask('release-version-pre-release-tag', dfd.callback(() => {
 					assert.isTrue(shell.calledOnce);
 
-					let command = shell.getCalls()[ 0 ].args[ 0 ];
+					let command = (<any> shell).getCalls()[ 0 ].args[ 0 ];
 
 					assert.isTrue(/npm version [\d.]+-test\.1/.test(command));
 				})).catch(dfd.rejectOnError(() => {
@@ -322,7 +322,7 @@ registerSuite({
 				runGruntTask('release-version-pre-release-tag', dfd.callback(() => {
 					assert.isTrue(shell.calledOnce);
 
-					let command = shell.getCalls()[ 0 ].args[ 0 ];
+					let command = (<any> shell).getCalls()[ 0 ].args[ 0 ];
 
 					assert.isTrue(/npm --no-git-tag-version version [\d.]+-test\.1/.test(command));
 				})).catch(dfd.rejectOnError(() => {
@@ -570,7 +570,7 @@ registerSuite({
 				runGruntTask('release-publish-flat');
 
 				assert.isTrue(runStub.calledOnce);
-				assert.deepEqual(runStub.getCalls()[ 0 ].args[ 0 ], [ 'copy:temp', 'release-publish', 'clean:temp' ]);
+				assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [ 'copy:temp', 'release-publish', 'clean:temp' ]);
 
 				const newPackageJson = grunt.file.readJSON(path.join('temp', 'package.json'));
 
@@ -651,7 +651,7 @@ registerSuite({
 				runGruntTask('release');
 
 				assert.isTrue(runStub.calledOnce);
-				assert.deepEqual(runStub.getCalls()[ 0 ].args[ 0 ], [
+				assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [
 					'can-publish-check',
 					'repo-is-clean-check',
 					'dist',
@@ -671,7 +671,7 @@ registerSuite({
 				runGruntTask('release');
 
 				assert.isTrue(runStub.calledOnce);
-				assert.deepEqual(runStub.getCalls()[ 0 ].args[ 0 ], [
+				assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [
 					'dist',
 					'release-version-pre-release-tag',
 					'release-publish-flat',
@@ -688,7 +688,7 @@ registerSuite({
 				runGruntTask('release');
 
 				assert.isTrue(runStub.calledOnce);
-				assert.deepEqual(runStub.getCalls()[ 0 ].args[ 0 ], [
+				assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [
 					'can-publish-check',
 					'repo-is-clean-check',
 					'dist',
