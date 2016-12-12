@@ -42,7 +42,7 @@
     "grunt-contrib-watch": ">=1.0.0",
     "grunt-text-replace": ">=0.4.0",
     "grunt-ts": ">=5.0.0",
-    "grunt-tslint": ">=3.0.0",
+    "grunt-tslint": "^3.0.0",
     "grunt-typings": "^0.1.5",
     "parse-git-config": "^0.4.2",
     "pkg-dir": "^1.0.0",
