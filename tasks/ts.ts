@@ -16,11 +16,11 @@ export = function(grunt: IGrunt) {
 		esm: {
 			exclude: ['tests/**/*.ts'],
 			compilerOptions: {
-				target: 'es6',
-				module: 'es6',
-				sourceMap: false,
 				outDir: 'dist/esm',
-				inlineSourceMap: true,
+				declaration: true,
+				target: 'es5',
+				module: 'es6',
+				sourceMap: true,
 				inlineSources: true
 			}
 		}

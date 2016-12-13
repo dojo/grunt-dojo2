@@ -5,6 +5,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const path = require('path');
 	const pkgDir = require('pkg-dir');
 	const parse = require('parse-git-config');
+	const babel = require('babel-core');
 
 	const packagePath = pkgDir.sync(process.cwd());
 	const npmBin = 'npm';
@@ -27,6 +28,23 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	const initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 	const commitMsg = '"Update package metadata"';
+
+	const umdToEsmMap: any = {
+		'dojo-actions': 'dojo-actions-esm',
+		'dojo-app': 'dojo-app-esm',
+		'dojo-compose': 'dojo-compose-esm',
+		'dojo-cli': 'dojo-cli-esm',
+		'dojo-core': 'dojo-core-esm',
+		'dojo-dataviz': 'dojo-dataviz-esm',
+		'dojo-dom': 'dojo-dom-esm',
+		'dojo-has': 'dojo-has-esm',
+		'dojo-shim': 'dojo-shim-esm',
+		'dojo-loader': 'dojo-loader-esm',
+		'dojo-widgets': 'dojo-widgets-esm',
+		'dojo-routing': 'dojo-routing-esm',
+		'dojo-stores': 'dojo-stores-esm',
+		'dojo-i18n': 'dojo-i18n-esm'
+	};
 
 	function matchesPreReleaseTag(preReleaseTag: string, version: string): string[] {
 		const regexp = new RegExp(`(.*)-(${preReleaseTag})\\.(\\d+)`);
@@ -53,6 +71,26 @@ export = function(grunt: IGrunt, packageJson: any) {
 		packageJson.files = undefined;
 		packageJson.typings = undefined;
 		packageJson.main = 'main.js';
+		return packageJson;
+	}
+
+	function remapDependencies(packageJson: any, key: string): void {
+		if (packageJson[key]) {
+			Object.keys(packageJson[key]).forEach((dependencyName) => {
+				const esmDependencyName = umdToEsmMap[dependencyName];
+				if (esmDependencyName) {
+					packageJson[key][esmDependencyName] = packageJson[key][dependencyName];
+					delete packageJson[key][dependencyName];
+				}
+			});
+		}
+	}
+
+	function preparePackageJsonForEsm(packageJson: any): any {
+		preparePackageJson(packageJson);
+		packageJson.name = `${packageJson.name}-esm`;
+		remapDependencies(packageJson, 'dependencies');
+		remapDependencies(packageJson, 'peerDependencies');
 		return packageJson;
 	}
 
@@ -203,11 +241,52 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
+	grunt.registerTask('esm-rewrite-paths', 'rewrite paths to point to esm pacakges', function () {
+		const src = [ `${temp}/**/*.js` ];
+		grunt.file.expand({}, src).forEach(function(path) {
+			const contents = babel.transformFileSync(path, {
+				babelrc: false,
+				plugins: [
+					[ 'module-resolver', {
+						root: [ '' ],
+						alias: umdToEsmMap
+					} ]
+				]
+			}).code;
+			grunt.file.write(path, contents);
+		});
+
+	});
+
+	grunt.registerTask('copy-extras', 'copy any additional files as part of the release', function () {
+		extraToCopy.forEach((fileName) => {
+			if (grunt.file.exists(fileName)) {
+				grunt.file.copy(fileName, temp + '/' + fileName);
+			}
+		});
+	});
+
+	grunt.registerTask('release-publish-esm', 'publish the esm package', function () {
+		grunt.log.subhead('making esm package...');
+		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
+		const dist = 'dist/esm';
+		const tasks = ['copy-extras', 'copy:temp', 'esm-rewrite-paths', 'release-publish', 'clean:temp'];
+
+		grunt.config.merge({
+			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
+			clean: { temp: [ temp ] }
+		});
+
+		const packageJson = preparePackageJsonForEsm(pkg);
+		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(packageJson, null, '  ') + '\n');
+		grunt.task.run(tasks);
+	});
+
 	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
 		grunt.log.subhead('making flat package...');
 		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
-		const dist = grunt.config('copy.staticDefinitionFiles.dest');
-		const tasks = ['copy:temp', 'release-publish', 'clean:temp'];
+		const dist = 'dist/umd';
+		const tasks = ['copy-extras', 'copy:temp', 'release-publish', 'clean:temp'];
 
 		grunt.config.merge({
 			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
@@ -215,18 +294,12 @@ export = function(grunt: IGrunt, packageJson: any) {
 		});
 
 		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(preparePackageJson(pkg), null, '  ') + '\n');
-
-		extraToCopy.forEach((fileName) => {
-			if (grunt.file.exists(fileName)) {
-				grunt.file.copy(fileName, temp + '/' + fileName);
-			}
-		});
 		grunt.task.run(tasks);
 	});
 
 	grunt.registerTask('release', 'release', function () {
 		grunt.option('remove-links', true);
-		const tasks = ['dist'];
+		const tasks = ['dist_esm'];
 
 		if (skipChecks && !dryRun) {
 			grunt.fail.fatal('you can only skip-checks on a dry-run!');
@@ -243,7 +316,8 @@ export = function(grunt: IGrunt, packageJson: any) {
 		} else {
 			grunt.fail.fatal('please specify --pre-release-tag or --release-version and --next-version');
 		}
-		tasks.push('release-publish-flat');
+		/*tasks.push('release-publish-flat');*/
+		tasks.push('release-publish-esm');
 		tasks.push('post-release-version');
 		grunt.task.run(tasks);
 	});
