@@ -60,7 +60,7 @@ registerSuite({
 	},
 
 	default() {
-		runGruntTask('ts');
+		runGruntTask('dojo-ts');
 
 		assert.deepEqual(grunt.config('ts.dev'), {
 			tsconfig: {
@@ -75,7 +75,7 @@ registerSuite({
 
 	dev() {
 
-		runGruntTask('ts:dev');
+		runGruntTask('dojo-ts:dev');
 
 		assert.deepEqual(grunt.config('ts.dev'), {
 			tsconfig: {
@@ -89,7 +89,7 @@ registerSuite({
 	},
 
 	dist() {
-		runGruntTask('ts:dist');
+		runGruntTask('dojo-ts:dist');
 
 		assert.deepEqual(grunt.config('ts.dist'), {
 			tsconfig: {
@@ -121,7 +121,7 @@ registerSuite({
 			}
 		});
 
-		runGruntTask('ts:esm');
+		runGruntTask('dojo-ts:esm');
 
 		assert.deepEqual(grunt.config('ts.esm'), {
 			tsconfig: {
@@ -138,7 +138,7 @@ registerSuite({
 	},
 
 	custom() {
-		runGruntTask('ts:custom');
+		runGruntTask('dojo-ts:custom');
 
 		assert.deepEqual(grunt.config('ts.custom'), {
 			tsconfig: {

@@ -26,7 +26,7 @@ export = function(grunt: IGrunt) {
 		}
 	};
 
-	grunt.registerTask('ts', <any> function (this: ITask) {
+	grunt.registerTask('dojo-ts', <any> function (this: ITask) {
 		grunt.loadNpmTasks('grunt-ts');
 
 		const flags = this.args && this.args.length ? this.args : [ 'dev' ];
