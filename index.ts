@@ -29,7 +29,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings:dev',
 		'tslint',
 		'clean:dev',
-		'ts:dev',
+		'dojo-ts:dev',
 		'copy:staticTestFiles'
 	];
 
@@ -39,12 +39,12 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'tslint',
 		'clean:dist',
 		'copy:staticDefinitionFiles',
-		'ts:dist',
+		'dojo-ts:dist',
 		'fixSourceMaps'
 	];
 
 	const distESMTasks = [
-		'ts:esm'
+		'dojo-ts:esm'
 	];
 
 	grunt.initConfig({
