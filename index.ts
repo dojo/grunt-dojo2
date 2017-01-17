@@ -40,6 +40,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'clean:dist',
 		'copy:staticDefinitionFiles',
 		'dojo-ts:dist',
+		'postcss:modules',
+		'postcss:variables',
 		'fixSourceMaps'
 	];
 
