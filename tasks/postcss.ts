@@ -9,14 +9,6 @@ export = function(grunt: IGrunt) {
 
 	const distDirectory = grunt.config.get<string>('distDirectory');
 
-	const cssModuleProcessor = postCssModules({
-		generateScopedName: '[name]__[local]__[hash:base64:5]',
-		getJSON: function(cssFileName: string, json: JSON) {
-			const outputPath = path.resolve(distDirectory, path.relative('src', cssFileName));
-			fs.writeFileSync(outputPath + '.json', JSON.stringify(json));
-		}
-	});
-
 	const moduleProcessors: any = [
 		postCssImport,
 		postCssNext({
@@ -29,7 +21,14 @@ export = function(grunt: IGrunt) {
 				}
 			}
 		}),
-		cssModuleProcessor
+		postCssModules({
+			generateScopedName: '[name]__[local]__[hash:base64:5]',
+			getJSON: function(cssFileName: string, json: JSON) {
+				console.log('********* RAN ************');
+				const outputPath = path.resolve(distDirectory, path.relative('src', cssFileName));
+				fs.writeFileSync(outputPath + '.json', JSON.stringify(json));
+			}
+		})
 	];
 
 	const variablesProcessors: any = [
@@ -45,7 +44,8 @@ export = function(grunt: IGrunt) {
 
 	const moduleFiles = [{
 		expand: true,
-		src: '**/*.css',
+		src: ['**/*.css', '!**/variables.css'],
+		exclude: '**/variables.css',
 		dest: distDirectory,
 		cwd: 'src'
 	}];
@@ -63,11 +63,15 @@ export = function(grunt: IGrunt) {
 		},
 		modules: {
 			files: moduleFiles,
-			processors: moduleProcessors
+			options: {
+				processors: moduleProcessors
+			}
 		},
 		variables: {
-			filed: variableFiles,
-			processors: variablesProcessors
+			files: variableFiles,
+			options: {
+				processors: variablesProcessors
+			}
 		}
 	});
 };
