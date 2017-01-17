@@ -22,7 +22,7 @@ export = function(grunt: IGrunt) {
 			}
 		}),
 		postCssModules({
-			generateScopedName: '[name]__[local]__[hash:base64:5]',
+			generateScopedName: '[hash:base64:8]',
 			getJSON: function(cssFileName: string, json: JSON) {
 				const outputPath = path.resolve(distDirectory, path.relative('src', cssFileName));
 				fs.writeFileSync(outputPath + '.json', JSON.stringify(json));
