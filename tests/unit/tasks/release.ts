@@ -133,7 +133,7 @@ registerSuite({
 				});
 
 				shell.withArgs('npm whoami')
-					.returns(Promise.resolve({ stdout: 'sitepen' }))
+					.returns(Promise.resolve({ stdout: 'dojo' }))
 					.withArgs('npm view . --json')
 					.throws();
 

@@ -13,7 +13,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const defaultBranch = 'master';
 	const preReleaseTags = ['alpha', 'beta', 'rc'];
 	const gitBaseRemote = 'git@github.com:dojo/';
-	const defaultMaintainers = ['sitepen', 'dojotoolkit'];
+	const defaultMaintainers = ['sitepen', 'dojotoolkit', 'dojo'];
 	const extraToCopy = ['README.md'];
 
 	const releaseVersion = grunt.option<string>('release-version');
