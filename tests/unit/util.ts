@@ -81,6 +81,9 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 
 	mockery.registerMock('lodash', _);
 
+	// Registering this mock as it has problems with `regenerate` from regexpu-core.
+	mockery.registerMock('postcss-modules', function noop() {});
+
 	if (mocks) {
 		var keys = Object.keys(mocks);
 
