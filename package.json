@@ -52,7 +52,8 @@
     "postcss-import": "^9.1.0",
     "postcss-modules": "^0.6.3",
     "remap-istanbul": ">=0.6.3",
-    "resolve-from": "^2.0.0"
+    "resolve-from": "^2.0.0",
+    "umd-wrapper": "^0.1.0"
   },
   "devDependencies": {
     "@types/es6-shim": "^0.31.32",

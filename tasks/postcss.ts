@@ -4,6 +4,7 @@ export = function(grunt: IGrunt) {
 	const postCssImport = require('postcss-import');
 	const postCssNext = require('postcss-cssnext');
 	const postCssModules = require('postcss-modules');
+	const umdWrapper = require('umd-wrapper');
 
 	grunt.loadNpmTasks('grunt-postcss');
 
@@ -25,7 +26,8 @@ export = function(grunt: IGrunt) {
 			generateScopedName: '[hash:base64:8]',
 			getJSON: function(cssFileName: string, json: JSON) {
 				const outputPath = path.resolve(distDirectory, path.relative('src', cssFileName));
-				fs.writeFileSync(outputPath + '.json', JSON.stringify(json));
+				const newFilePath = outputPath.replace(/.css$/, '.js');
+				fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 			}
 		})
 	];
