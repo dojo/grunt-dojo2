@@ -27,8 +27,6 @@ export = function(grunt: IGrunt) {
 			postCssModules({
 				generateScopedName: '[hash:base64:8]',
 				getJSON: function(cssFileName: string, json: JSON) {
-					console.log(dest);
-					console.log(path.relative('src', cssFileName));
 					const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 					const newFilePath = outputPath.replace(/.css$/, '.js');
 					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
