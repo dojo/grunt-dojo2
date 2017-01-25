@@ -8,10 +8,11 @@ export = function(grunt: IGrunt) {
 
 	grunt.loadNpmTasks('grunt-postcss');
 
-	const distDirectory = grunt.config.get<string>('distDirectory');
-	const devDirectory = grunt.config.get<string>('devDirectory');
+	const distDirectory = grunt.config.get<string>('distDirectory') || '';
+	const devDirectory = grunt.config.get<string>('devDirectory') || '';
 
 	function moduleProcessors(dest: string, cwd = '') {
+		const scopedName = dest === devDirectory ? '[name]__[local]__[hash:base64:5]' : '[hash:base64:8]';
 		return [
 			postCssImport,
 			postCssNext({
@@ -25,7 +26,7 @@ export = function(grunt: IGrunt) {
 				}
 			}),
 			postCssModules({
-				generateScopedName: '[hash:base64:8]',
+				generateScopedName: scopedName,
 				getJSON: function(cssFileName: string, json: JSON) {
 					const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 					const newFilePath = outputPath.replace(/.css$/, '.js');
