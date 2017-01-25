@@ -29,6 +29,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings:dev',
 		'tslint',
 		'clean:dev',
+		'copy:staticDefinitionFiles-dev',
 		'dojo-ts:dev',
 		'copy:staticTestFiles'
 	];
@@ -38,7 +39,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings:dist',
 		'tslint',
 		'clean:dist',
-		'copy:staticDefinitionFiles',
+		'copy:staticDefinitionFiles-dist',
 		'dojo-ts:dist',
 		'fixSourceMaps'
 	];
