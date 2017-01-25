@@ -57,14 +57,12 @@ export = function(grunt: IGrunt) {
 		}];
 	}
 
-	function variableFiles(dest: string) {
-		return [{
-			expand: true,
-			src: '**/variables.css',
-			dest: dest,
-			cwd: 'src'
-		}];
-	}
+	const variableFiles = [{
+		expand: true,
+		src: '**/variables.css',
+		dest: distDirectory,
+		cwd: 'src'
+	}];
 
 	grunt.config.set('postcss', {
 		options: {
@@ -76,20 +74,14 @@ export = function(grunt: IGrunt) {
 				processors: moduleProcessors(devDirectory)
 			}
 		},
-		'variables-dev': {
-			files: variableFiles(path.join(devDirectory, 'src')),
-			options: {
-				processors: variablesProcessors
-			}
-		},
 		'modules-dist': {
 			files: moduleFiles(distDirectory),
 			options: {
 				processors: moduleProcessors(distDirectory, 'src')
 			}
 		},
-		'variables-dist': {
-			files: variableFiles(distDirectory),
+		variables: {
+			files: variableFiles,
 			options: {
 				processors: variablesProcessors
 			}
