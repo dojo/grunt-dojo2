@@ -4,7 +4,7 @@ export = function(grunt: IGrunt) {
 	const postCssImport = require('postcss-import');
 	const postCssNext = require('postcss-cssnext');
 	const postCssModules = require('postcss-modules');
-	const umdWrapper = require('umd-wrapper');
+	const umdWrapper = require('./util/umdWrapper');
 
 	grunt.loadNpmTasks('grunt-postcss');
 
