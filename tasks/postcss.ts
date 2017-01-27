@@ -31,8 +31,10 @@ export = function(grunt: IGrunt) {
 					const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 					const newFilePath = outputPath.replace(/.css$/, '.js');
 					const output = {
-						classes: json,
-						path: path.basename(outputPath, '.css')
+						default: {
+							classes: json,
+							path: path.basename(outputPath, '.css')
+						}
 					};
 					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(output)));
 				}
