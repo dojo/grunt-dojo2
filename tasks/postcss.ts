@@ -50,8 +50,7 @@ export = function(grunt: IGrunt) {
 	function moduleFiles(dest: string) {
 		return [{
 			expand: true,
-			src: ['**/*.css', '!**/variables.css'],
-			exclude: '**/variables.css',
+			src: ['**/*.css', '!**/variables.css', '!styles/widgets.css'],
 			dest: dest,
 			cwd: 'src'
 		}];
