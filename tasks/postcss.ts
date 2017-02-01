@@ -30,7 +30,13 @@ export = function(grunt: IGrunt) {
 				getJSON: function(cssFileName: string, json: JSON) {
 					const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 					const newFilePath = outputPath.replace(/.css$/, '.js');
-					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
+					const output = {
+						default: {
+							classes: json,
+							key: 'dojo-' + path.basename(outputPath, '.css')
+						}
+					};
+					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(output)));
 				}
 			})
 		];
