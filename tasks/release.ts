@@ -206,7 +206,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
 		grunt.log.subhead('making flat package...');
 		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
-		const dist = grunt.config('copy.staticDefinitionFiles.dest');
+		const dist = grunt.config('copy.staticDefinitionFiles-dist.dest');
 		const tasks = ['copy:temp', 'release-publish', 'clean:temp'];
 
 		grunt.config.merge({
