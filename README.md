@@ -162,11 +162,11 @@ proxy: {
 
 #### grunt link
 
-The link task it designed to ease the local development and testing of changes that span multiple packages. Traditionally `npm link` can be used but this assumes that project structure is the same as the distrubtion, which for dojo2 projects is not the case. 
+The link task is designed to ease the local development and testing of changes that span multiple packages. Traditionally `npm link` can be used but this assumes that the project structure is the same as the distribution, which for dojo2 projects is not the case. 
 
-This command emulates the behaviour of `npm link` but with some additional steps to ensure that the linked structure matches that of the distrubuted package.
+This command emulates the behaviour of `npm link` but with some additional steps to ensure that the linked structure matches that of the distributed package.
 
-Once `grunt link` has been run within a dojo2 package, `npm link` can be used as normal to created the linked package depedency.
+Once `grunt link` has been run within a dojo2 package, `npm link` can be used as normal to created the linked package dependency.
 
 *Example*
 
@@ -184,7 +184,7 @@ grunt release --pre-release-tag=alpha
 
 **note:** 
 
-1. Task runs the `dist` pipelines as a prequisite.
+1. Task runs the `dist` pipelines as a prerequisite.
 2. Requires being logged into NPM unless using the `dry-run` options
 
 #####Options
