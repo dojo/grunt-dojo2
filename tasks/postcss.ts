@@ -32,10 +32,7 @@ export = function(grunt: IGrunt) {
 					const newFilePath = outputPath.replace(/.css$/, '.js');
 					const themeKey = ' _key';
 					json[themeKey] = 'dojo-' + path.basename(outputPath, '.css');
-					const output = {
-						default: json
-					};
-					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(output)));
+					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 				}
 			})
 		];
