@@ -27,16 +27,12 @@ export = function(grunt: IGrunt) {
 			}),
 			postCssModules({
 				generateScopedName: scopedName,
-				getJSON: function(cssFileName: string, json: JSON) {
+				getJSON: function(cssFileName: string, json: any) {
 					const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
-					const newFilePath = outputPath.replace(/.css$/, '.js');
-					const output = {
-						default: {
-							classes: json,
-							key: 'dojo-' + path.basename(outputPath, '.css')
-						}
-					};
-					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(output)));
+					const newFilePath = outputPath + '.js';
+					const themeKey = ' _key';
+					json[themeKey] = 'dojo-' + path.basename(outputPath, '.css');
+					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 				}
 			})
 		];
