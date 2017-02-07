@@ -28,6 +28,9 @@ export = function (grunt: IGrunt) {
 		},
 		coverage: {
 			src: [ 'coverage-unmapped.json' ]
+		},
+		typedoc: {
+			src: [ '<%= apiDocDirectory %>', '<%= apiPubDirectory %>' ]
 		}
 	};
 };
