@@ -5,7 +5,7 @@ export = function (grunt: IGrunt) {
 		options: {
 			// All options but publishOptions are passed directly to the typedoc command line.
 			mode: 'modules',
-			externalPattern: '**/+(examples|node_modules|tests|typings)/**/*.ts',
+			externalPattern: '**/+(example|examples|node_modules|tests|typings)/**/*.ts',
 			excludeExternals: true,
 			excludeNotExported: true,
 			includeDeclarations: true,
