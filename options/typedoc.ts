@@ -5,9 +5,10 @@ export = function (grunt: IGrunt) {
 		options: {
 			// All options but publishOptions are passed directly to the typedoc command line.
 			mode: 'modules',
-			externalPattern: '**/+(tests|examples)/**/*.ts',
+			externalPattern: '**/+(node_modules|tests|examples)/**/*.ts',
 			excludeExternals: true,
 			excludeNotExported: true,
+			includeDeclarations: true,
 
 			// publishOptions are only used when publishing the generate API docs
 			publishOptions: {
