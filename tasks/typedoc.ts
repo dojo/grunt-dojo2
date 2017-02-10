@@ -75,6 +75,28 @@ export = function (grunt: IGrunt) {
 		// Throw when any shelljs command fails
 		config.fatal = true;
 
+		// TODO: typedoc <= 0.5.5 breaks TS's automatic type discovery, and also leaves out important
+		// compiler flags like strictNullChecks. Fake the type discovery, and ignore remaining errors.
+		const typedocInfo = grunt.file.readJSON(require.resolve('typedoc/package.json'));
+		const [ major, minor, patch ] = typedocInfo.version.split('.');
+		if (major === '0' && Number(minor) <= 5 && Number(patch) <= 5) {
+			grunt.loadNpmTasks('grunt-ts');
+			const { cloneDeep } = require('lodash');
+			const tsconfig: any = cloneDeep(grunt.config.get('tsconfig'));
+			const installedTypes = grunt.file.expand(['./node_modules/@types/*/index.d.ts']);
+			if (installedTypes.length > 0) {
+				tsconfig.include = installedTypes.concat(tsconfig.include || []);
+			}
+			const tsconfigFileName = '.tsconfig-typedoc.json';
+			grunt.file.write(tsconfigFileName, JSON.stringify(tsconfig, null, '  '));
+			args.push('--tsconfig', tsconfigFileName);
+
+			grunt.config.set('clean.typedocTsconfig', { src: tsconfigFileName});
+			grunt.task.run('clean:typedocTsconfig');
+
+			args.push('--ignoreCompilerErrors');
+		}
+
 		// Use project-local typedoc
 		const typedoc = require.resolve('typedoc/bin/typedoc');
 		exec(`node "${typedoc}" ${args.join(' ')}`);

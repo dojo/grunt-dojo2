@@ -54,7 +54,7 @@
     "remap-istanbul": ">=0.6.3",
     "resolve-from": "^2.0.0",
     "shelljs": "^0.7.6",
-    "typedoc": "../typedoc/typedoc-0.5.5.tgz",
+    "typedoc": "^0.5.5",
     "umd-wrapper": "^0.1.0"
   },
   "devDependencies": {
