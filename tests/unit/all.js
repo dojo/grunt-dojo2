@@ -7,6 +7,7 @@ define([
 	'./tasks/repl',
 	'./tasks/run',
 	'./tasks/ts',
+	'./tasks/typedoc',
 	'./tasks/uploadCoverage',
 	'./lib/load-dojo-loader'
 ], function () {});

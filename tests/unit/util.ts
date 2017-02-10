@@ -2,7 +2,6 @@ import * as grunt from 'grunt';
 import * as path from 'path';
 import * as mockery from 'mockery';
 import * as _ from 'lodash';
-import ITask = grunt.task.ITask;
 
 export interface MockList {
 	[key: string]: any;
@@ -11,7 +10,7 @@ export interface MockList {
 export interface TaskLoadingOptions {
 	peerDependencies?: {
 		[key: string]: any;
-	}
+	};
 }
 
 export function createDummyFile(name: string, data?: string) {
@@ -21,7 +20,7 @@ export function createDummyFile(name: string, data?: string) {
 }
 
 export function createDummyDirectory(name: string) {
-	var filePath = path.join(getInputDirectory(), name);
+	const filePath = path.join(getInputDirectory(), name);
 	grunt.file.mkdir(filePath);
 }
 
@@ -50,7 +49,7 @@ export function cleanOutputDirectory() {
 }
 
 export function runGruntTask(taskName: string, callback?: () => void) {
-	var task = (<any> grunt.task)._taskPlusArgs(taskName);
+	const task = (<any> grunt.task)._taskPlusArgs(taskName);
 
 	return task.task.fn.apply({
 		nameArgs: task.nameArgs,
@@ -85,17 +84,17 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 	mockery.registerMock('postcss-modules', function noop() {});
 
 	if (mocks) {
-		var keys = Object.keys(mocks);
+		const keys = Object.keys(mocks);
 
-		for (var i = 0; i < keys.length; i++) {
-			mockery.registerMock(keys[ i ], mocks[ keys[ i ] ]);
+		for (let i = 0; i < keys.length; i++) {
+			mockery.registerMock(keys[i], mocks[keys[i]]);
 		}
 	}
 
 	grunt.registerTask('clean', 'Clean mock task', () => {
 	});
 
-	var packageJson = grunt.file.readJSON('package.json');
+	const packageJson = grunt.file.readJSON('package.json');
 
 	if (options && options.peerDependencies) {
 		packageJson.peerDependencies = options.peerDependencies;

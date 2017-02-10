@@ -13,3 +13,5 @@ export const excludeInstrumentation = /^(?:tests|node_modules)\//;
 export const loaders = {
 	'host-node': 'dojo-loader'
 };
+
+export const filterErrorStack = true;
