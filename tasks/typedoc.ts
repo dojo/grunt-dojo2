@@ -1,5 +1,7 @@
+import ITask = grunt.task.ITask;
+
 export = function (grunt: IGrunt) {
-	grunt.registerTask('typedoc', function () {
+	grunt.registerTask('typedoc', function (this: ITask) {
 		const { config, cp, rm } = require('shelljs');
 		const { execSync } = require('child_process');
 		const { join } = require('path');
