@@ -6,6 +6,8 @@ export = function (grunt: IGrunt) {
 			// All options but publishOptions are passed directly to the typedoc command line.
 			mode: 'modules',
 			externalPattern: '**/+(example|examples|node_modules|tests|typings)/**/*.ts',
+			// TODO: A dummy exclude pattern is required for typedoc 0.5.6
+			exclude: '_',
 			excludeExternals: true,
 			excludeNotExported: true,
 			includeDeclarations: true,
