@@ -59,7 +59,8 @@ export = function (grunt: IGrunt) {
 		}
 
 		const options: any = this.options({});
-		options.out = options.out || grunt.config.get<string>('apiDocDirectory');
+		const outOption = grunt.option<string>('doc-dir');
+		options.out = outOption || options.out || grunt.config.get<string>('apiDocDirectory');
 
 		const args: string[] = [];
 		Object.keys(options).filter(key => {
