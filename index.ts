@@ -48,6 +48,12 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'dojo-ts:esm'
 	];
 
+	const docTasks = [
+		'clean:typings',
+		'typings:dev',
+		'typedoc'
+	];
+
 	grunt.initConfig({
 		name: packageJson.name,
 		version: packageJson.version,
@@ -60,11 +66,14 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		staticTestFiles: 'tests/**/*.{html,css,json,xml,js,txt}',
 		staticDefinitionFiles: '**/*.d.ts',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',
+		apiDocDirectory: '_apidoc',
+		apiPubDirectory: '_apipub',
 		distDirectory: 'dist/umd/',
 		otherOptions: otherOptions,
 		devTasks,
 		distTasks,
-		distESMTasks
+		distESMTasks,
+		docTasks
 	});
 
 	const options: { [option: string]: any } = {};
@@ -90,6 +99,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	}
 
 	require('./tasks/ts')(grunt);
+	require('./tasks/typedoc')(grunt);
 
 	// Set some Intern-specific options if specified on the command line.
 	[ 'suites', 'functionalSuites', 'grep' ].forEach(function (option) {
@@ -134,6 +144,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	grunt.registerTask('dev', grunt.config.get<string[]>('devTasks'));
 	grunt.registerTask('dist', grunt.config.get<string[]>('distTasks'));
 	grunt.registerTask('dist_esm', grunt.config.get<string[]>('distESMTasks'));
+	grunt.registerTask('doc', grunt.config.get<string[]>('docTasks'));
 
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };

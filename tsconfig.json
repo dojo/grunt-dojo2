@@ -2,7 +2,6 @@
 	"compilerOptions": {
 		"inlineSourceMap": true,
 		"inlineSources": true,
-		"listFiles": true,
 		"module": "umd",
 		"moduleResolution": "node",
 		"noImplicitAny": true,
