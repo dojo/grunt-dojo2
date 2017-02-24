@@ -5,7 +5,7 @@ export = function(grunt: IGrunt) {
 	const distDirectory = grunt.config.get<string>('distDirectory');
 	const defaultOptions: any = {
 		dist: {
-			exclude: ['tests/**/*.ts', 'src/**/example/**/*.ts'],
+			exclude: ['tests/**/*.ts', 'src/examples/**/*.ts'],
 			compilerOptions: {
 				outDir: distDirectory,
 				declaration: true,
