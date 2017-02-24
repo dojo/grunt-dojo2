@@ -15,6 +15,7 @@
 		"./index.d.ts",
 		"./options/**/*.ts",
 		"./tasks/**/*.ts",
+		"./lib/**/*.ts",
 		"./tests/**/*.ts",
 		"./typings/index.d.ts"
 	]

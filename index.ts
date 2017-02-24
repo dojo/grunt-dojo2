@@ -116,8 +116,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	function setCombined(combined: boolean) {
 		if (combined) {
 			grunt.config('intern.options.reporters', [
-				/* TODO: Migrate the reporter to this package */
-				{ id: 'tests/support/Reporter', file: 'coverage-unmapped.json' }
+				{ id: 'grunt-dojo2/lib/intern/Reporter', file: 'coverage-unmapped.json' }
 			]);
 		}
 	}
