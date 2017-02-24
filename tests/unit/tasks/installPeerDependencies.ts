@@ -53,8 +53,8 @@ registerSuite({
 
 			mockShell
 			.withArgs('yarn --version').returns(Promise.resolve({}))
-			.withArgs('yarn add --ignore-engines my-dep@"1.0"').returns(Promise.resolve({}))
-			.withArgs('yarn add --ignore-engines error-dep@"1.0"').throws();
+			.withArgs('yarn add --ignore-engines --peer my-dep@"1.0"').returns(Promise.resolve({}))
+			.withArgs('yarn add --ignore-engines --peer error-dep@"1.0"').throws();
 
 			loadTasks({
 				child_process: {
@@ -71,8 +71,8 @@ registerSuite({
 			runGruntTask('peerDepInstall');
 
 			assert.isTrue(mockShell.calledThrice);
-			assert.isTrue(mockShell.calledWith('yarn add --ignore-engines my-dep@"1.0"'));
-			assert.isTrue(mockShell.calledWith('yarn add --ignore-engines error-dep@"1.0"'));
+			assert.isTrue(mockShell.calledWith('yarn add --ignore-engines --peer my-dep@"1.0"'));
+			assert.isTrue(mockShell.calledWith('yarn add --ignore-engines --peer error-dep@"1.0"'));
 			assert.isTrue(mockLogger.called);
 			assert.isTrue(mockLogger.calledWith('failed.'));
 		}

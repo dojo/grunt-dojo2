@@ -3,7 +3,7 @@ import { execSync as exec } from 'child_process';
 export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('peerDepInstall', <any> function () {
 		const peerDeps = packageJson.peerDependencies;
-		let packageCmd = 'yarn add --ignore-engines';
+		let packageCmd = 'yarn add --ignore-engines --peer';
 
 		try {
 			exec('yarn --version');
