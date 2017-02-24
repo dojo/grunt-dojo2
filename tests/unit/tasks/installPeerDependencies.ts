@@ -44,37 +44,5 @@ registerSuite({
 			assert.isTrue(mockLogger.called);
 			assert.isTrue(mockLogger.calledWith('failed.'));
 		}
-	},
-	'yarn': {
-		beforeEach() {
-			grunt.initConfig({});
-			mockLogger = stub(grunt.log, 'error');
-			mockShell = stub();
-
-			mockShell
-			.withArgs('yarn --version').returns(Promise.resolve({}))
-			.withArgs('yarn add --ignore-engines --peer my-dep@"1.0"').returns(Promise.resolve({}))
-			.withArgs('yarn add --ignore-engines --peer error-dep@"1.0"').throws();
-
-			loadTasks({
-				child_process: {
-					execSync: mockShell
-				}
-			}, {
-				peerDependencies: {
-					'my-dep': '1.0',
-					'error-dep': '1.0'
-				}
-			});
-		},
-		runsCommands() {
-			runGruntTask('peerDepInstall');
-
-			assert.isTrue(mockShell.calledThrice);
-			assert.isTrue(mockShell.calledWith('yarn add --ignore-engines --peer my-dep@"1.0"'));
-			assert.isTrue(mockShell.calledWith('yarn add --ignore-engines --peer error-dep@"1.0"'));
-			assert.isTrue(mockLogger.called);
-			assert.isTrue(mockLogger.calledWith('failed.'));
-		}
 	}
 });
