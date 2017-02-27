@@ -20,7 +20,6 @@ registerSuite({
 			mockShell = stub();
 
 			mockShell
-			.withArgs('yarn --version').throws()
 			.withArgs('npm install my-dep@"1.0"').returns(Promise.resolve({}))
 			.withArgs('npm install error-dep@"1.0"').throws();
 
@@ -38,7 +37,7 @@ registerSuite({
 		runsCommands() {
 			runGruntTask('peerDepInstall');
 
-			assert.isTrue(mockShell.calledThrice);
+			assert.isTrue(mockShell.calledTwice);
 			assert.isTrue(mockShell.calledWith('npm install my-dep@"1.0"'));
 			assert.isTrue(mockShell.calledWith('npm install error-dep@"1.0"'));
 			assert.isTrue(mockLogger.called);
