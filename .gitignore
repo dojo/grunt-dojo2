@@ -5,3 +5,4 @@ lcov.info
 .tsConfig*.json
 html-report
 coverage-final.json
+deploy_key

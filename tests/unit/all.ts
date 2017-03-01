@@ -1,0 +1,12 @@
+import './tasks/fixSourceMaps';
+import './tasks/installPeerDependencies';
+import './tasks/link';
+import './tasks/release';
+import './tasks/rename';
+import './tasks/repl';
+import './tasks/run';
+import './tasks/ts';
+import './tasks/typedoc';
+import './tasks/uploadCoverage';
+import './tasks/util/Publisher';
+import './lib/load-dojo-loader';

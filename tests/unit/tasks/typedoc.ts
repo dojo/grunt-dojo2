@@ -4,10 +4,15 @@ import * as grunt from 'grunt';
 import { join } from 'path';
 import { SinonSpy, spy, SinonStub, stub } from 'sinon';
 import {
-	loadTasks, prepareOutputDirectory, unloadTasks, cleanOutputDirectory, runGruntTask,
+	loadTasks,
+	prepareOutputDirectory,
+	unloadTasks,
+	cleanOutputDirectory,
+	runGruntTask,
 	getOutputDirectory
 } from '../util';
 
+const cachedDeployDocsEnv = process.env.DEPLOY_DOCS;
 const outputPath = getOutputDirectory();
 const tsconfigPath = join(outputPath, 'tsconfig.json');
 const apiDocDirectory = join(outputPath, 'doc');
@@ -18,13 +23,18 @@ let run: SinonStub;
 let write: SinonSpy;
 let readJSON: SinonStub;
 let expandMapping: SinonStub;
-let publishApi: boolean;
 let execSync: SinonSpy;
 let cp: SinonSpy;
 let rm: SinonSpy;
 let shouldPush: SinonSpy;
 let shouldPushValue: boolean;
 let failInitialCheckout: boolean;
+let publisherConstructor: SinonSpy;
+let publisher: {
+	log?: any;
+	publish: SinonStub;
+	skipPublish?: boolean;
+};
 
 registerSuite({
 	name: 'tasks/typedoc',
@@ -38,6 +48,12 @@ registerSuite({
 				throw new Error('Failing checkout');
 			}
 		});
+		publisher = {
+			publish: stub()
+		};
+		publisherConstructor = spy(function () {
+			return publisher;
+		});
 
 		loadTasks({
 			'shelljs': {
@@ -45,8 +61,11 @@ registerSuite({
 				cp,
 				rm
 			},
-			'child_process': {
-				execSync
+			'./util/exec': {
+				'default': execSync
+			},
+			'./util/Publisher': {
+				'default': publisherConstructor
 			}
 		});
 
@@ -62,8 +81,6 @@ registerSuite({
 		shouldPush = spy(() => shouldPushValue);
 
 		prepareOutputDirectory();
-
-		publishApi = grunt.option<boolean>('publish-api');
 	},
 
 	teardown() {
@@ -76,7 +93,7 @@ registerSuite({
 		unloadTasks();
 		cleanOutputDirectory();
 
-		grunt.option('publish-api', publishApi);
+		process.env.DEPLOY_DOCS = '';
 	},
 
 	beforeEach() {
@@ -102,7 +119,7 @@ registerSuite({
 					tsconfig: tsconfigPath,
 					logger: 'none',
 					publishOptions: {
-						subdir: 'api',
+						subDirectory: 'api',
 						shouldPush
 					}
 				}
@@ -112,6 +129,8 @@ registerSuite({
 		write.reset();
 		execSync.reset();
 		shouldPush.reset();
+		publisher.publish.reset();
+		publisherConstructor.reset();
 
 		shouldPushValue = false;
 		failInitialCheckout = false;
@@ -128,56 +147,42 @@ registerSuite({
 		assert.strictEqual(shouldPush.callCount, 0, 'Push check should not have been called');
 		assert.strictEqual(write.callCount, 0, 'Nothing should have been written');
 		assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
+		assert.isFalse(publisherConstructor.called);
 	},
 
-	publish: (() => {
-		let publishApi: boolean;
+	publish: {
+		setup() {
+			process.env.DEPLOY_DOCS = 'publish';
+		},
 
-		return {
-			setup() {
-				publishApi = grunt.option<boolean>('publish-api');
-				grunt.option('publish-api', true);
-			},
+		teardown() {
+			process.env.DEPLOY_DOCS = cachedDeployDocsEnv;
+		},
 
-			teardown() {
-				grunt.option('publish-api', publishApi);
-			},
+		test() {
+			runGruntTask('typedoc');
+			assert.isTrue(publisherConstructor.calledOnce);
+			assert.isFalse(publisher.skipPublish);
+			assert.isDefined(publisher.log);
+			assert.isTrue(publisher.publish.calledOnce);
+		}
+	},
 
-			'should push': {
-				beforeEach() {
-					shouldPushValue = true;
-				},
+	commit: {
+		setup() {
+			process.env.DEPLOY_DOCS = 'commit';
+		},
 
-				'gh-pages exists'() {
-					runGruntTask('typedoc');
-					assert.strictEqual(shouldPush.callCount, 1, 'Push check should have been called once');
-					assert.strictEqual(execSync.callCount, 8, 'Unexpected number of exec calls');
-				},
+		teardown() {
+			process.env.DEPLOY_DOCS = cachedDeployDocsEnv;
+		},
 
-				'gh-pages does not exist'() {
-					failInitialCheckout = true;
-					runGruntTask('typedoc');
-					assert.strictEqual(shouldPush.callCount, 1, 'Push check should have been called once');
-					// There should be more exec calls when gh-pages doesn't exist
-					assert.strictEqual(execSync.callCount, 10, 'Unexpected number of exec calls');
-				}
-			},
-
-			'should not push': {
-				'checker in options'() {
-					shouldPushValue = false;
-					runGruntTask('typedoc');
-					assert.strictEqual(shouldPush.callCount, 1, 'Push check should have been called once');
-					assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
-				},
-
-				'default checker'() {
-					// With no shouldPush config value, the default should be not to push
-					grunt.config.set('typedoc.options.publishOptions.shouldPush', undefined);
-					runGruntTask('typedoc');
-					assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
-				}
-			}
-		};
-	})()
+		test() {
+			runGruntTask('typedoc');
+			assert.isTrue(publisherConstructor.calledOnce);
+			assert.isTrue(publisher.skipPublish);
+			assert.isDefined(publisher.log);
+			assert.isTrue(publisher.publish.calledOnce);
+		}
+	}
 });

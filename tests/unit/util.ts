@@ -2,6 +2,9 @@ import * as grunt from 'grunt';
 import * as path from 'path';
 import * as mockery from 'mockery';
 import * as _ from 'lodash';
+import { IRootRequire } from 'dojo/loader';
+
+declare const require: IRootRequire;
 
 export interface MockList {
 	[key: string]: any;
@@ -70,6 +73,28 @@ export function fileExistsInInputDirectory(fileName: string) {
 	return grunt.file.exists(path.join(getInputDirectory(), fileName));
 }
 
+function registerMockList(mocks: MockList) {
+	const keys = Object.keys(mocks);
+
+	for (let i = 0; i < keys.length; i++) {
+		mockery.registerMock(keys[i], mocks[keys[i]]);
+	}
+}
+
+export function loadModule(mid: string, mocks: MockList = {}): any {
+	mockery.enable({
+		warnOnReplace: false,
+		warnOnUnregistered: false,
+		useCleanCache: true
+	});
+	mockery.resetCache();
+
+	registerMockList(mocks);
+
+	const loader = require.nodeRequire || require;
+	return loader(require.toUrl(mid)).default;
+}
+
 export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 	mockery.enable({
 		warnOnReplace: false,
@@ -84,11 +109,7 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 	mockery.registerMock('postcss-modules', function noop() {});
 
 	if (mocks) {
-		const keys = Object.keys(mocks);
-
-		for (let i = 0; i < keys.length; i++) {
-			mockery.registerMock(keys[i], mocks[keys[i]]);
-		}
+		registerMockList(mocks);
 	}
 
 	grunt.registerTask('clean', 'Clean mock task', () => {
