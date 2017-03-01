@@ -168,10 +168,10 @@ instead.
 
 ##### Environment Variables
 
-Running `grunt typedoc` (part of `grunt doc`) will only generate APIs using typedoc. In order automatically commit or 
- publish API documentation the `DEPLOY_DOCS` environment variable must be set to either `publish` or `commit`.
- Environment variables are used so they may be turned on/off using travis-ci settings and to support forks that may 
- want to use the travis build, but do not want to automatically publish documentation.
+Running `grunt typedoc` (part of `grunt doc`) will only generate APIs using typedoc. In order to 
+ automatically commit or publish API documentation the `DEPLOY_DOCS` environment variable must be set to either 
+ `publish` or `commit`. Environment variables are used so they may be turned on/off using travis-ci settings and to 
+ support forks that may want to use the travis build, but do not want to automatically publish documentation.
 
 ##### Prerequisites
 

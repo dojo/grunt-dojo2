@@ -17,6 +17,7 @@ export = function (grunt: IGrunt) {
 				branch: 'gh-pages',
 				subdir: 'api',
 				encryptedDeployKey: 'deploy_key.enc',
+				deployKeyTag: process.env.DEPLOY_KEY_TAG,
 
 				// shouldPush is a function that indicates whether doc updates should be pushed to the origin
 				shouldPush: function () {

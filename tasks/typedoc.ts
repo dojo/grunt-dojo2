@@ -13,14 +13,12 @@ function typedocOptions(options: any) {
 	Object.keys(options).filter(key => {
 		return key !== 'publishOptions';
 	}).forEach(key => {
-		if (typeof options[key] === 'boolean') {
-			if (options[key]) {
-				args.push('--' + key);
+		if (options[key]) {
+			args.push(`--${key}`);
+
+			if (typeof options[key] !== 'boolean') {
+				args.push(`"${options[key]}"`);
 			}
-		}
-		else if (options[key]) {
-			args.push('--' + key);
-			args.push(`"${options[key]}"`);
 		}
 	});
 	return args;
