@@ -162,8 +162,8 @@ registerSuite({
 		test() {
 			runGruntTask('typedoc');
 			assert.isTrue(publisherConstructor.calledOnce);
-			assert.isFalse(publisher.skipPublish);
-			assert.isDefined(publisher.log);
+			assert.isFalse(publisherConstructor.firstCall.args[2].skipPublish);
+			assert.isDefined(publisherConstructor.firstCall.args[2].log);
 			assert.isTrue(publisher.publish.calledOnce);
 		}
 	},
@@ -180,8 +180,8 @@ registerSuite({
 		test() {
 			runGruntTask('typedoc');
 			assert.isTrue(publisherConstructor.calledOnce);
-			assert.isTrue(publisher.skipPublish);
-			assert.isDefined(publisher.log);
+			assert.isTrue(publisherConstructor.firstCall.args[2].skipPublish);
+			assert.isDefined(publisherConstructor.firstCall.args[2].log);
 			assert.isTrue(publisher.publish.calledOnce);
 		}
 	}

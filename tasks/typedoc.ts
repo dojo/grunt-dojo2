@@ -26,6 +26,9 @@ function typedocOptions(options: any) {
 
 export = function (grunt: IGrunt) {
 	grunt.registerTask('typedoc', function (this: ITask) {
+		const deploy = process.env.DEPLOY_DOCS;
+		const shouldPublish = deploy === 'publish' || deploy === 'commit';
+
 		// Throw when any shelljs command fails
 		config.fatal = true;
 
@@ -37,13 +40,13 @@ export = function (grunt: IGrunt) {
 		const typedoc = require.resolve('typedoc/bin/typedoc');
 		exec(`node "${ typedoc }" ${ typedocOptions(options).join(' ') }`);
 
-		const deploy = process.env.DEPLOY_DOCS;
-		if (deploy === 'publish' || deploy === 'commit') {
+		if (shouldPublish) {
 			const cloneDir = grunt.config.get<string>('apiPubDirectory');
-
-			const publisher = new Publisher(cloneDir, options.out, options.publishOptions);
-			publisher.skipPublish = deploy !== 'publish';
-			publisher.log = grunt.log;
+			const publishOptions = Object.assign({
+				log: grunt.log,
+				skipPublish: (deploy !== 'publish')
+			}, options.publishOptions || {});
+			const publisher = new Publisher(cloneDir, options.out, publishOptions);
 			publisher.publish();
 		}
 	});

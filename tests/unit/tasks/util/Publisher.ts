@@ -8,7 +8,9 @@ const cloneDir = '_tests/cloneDir';
 const generatedDocsDir = '_tests/generatedDocsDir';
 const cpStub: SinonStub = stub();
 const rmStub: SinonStub = stub();
+const chmodStub: SinonStub = stub();
 const execStub: SinonStub = stub();
+const existsStub: SinonStub = stub();
 let Publisher: typeof PublisherInstance;
 
 function assertCommit() {
@@ -26,6 +28,10 @@ registerSuite({
 				cp: cpStub,
 				rm: rmStub
 			},
+			fs: {
+				chmodSync: chmodStub,
+				existsSync: existsStub
+			},
 			'./exec': {
 				'default': execStub
 			}
@@ -37,6 +43,8 @@ registerSuite({
 		cpStub.reset();
 		execStub.reset();
 		rmStub.reset();
+		chmodStub.reset();
+		existsStub.reset();
 	},
 
 	teardown() {
@@ -47,64 +55,61 @@ registerSuite({
 		'no overrides'() {
 			const publisher = new Publisher(cloneDir, generatedDocsDir);
 
-			assert.strictEqual(publisher.cloneDir, cloneDir);
-			assert.strictEqual(publisher.encryptedDeployKey, false);
-			assert.isUndefined(publisher.deployKeyTag);
-			assert.strictEqual(publisher.generatedDocsDirectory, generatedDocsDir);
-			assert.strictEqual(publisher.subDirectory, 'api');
 			assert.strictEqual(publisher.branch, 'gh-pages');
-			assert.strictEqual(publisher.shouldPush, Publisher.prototype.shouldPush);
+			assert.strictEqual(publisher.cloneDir, cloneDir);
+			assert.strictEqual(publisher.deployKey, false);
+			assert.strictEqual(publisher.generatedDocsDirectory, generatedDocsDir);
+			assert.isDefined(publisher.log);
 			assert.isFalse(publisher.skipPublish);
+			assert.strictEqual(publisher.subDirectory, 'api');
+			assert.strictEqual(publisher.url, 'git@github.com:.git');
+			assert.strictEqual(publisher.shouldPush, Publisher.prototype.shouldPush);
 		},
 
 		'with overrides'() {
 			const overrides: Options = {
 				branch: 'branch',
-				deployKeyTag: 'deployKeyTag',
-				encryptedDeployKey: 'encrypted',
+				deployKey: 'deployKey',
+				log: { writeln: stub() },
+				skipPublish: true,
 				shouldPush: () => false,
-				subDirectory: 'subDirectory'
+				subDirectory: 'subDirectory',
+				url: 'tacos'
 			};
 			const publisher = new Publisher(cloneDir, generatedDocsDir, overrides);
 
-			assert.strictEqual(publisher.cloneDir, cloneDir);
-			assert.strictEqual(publisher.encryptedDeployKey, overrides.encryptedDeployKey);
-			assert.strictEqual(publisher.deployKeyTag, overrides.deployKeyTag);
-			assert.strictEqual(publisher.generatedDocsDirectory, generatedDocsDir);
-			assert.strictEqual(publisher.subDirectory, overrides.subDirectory);
 			assert.strictEqual(publisher.branch, overrides.branch);
+			assert.strictEqual(publisher.cloneDir, cloneDir);
+			assert.strictEqual(publisher.deployKey, overrides.deployKey);
+			assert.strictEqual(publisher.generatedDocsDirectory, generatedDocsDir);
+			assert.deepEqual(publisher.log, overrides.log);
+			assert.isTrue(publisher.skipPublish);
+			assert.strictEqual(publisher.subDirectory, overrides.subDirectory);
+			assert.strictEqual(publisher.url, overrides.url);
 			assert.strictEqual(publisher.shouldPush, overrides.shouldPush);
-			assert.isFalse(publisher.skipPublish);
 		}
 	},
 
 	hasDeployCredentials: {
-		'missing encryptedDeployKey; returns false'() {
+		'deployKey false; returns false'() {
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				deployKeyTag: 'key tag'
+				deployKey: false
 			});
 			assert.isFalse(publisher.hasDeployCredentials());
 		},
 
 		'missing deployKeyTag; returns false'() {
+			existsStub.returns(false);
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				encryptedDeployKey: 'LICENSE'
+				deployKey: 'does not exist'
 			});
 			assert.isFalse(publisher.hasDeployCredentials());
 		},
 
 		'missing keyFile; returns false'() {
+			existsStub.returns(true);
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				deployKeyTag: 'key tag',
-				encryptedDeployKey: 'does-not-exist'
-			});
-			assert.isFalse(publisher.hasDeployCredentials());
-		},
-
-		'keyFile present; returns true'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				deployKeyTag: 'key tag',
-				encryptedDeployKey: 'LICENSE'
+				deployKey: 'deploy_key'
 			});
 			assert.isTrue(publisher.hasDeployCredentials());
 		}
@@ -112,57 +117,58 @@ registerSuite({
 
 	publish: {
 		'skipPublish; commit only'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
-			const log = publisher.log = { writeln: stub() };
-			const decryptDeployKey = spy(publisher, 'decryptDeployKey');
-			publisher.skipPublish = true;
+			const log = { writeln: stub() };
+			const publisher = new Publisher(cloneDir, generatedDocsDir, {
+				log,
+				skipPublish: true
+			});
+			const canPublishSpy = spy(publisher, 'canPublish');
 			publisher.publish();
 
 			assertCommit();
-			assert.isFalse(decryptDeployKey.called);
+			assert.isFalse(canPublishSpy.called);
 			assert.strictEqual(log.writeln.lastCall.args[0], 'Only committing -- skipping push to repo');
 		},
 
 		'shouldPush false; commit only'() {
+			const log = { writeln: stub() };
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
+				log,
 				shouldPush() { return false; }
 			});
-			const log = publisher.log = { writeln: stub() };
-			const decryptDeployKey = spy(publisher, 'decryptDeployKey');
+			const canPublishSpy = spy(publisher, 'canPublish');
 			publisher.publish();
 
 			assertCommit();
-			assert.isFalse(decryptDeployKey.called);
+			assert.isFalse(canPublishSpy.called);
 			assert.strictEqual(log.writeln.lastCall.args[0], 'Only committing -- skipping push to repo');
 		},
 
 		'canPublish false; logs error'() {
+			const log = { writeln: stub() };
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
+				log,
 				shouldPush() { return true; }
 			});
-			const decryptDeployKey = spy(publisher, 'decryptDeployKey');
 			const canPublish = stub(publisher, 'canPublish');
-			const log = publisher.log = { writeln: stub() };
 			canPublish.returns(false);
 			publisher.publish();
 
 			assertCommit();
-			assert.isTrue(decryptDeployKey.called);
 			assert.strictEqual(log.writeln.lastCall.args[0], 'Push check failed -- not publishing API docs');
 		},
 
 		'working case'() {
+			const log = { writeln: stub() };
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
+				log,
 				shouldPush() { return true; }
 			});
-			const decryptDeployKey = spy(publisher, 'decryptDeployKey');
 			const canPublish = stub(publisher, 'canPublish');
-			const log = publisher.log = { writeln: stub() };
 			canPublish.returns(true);
 			publisher.publish();
 
 			assertCommit();
-			assert.isTrue(decryptDeployKey.called);
 			assert.strictEqual(log.writeln.lastCall.args[0], 'Pushed gh-pages to origin');
 		}
 	},

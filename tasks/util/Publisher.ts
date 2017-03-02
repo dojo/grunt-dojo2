@@ -1,15 +1,18 @@
 import { join } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, chmodSync } from 'fs';
 import exec from './exec';
 import { cp, rm } from 'shelljs';
 import LogModule = grunt.log.LogModule;
+import { relative } from 'path';
 
 export interface Options {
 	branch?: Publisher['branch'];
-	deployKeyTag?: Publisher['deployKeyTag'];
-	encryptedDeployKey?: Publisher['encryptedDeployKey'];
+	deployKey?: Publisher['deployKey'];
+	log?: Publisher['log'];
 	shouldPush?: Publisher['shouldPush'];
+	skipPublish?: Publisher['skipPublish'];
 	subDirectory?: Publisher['subDirectory'];
+	url?: Publisher['url'];
 }
 
 export interface Log {
@@ -24,7 +27,7 @@ const consoleLogger = {
 };
 
 export function setConfig(key: string, value: string, global: boolean = false) {
-	return exec(`git config ${ global ? '--global ' : '' }${ key } ${ value }`, false);
+	return exec(`git config ${ global ? '--global ' : '' }${ key } ${ value }`, { silent: true });
 }
 
 export default class Publisher {
@@ -38,17 +41,20 @@ export default class Publisher {
 	 */
 	cloneDir: string;
 
+	/**
+	 * The deployment key to use
+	 */
+	deployKey: string | boolean = false;
+
+	/**
+	 * The directory where typedoc generates its docs
+	 */
+	generatedDocsDirectory: string;
+
+	/**
+	 * Logging utility
+	 */
 	log: Log = consoleLogger;
-
-	/**
-	 * The filename of the encrypted deployment file or false if one is not used
-	 */
-	encryptedDeployKey: string | boolean;
-
-	/**
-	 * Travis identifier used with encrypted files
-	 */
-	deployKeyTag?: string;
 
 	/**
 	 * If publishing should be skipped
@@ -61,42 +67,54 @@ export default class Publisher {
 	subDirectory: string = 'api';
 
 	/**
-	 * The directory where typedoc generates its docs
+	 * The repo location
 	 */
-	generatedDocsDirectory: string;
+	url: string;
 
 	constructor(cloneDir: string, generatedDocsDir: string, options: Options = {}) {
 		this.cloneDir = cloneDir;
-		this.encryptedDeployKey = options.encryptedDeployKey || false;
-		this.deployKeyTag = options.deployKeyTag;
 		this.generatedDocsDirectory = generatedDocsDir;
 
 		// optional configuration values
-		options.subDirectory && (this.subDirectory = options.subDirectory);
 		options.branch && (this.branch = options.branch);
+		options.deployKey && (this.deployKey = options.deployKey);
+		options.log && (this.log = options.log);
+		typeof options.skipPublish === 'boolean' && (this.skipPublish = options.skipPublish);
+		options.subDirectory && (this.subDirectory = options.subDirectory);
+		if (options.url) {
+			this.url = options.url;
+		}
+		else {
+			const repo = process.env.TRAVIS_REPO_SLUG || ''; // TODO look up the repo information?
+			this.url = `git@github.com:${ repo }.git`;
+		}
 
 		// optional method overrides
 		options.shouldPush && (this.shouldPush = options.shouldPush);
 	}
 
 	/**
-	 * If deploy credentials
-	 * @return {boolean}
+	 * @return {boolean} if a deploy key exists in the file system
 	 */
 	hasDeployCredentials(): boolean {
-		if (typeof this.encryptedDeployKey === 'boolean') {
+		if (typeof this.deployKey === 'boolean') {
 			return false;
 		}
-		const keyFile = this.encryptedDeployKey;
-		const deployKeyTag = this.deployKeyTag;
-		return !!keyFile && !!deployKeyTag && existsSync(keyFile);
+		return existsSync(this.deployKey);
 	}
 
+	/**
+	 * Publish the contents of { generatedDocsDirectory } in the clone at { cloneDir } in the directory
+	 * { subDirectory } and push to the { branch } branch.
+	 */
 	publish() {
+		if (!existsSync(this.cloneDir)) {
+			this.setup();
+		}
+		this.refreshTypeDoc();
 		this.commit();
 
 		if (!this.skipPublish && this.shouldPush()) {
-			this.decryptDeployKey();
 			if (this.canPublish()) {
 				this.push();
 			}
@@ -110,29 +128,17 @@ export default class Publisher {
 	}
 
 	/**
-	 * @return {boolean} indicates whether doc updates should be pushed to the origin
+	 * Clone the target repository and switch to the deployment branch
 	 */
-	shouldPush() {
-		const branch = exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim();
-		return branch === 'master';
-	}
-
-	/**
-	 * If configuration information exists for obtaining a deployment key and prerequisites have been met to publish
-	 */
-	private canPublish(): boolean {
-		const skipDeploymentCredentials = this.encryptedDeployKey === false;
-		return (skipDeploymentCredentials || this.hasDeployCredentials()) && this.shouldPush();
-	}
-
-	private commit() {
+	setup() {
 		const publishBranch = this.branch;
-		const publishDir = this.subDirectory;
 
+		// Prerequisites for using git
 		setConfig('user.name', 'Travis CI', true);
-		setConfig('user.email', 'pshannon@sitepen.com', true);
+		setConfig('user.email', 'support@sitepen.com', true);
 
-		exec(`git clone . ${ this.cloneDir }`, { silent: true });
+		this.log.writeln(`Cloning ${ this.url }`);
+		this.execSSHAgent(`git clone ${ this.url } ${ this.cloneDir }`, { silent: true });
 
 		try {
 			exec(`git checkout ${ publishBranch }`, { silent: true, cwd: this.cloneDir });
@@ -143,9 +149,39 @@ export default class Publisher {
 			exec('git rm -rf .', { silent: true, cwd: this.cloneDir });
 			this.log.writeln(`Created ${publishBranch} branch`);
 		}
+	}
+
+	/**
+	 * @return {boolean} indicates whether doc updates should be pushed to the origin
+	 */
+	shouldPush() {
+		const branch = process.env.TRAVIS_BRANCH || exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim();
+		return branch === 'master';
+	}
+
+	/**
+	 * If configuration information exists for obtaining a deployment key and prerequisites have been met to publish
+	 */
+	private canPublish(): boolean {
+		const skipDeploymentCredentials = typeof this.deployKey === 'boolean' && !this.deployKey;
+		return (skipDeploymentCredentials || this.hasDeployCredentials()) && this.shouldPush();
+	}
+
+	/**
+	 * Remove everything in preparation for the typedoc
+	 */
+	private refreshTypeDoc() {
+		const publishDir = this.subDirectory;
 
 		rm('-rf', join(this.cloneDir, publishDir));
 		cp('-r', this.generatedDocsDirectory, join(this.cloneDir, publishDir));
+	}
+
+	/**
+	 * Commit (but do not push) everything the new documentation
+	 */
+	private commit() {
+		const publishDir = this.subDirectory;
 
 		if (exec('git status --porcelain', { silent: true, cwd: this.cloneDir }) === '') {
 			this.log.writeln('Nothing changed');
@@ -156,16 +192,21 @@ export default class Publisher {
 		exec('git commit -m "Update API docs"', { silent: true, cwd: this.cloneDir });
 	}
 
-	private decryptDeployKey() {
-		const keyFile = this.encryptedDeployKey;
-		const deployKeyTag = this.deployKeyTag;
-
-		if (!keyFile || !deployKeyTag) {
-			return;
+	/**
+	 * Execute a credentialed git command
+	 * @param command the command to execute
+	 * @param options execute options
+	 */
+	private execSSHAgent(command: string, options: any = {}): string {
+		if (this.hasDeployCredentials()) {
+			const deployKey: string = <string> this.deployKey;
+			const relativeDeployKey = options.cwd ? relative(options.cwd, deployKey) : deployKey;
+			chmodSync(deployKey, '600');
+			return exec(`ssh-agent bash -c 'ssh-add ${ relativeDeployKey }; ${ command }'`, options);
 		}
-
-		exec(`openssl aes-256-cbc -K $encrypted_${ deployKeyTag }_key -iv $encrypted_${ deployKeyTag }_iv -in ${ keyFile } -out deploy_key -d`);
-		exec('chmod 600 deploy_key');
+		else {
+			return exec(command, options);
+		}
 	}
 
 	/**
@@ -174,18 +215,8 @@ export default class Publisher {
 	private push() {
 		this.log.writeln('Publishing API docs');
 		const publishBranch = this.branch || 'gh-pages';
-		// push changes from the temporary clone to the local repo
-		exec('git push', { silent: true, cwd: this.cloneDir });
-		this.log.writeln(`Updated ${publishBranch} in local repo`);
 
-		// push changes from the local repo to the origin repo
-		const pushCommand = `git push origin ${publishBranch}`;
-		if (this.hasDeployCredentials()) {
-			exec(`ssh-agent bash -c 'ssh-add deploy_key; ${ pushCommand }'`, { silent: true });
-		}
-		else {
-			exec(pushCommand);
-		}
+		this.execSSHAgent(`git push origin ${publishBranch}`, { silent: true, cwd: this.cloneDir });
 		this.log.writeln(`Pushed ${publishBranch} to origin`);
 	}
 }
