@@ -9,7 +9,6 @@ export = function (grunt: IGrunt) {
 			src: [
 				'<%= all %>',
 				'!typings/**/*.ts',
-				'!tests/typings/**/*.ts',
 				'!node_modules/**/*.ts'
 			]
 		}

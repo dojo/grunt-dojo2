@@ -6,14 +6,14 @@ export = function (grunt: IGrunt) {
 	return {
 		staticTestFiles: {
 			expand: true,
-			cwd: '.',
+			cwd: 'src',
 			src: [ '<%= staticTestFiles %>' ],
 			dest: '<%= devDirectory %>'
 		},
 		'staticDefinitionFiles-dev': {
 			expand: true,
-			cwd: '.',
-			src: [ path.join('src', '<%= staticDefinitionFiles %>') ],
+			cwd: 'src',
+			src: [ '<%= staticDefinitionFiles %>' ],
 			dest: '<%= devDirectory %>'
 		},
 		'staticDefinitionFiles-dist': {

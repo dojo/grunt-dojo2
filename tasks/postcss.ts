@@ -52,7 +52,7 @@ export = function(grunt: IGrunt) {
 	function moduleFiles(dest: string) {
 		return [{
 			expand: true,
-			src: ['**/*.css', '!**/variables.css', '!styles/widgets.css'],
+			src: ['**/*.css', '!**/variables.css', '!common/styles/widgets.css'],
 			dest: dest,
 			cwd: 'src'
 		}];
@@ -70,9 +70,9 @@ export = function(grunt: IGrunt) {
 			map: true
 		},
 		'modules-dev': {
-			files: moduleFiles(path.join(devDirectory, 'src')),
+			files: moduleFiles(devDirectory),
 			options: {
-				processors: moduleProcessors(devDirectory)
+				processors: moduleProcessors(devDirectory, 'src')
 			}
 		},
 		'modules-dist': {

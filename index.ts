@@ -63,7 +63,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		all: [ '<%= filesGlob %>' ],
 		skipTests: [ '<%= all %>' , '!tests/**/*.ts' ],
 		testsGlob: ['./tests/**/*.ts', 'tests/**/*.ts'],
-		staticTestFiles: 'tests/**/*.{html,css,json,xml,js,txt}',
+		staticTestFiles: '*/tests/**/*.{html,css,json,xml,js,txt}',
 		staticDefinitionFiles: '**/*.d.ts',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',
 		apiDocDirectory: '_apidoc',

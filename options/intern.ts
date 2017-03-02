@@ -4,19 +4,19 @@ export = function (grunt: IGrunt) {
 	return {
 		options: {
 			runType: 'runner',
-			config: '<%= devDirectory %>/tests/intern',
+			config: '<%= devDirectory %>/common/tests/intern',
 			reporters: [ 'Runner' ]
 		},
 		browserstack: {},
 		saucelabs: {
 			options: {
-				config: '<%= devDirectory %>/tests/intern-saucelabs'
+				config: '<%= devDirectory %>/common/tests/intern-saucelabs'
 			}
 		},
 		remote: {},
 		local: {
 			options: {
-				config: '<%= devDirectory %>/tests/intern-local',
+				config: '<%= devDirectory %>/common/tests/intern-local',
 			}
 		},
 		node: {
