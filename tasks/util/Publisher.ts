@@ -23,6 +23,10 @@ const consoleLogger = {
 	}
 };
 
+export function setConfig(key: string, value: string, global: boolean = false) {
+	return exec(`git config ${ global ? '--global ' : '' }${ key } ${ value }`, false);
+}
+
 export default class Publisher {
 	/**
 	 * The branch to publish API documents
@@ -124,6 +128,9 @@ export default class Publisher {
 	private commit() {
 		const publishBranch = this.branch;
 		const publishDir = this.subDirectory;
+
+		setConfig('user.name', 'Travis CI', true);
+		setConfig('user.email', 'pshannon@sitepen.com', true);
 
 		exec(`git clone . ${ this.cloneDir }`, { silent: true });
 
