@@ -4,6 +4,7 @@ import { SinonStub, stub, spy } from 'sinon';
 import { Options, default as PublisherInstance } from 'grunt-dojo2/tasks/util/Publisher';
 import { unloadTasks, loadModule } from 'grunt-dojo2/tests/unit/util';
 
+const cachedTravisBranchEnv = process.env.TRAVIS_BRANCH;
 const cloneDir = '_tests/cloneDir';
 const generatedDocsDir = '_tests/generatedDocsDir';
 const cpStub: SinonStub = stub();
@@ -62,7 +63,7 @@ registerSuite({
 			assert.isDefined(publisher.log);
 			assert.isFalse(publisher.skipPublish);
 			assert.strictEqual(publisher.subDirectory, 'api');
-			assert.strictEqual(publisher.url, 'git@github.com:.git');
+			assert.isTrue(publisher.url.indexOf('git@github.com') >= 0);
 			assert.strictEqual(publisher.shouldPush, Publisher.prototype.shouldPush);
 		},
 
@@ -174,6 +175,14 @@ registerSuite({
 	},
 
 	shouldPush: {
+		setup() {
+			process.env.TRAVIS_BRANCH = '';
+		},
+
+		teardown() {
+			process.env.TRAVIS_BRANCH = cachedTravisBranchEnv;
+		},
+
 		'not master; returns false'() {
 			execStub.returns('branch');
 			const publisher = new Publisher(cloneDir, generatedDocsDir);
@@ -182,6 +191,13 @@ registerSuite({
 
 		'branch is master; returns true'() {
 			execStub.returns('master');
+			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			assert.isTrue(publisher.shouldPush());
+		},
+
+		'travis env is master; returns true'() {
+			process.env.TRAVIS_BRANCH = 'master';
+			execStub.returns('branch');
 			const publisher = new Publisher(cloneDir, generatedDocsDir);
 			assert.isTrue(publisher.shouldPush());
 		}
