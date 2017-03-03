@@ -214,9 +214,7 @@ export default class Publisher {
 	 */
 	private push() {
 		this.log.writeln('Publishing API docs');
-		const publishBranch = this.branch || 'gh-pages';
-
-		this.execSSHAgent(`git push origin ${publishBranch}`, { silent: true, cwd: this.cloneDir });
-		this.log.writeln(`Pushed ${publishBranch} to origin`);
+		this.execSSHAgent(`git push origin ${this.branch}`, { silent: true, cwd: this.cloneDir });
+		this.log.writeln(`Pushed ${this.branch} to origin`);
 	}
 }

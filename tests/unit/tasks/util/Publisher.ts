@@ -3,6 +3,7 @@ import * as assert from 'intern/chai!assert';
 import { SinonStub, stub, spy } from 'sinon';
 import { Options, default as PublisherInstance } from 'grunt-dojo2/tasks/util/Publisher';
 import { unloadTasks, loadModule } from 'grunt-dojo2/tests/unit/util';
+import { existsSync } from 'fs';
 
 const cachedTravisBranchEnv = process.env.TRAVIS_BRANCH;
 const cloneDir = '_tests/cloneDir';
@@ -88,6 +89,11 @@ registerSuite({
 			assert.strictEqual(publisher.subDirectory, overrides.subDirectory);
 			assert.strictEqual(publisher.url, overrides.url);
 			assert.strictEqual(publisher.shouldPush, overrides.shouldPush);
+		},
+
+		'default logger'() {
+			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			publisher.log.writeln('hi');
 		}
 	},
 
@@ -117,6 +123,10 @@ registerSuite({
 	},
 
 	publish: {
+		beforeEach() {
+			existsStub.onFirstCall().returns(false);
+		},
+
 		'skipPublish; commit only'() {
 			const log = { writeln: stub() };
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
@@ -160,13 +170,13 @@ registerSuite({
 		},
 
 		'working case'() {
+			existsStub.returns(true);
 			const log = { writeln: stub() };
 			const publisher = new Publisher(cloneDir, generatedDocsDir, {
 				log,
-				shouldPush() { return true; }
+				shouldPush() { return true; },
+				deployKey: 'deploy_key'
 			});
-			const canPublish = stub(publisher, 'canPublish');
-			canPublish.returns(true);
 			publisher.publish();
 
 			assertCommit();
