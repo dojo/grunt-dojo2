@@ -12,8 +12,8 @@ export = function (grunt: IGrunt) {
 		},
 		'staticDefinitionFiles-dev': {
 			expand: true,
-			cwd: '.',
-			src: [ path.join('src', '<%= staticDefinitionFiles %>') ],
+			cwd: 'src',
+			src: [ '<%= staticDefinitionFiles %>' ],
 			dest: '<%= devDirectory %>'
 		},
 		'staticDefinitionFiles-dist': {
