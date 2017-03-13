@@ -1,7 +1,8 @@
 import ITask = grunt.task.ITask;
-import { config } from 'shelljs';
+import { config, touch } from 'shelljs';
 import exec from './util/exec';
 import Publisher from './util/Publisher';
+import { join } from 'path';
 
 /**
  * Build command line arguments for typedoc from grunt options
@@ -39,6 +40,10 @@ export = function (grunt: IGrunt) {
 		// Use project-local typedoc
 		const typedoc = require.resolve('typedoc/bin/typedoc');
 		exec(`node "${ typedoc }" ${ typedocOptions(options).join(' ') }`);
+
+		// Add a .nojekyll file to prevent GitHub pages from trying to parse files starting with an underscore
+		// @see https://github.com/blog/572-bypassing-jekyll-on-github-pages
+		touch(join(options.out, '.nojekyll'));
 
 		if (shouldPublish) {
 			const cloneDir = grunt.config.get<string>('apiPubDirectory');

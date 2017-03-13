@@ -26,6 +26,7 @@ let expandMapping: SinonStub;
 let execSync: SinonSpy;
 let cp: SinonSpy;
 let rm: SinonSpy;
+let touch: SinonSpy;
 let shouldPush: SinonSpy;
 let shouldPushValue: boolean;
 let failInitialCheckout: boolean;
@@ -42,6 +43,7 @@ registerSuite({
 	setup() {
 		cp = spy(() => {});
 		rm = spy(() => {});
+		touch = spy(() => {});
 		execSync = spy((command: string) => {
 			if (/git checkout/.test(command) && failInitialCheckout) {
 				failInitialCheckout = false;
@@ -59,7 +61,8 @@ registerSuite({
 			'shelljs': {
 				config: {},
 				cp,
-				rm
+				rm,
+				touch
 			},
 			'./util/exec': {
 				'default': execSync
