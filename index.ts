@@ -51,7 +51,9 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	const docTasks = [
 		'clean:typings',
 		'typings:dev',
-		'typedoc'
+		'typedoc',
+		'clean:typedoc',
+		'clean:ghpages'
 	];
 
 	grunt.initConfig({

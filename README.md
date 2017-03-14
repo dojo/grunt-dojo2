@@ -160,6 +160,31 @@ proxy: {
 }
 ```
 
+#### grunt doc
+
+The `doc` task is used to automatically build and publish API documentation to the project's GitHub pages. Please note
+that if you want to generate documentation locally by manually running this command use the `grunt typedoc` command 
+instead.
+
+##### Environment Variables
+
+Running `grunt typedoc` (part of `grunt doc`) will only generate APIs using typedoc. In order to 
+ automatically commit or publish API documentation the `DEPLOY_DOCS` environment variable must be set to either 
+ `publish` or `commit`. Environment variables are used so they may be turned on/off using travis-ci settings and to 
+ support forks that may want to use the travis build, but do not want to automatically publish documentation.
+
+##### Prerequisites
+
+To support continuous delivery of API documents to your project's GitHub pages Travis-ci needs access to your GitHub
+repository. This is best achieved by supplying an encrypted deployment key that can be used via SSH (there are other
+methods that are less secure that we will not go into). To use this method you will need to:
+
+1. Create a ssh key; e.g. `ssh-keygen -t rsa -C "your_email@example.com"`
+1. encrypt the private key using travis cli; e.g. `travis encrypt-file deploy_key` (you will need to be logged in and
+	be the owner of the GitHub repository to do this)
+1. add the public key under your project's GitHub settings
+1. add `grunt doc --publish-api` as part of your `install` steps
+
 #### grunt link
 
 The link task is designed to ease the local development and testing of changes that span multiple packages. Traditionally `npm link` can be used but this assumes that the project structure is the same as the distribution, which for dojo2 projects is not the case. 
@@ -219,6 +244,16 @@ The running `grunt dist` will execute the dist pipeline which as follows:
 - `tslint`
 - `clean:dist`
 - `ts:dist`
+
+#### doc
+
+Running `grunt doc` will execute the doc pipeline, which comes from the `docTasks` configuration:
+
+- `clean:typings`
+- `typings:dev`
+- `typedoc`
+- `clean:typedoc`
+- `clean:ghpages`
 
 #### test
 

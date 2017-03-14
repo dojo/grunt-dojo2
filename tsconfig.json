@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"baseUrl": ".",
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "umd",
@@ -8,7 +9,12 @@
 		"pretty": true,
 		"target": "es5",
 		"strictNullChecks": true,
-		"noImplicitThis": true
+		"noImplicitThis": true,
+		"paths": {
+			"grunt-dojo2/*": [
+				"./*"
+			]
+		}
 	},
 	"include": [
 		"./index.ts",

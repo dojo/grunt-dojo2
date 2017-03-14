@@ -1,6 +1,4 @@
-export = function (grunt: IGrunt) {
-	const { exec } = require('shelljs');
-
+export = function (_grunt: IGrunt) {
 	return {
 		options: {
 			// All options but publishOptions are passed directly to the typedoc command line.
@@ -16,14 +14,7 @@ export = function (grunt: IGrunt) {
 			publishOptions: {
 				branch: 'gh-pages',
 				subdir: 'api',
-
-				// shouldPush is a function that indicates whether doc updates should be pushed to the origin
-				shouldPush: function () {
-					const branch = exec('git rev-parse --abbrev-ref HEAD', { silent: true }).stdout.trim();
-					const keyTag = process.env['SSH_KEY_TAG'];
-					const keyVar = process.env[`encrypted_${keyTag}_key`];
-					return branch === 'master' && keyVar;
-				}
+				deployKey: 'deploy_key'
 			}
 		}
 	};

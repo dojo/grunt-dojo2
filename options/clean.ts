@@ -31,6 +31,9 @@ export = function (grunt: IGrunt) {
 		},
 		typedoc: {
 			src: [ '<%= apiDocDirectory %>', '<%= apiPubDirectory %>' ]
+		},
+		ghpages: {
+			src: [ '<%= apiPubDirectory %>' ]
 		}
 	};
 };
