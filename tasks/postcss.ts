@@ -52,7 +52,7 @@ export = function(grunt: IGrunt) {
 	function moduleFiles(dest: string) {
 		return [{
 			expand: true,
-			src: ['**/*.css', '!**/variables.css', '!common/styles/widgets.css'],
+			src: ['**/*.css', '!**/variables.css', '!**/widgets.css'],
 			dest: dest,
 			cwd: 'src'
 		}];
