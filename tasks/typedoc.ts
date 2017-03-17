@@ -34,8 +34,9 @@ export = function (grunt: IGrunt) {
 		config.fatal = true;
 
 		const options: any = this.options({});
+		const rootApiDocDirectory = grunt.config.get<string>('apiDocDirectory');
 		const outOption = grunt.option<string>('doc-dir');
-		options.out = outOption || options.out || grunt.config.get<string>('apiDocDirectory');
+		options.out = outOption || options.out || rootApiDocDirectory;
 
 		// Use project-local typedoc
 		const typedoc = require.resolve('typedoc/bin/typedoc');
@@ -43,7 +44,8 @@ export = function (grunt: IGrunt) {
 
 		// Add a .nojekyll file to prevent GitHub pages from trying to parse files starting with an underscore
 		// @see https://github.com/blog/572-bypassing-jekyll-on-github-pages
-		touch(join(options.out, '.nojekyll'));
+		grunt.log.writeln(`writing .nojekyll file to ${ rootApiDocDirectory }`);
+		touch(join(rootApiDocDirectory, '.nojekyll'));
 
 		if (shouldPublish) {
 			const cloneDir = grunt.config.get<string>('apiPubDirectory');
