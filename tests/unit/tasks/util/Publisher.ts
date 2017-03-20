@@ -5,15 +5,15 @@ import { Options, default as PublisherInstance } from 'grunt-dojo2/tasks/util/Pu
 import { unloadTasks, loadModule } from 'grunt-dojo2/tests/unit/util';
 
 const cloneDir = '_tests/cloneDir';
-const generatedDocsDir = '_tests/generatedDocsDir';
 const cpStub: SinonStub = stub();
 const rmStub: SinonStub = stub();
 const chmodStub: SinonStub = stub();
 const spawnStub: SinonSpy = spy( () => {
 	return { stdout: '' };
 });
-const execStub: SinonStub = stub();
+const execStub = stub();
 const existsStub: SinonStub = stub();
+const log = { writeln: stub() };
 let Publisher: typeof PublisherInstance;
 
 registerSuite({
@@ -45,6 +45,7 @@ registerSuite({
 		rmStub.reset();
 		chmodStub.reset();
 		existsStub.reset();
+		log.writeln.reset();
 	},
 
 	teardown() {
@@ -53,7 +54,7 @@ registerSuite({
 
 	construct: {
 		'no overrides'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			const publisher = new Publisher(cloneDir);
 
 			assert.strictEqual(publisher.branch, 'gh-pages');
 			assert.strictEqual(publisher.cloneDirectory, cloneDir);
@@ -79,7 +80,7 @@ registerSuite({
 		},
 
 		'default logger'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			const publisher = new Publisher(cloneDir);
 			publisher.log.writeln('hi');
 		}
 	},
@@ -87,35 +88,78 @@ registerSuite({
 	hasDeployCredentials: {
 		'missing deployKey; returns false'() {
 			existsStub.returns(false);
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			const publisher = new Publisher(cloneDir);
 			assert.isFalse(publisher.hasDeployCredentials());
 		},
 
 		'deployKey is present; returns true'() {
 			existsStub.returns(true);
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			const publisher = new Publisher(cloneDir);
 			assert.isTrue(publisher.hasDeployCredentials());
 		}
 	},
 
-	init() {
-		existsStub.onFirstCall().returns(true);
-		const log = { writeln: stub() };
-		const publisher = new Publisher(cloneDir, { log });
-		publisher.init();
+	init: {
+		checkout() {
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
 
-		assert.include(log.writeln.lastCall.args[0], 'Cloning');
+			assert.include(log.writeln.lastCall.args[0], 'Cloning');
+			assert.include(execStub.lastCall.args[0], 'git checkout');
+		},
+
+		'create new branch'() {
+			execStub.onCall(5).throws(new Error());
+
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
+
+			assert.include(execStub.lastCall.args[0], 'git rm');
+		},
+
+		'init without deploy key'() {
+			existsStub.returns(false);
+
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
+
+			assert.isTrue(spawnStub.called);
+		},
+
+		'git config is present; does not set config values'() {
+			execStub.onCall(0).returns('user.name');
+			execStub.onCall(1).returns('user.email');
+
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
+
+			assert.include(execStub.getCall(0).args[0], 'git config user.name');
+			assert.include(execStub.getCall(1).args[0], 'git config user.email');
+			assert.include(execStub.lastCall.args[0], 'git checkout');
+			assert.strictEqual(execStub.callCount, 3);
+		}
 	},
 
-	commit() {
-		existsStub.onFirstCall().returns(false);
-		const log = { writeln: stub() };
-		const publisher = new Publisher(cloneDir, { log });
-		publisher.commit();
+	commit: {
+		'no changes; skips commit'() {
+			const publisher = new Publisher(cloneDir, { log });
+			execStub.onFirstCall().returns('');
+			publisher.commit();
 
-		assert.include(execStub.getCall(0).args[0], 'git status');
-		assert.include(execStub.getCall(1).args[0], 'git add');
-		assert.include(execStub.lastCall.args[0], 'git commit -m');
+			assert.isTrue(execStub.calledOnce);
+			assert.include(execStub.getCall(0).args[0], 'git status');
+		},
+
+		'changed files; exec commit'() {
+			const publisher = new Publisher(cloneDir, { log });
+			execStub.onFirstCall().returns('changes');
+			publisher.commit();
+
+			assert.isTrue(execStub.calledThrice);
+			assert.include(execStub.getCall(0).args[0], 'git status');
+			assert.include(execStub.getCall(1).args[0], 'git add');
+			assert.include(execStub.lastCall.args[0], 'git commit -m');
+		}
 	},
 
 	publish() {

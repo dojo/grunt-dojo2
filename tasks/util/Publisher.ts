@@ -21,8 +21,12 @@ const consoleLogger = {
 	}
 };
 
-export function setConfig(key: string, value: string, global: boolean = false) {
-	return exec(`git config ${ global ? '--global ' : '' }${ key } ${ value }`, { silent: true });
+export function getConfig(key: string): string {
+	return exec(`git config ${ key }`, { silent: true });
+}
+
+export function setGlobalConfig(key: string, value: string) {
+	return exec(`git config --global ${ key } ${ value }`, { silent: true });
 }
 
 export default class Publisher {
@@ -95,8 +99,12 @@ export default class Publisher {
 		const publishBranch = this.branch;
 
 		// Prerequisites for using git
-		setConfig('user.name', 'Travis CI', true);
-		setConfig('user.email', 'support@sitepen.com', true);
+		if (!getConfig('user.name')) {
+			setGlobalConfig('user.name', 'Travis CI');
+		}
+		if (!getConfig('user.email')) {
+			setGlobalConfig('user.email', 'support@sitepen.com');
+		}
 
 		this.log.writeln(`Cloning ${ this.url }`);
 		this.execSSHAgent('git', [ 'clone', this.url, this.cloneDirectory ], { silent: true });
@@ -127,7 +135,7 @@ export default class Publisher {
 	 * @param command the command to execute
 	 * @param options execute options
 	 */
-	private execSSHAgent(command: string, args: string[] = [], options: any = {}): string {
+	private execSSHAgent(command: string, args: string[], options: any): string {
 		if (this.hasDeployCredentials()) {
 			const deployKey: string = <string> this.deployKey;
 			const relativeDeployKey = options.cwd ? relative(options.cwd, deployKey) : deployKey;
