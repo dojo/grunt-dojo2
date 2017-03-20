@@ -21,10 +21,6 @@ const consoleLogger = {
 	}
 };
 
-export function getConfig(key: string): string {
-	return exec(`git config ${ key }`, { silent: true });
-}
-
 export function setGlobalConfig(key: string, value: string) {
 	return exec(`git config --global ${ key } ${ value }`, { silent: true });
 }
@@ -99,10 +95,10 @@ export default class Publisher {
 		const publishBranch = this.branch;
 
 		// Prerequisites for using git
-		if (!getConfig('user.name')) {
+		if (!this.hasConifg('user.name')) {
 			setGlobalConfig('user.name', 'Travis CI');
 		}
-		if (!getConfig('user.email')) {
+		if (!this.hasConifg('user.email')) {
 			setGlobalConfig('user.email', 'support@sitepen.com');
 		}
 
@@ -151,5 +147,14 @@ export default class Publisher {
 			}
 			return response.stdout;
 		}
+	}
+
+	private hasConifg(key: string): boolean {
+		try {
+			return !!exec(`git config ${ key }`, { silent: true });
+		}
+		catch (e) { }
+
+		return false;
 	}
 }
