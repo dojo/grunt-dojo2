@@ -144,7 +144,12 @@ export default class Publisher {
 		}
 		else {
 			this.log.writeln(`Deploy Key "${ this.deployKey }" is not present. Using environment credentials.`);
-			return spawn(command, args, options).stdout;
+			const response = spawn(command, args, options);
+
+			if (response.stderr) {
+				this.log.writeln(response.stderr);
+			}
+			return response.stdout;
 		}
 	}
 }

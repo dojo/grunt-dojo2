@@ -8,9 +8,7 @@ const cloneDir = '_tests/cloneDir';
 const cpStub: SinonStub = stub();
 const rmStub: SinonStub = stub();
 const chmodStub: SinonStub = stub();
-const spawnStub: SinonSpy = spy( () => {
-	return { stdout: '' };
-});
+const spawnStub = stub();
 const execStub = stub();
 const existsStub: SinonStub = stub();
 const log = { writeln: stub() };
@@ -46,6 +44,10 @@ registerSuite({
 		chmodStub.reset();
 		existsStub.reset();
 		log.writeln.reset();
+
+		spawnStub.returns({
+			stdout: 'result'
+		});
 	},
 
 	teardown() {
