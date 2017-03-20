@@ -44,7 +44,7 @@
     "grunt-postcss": "^0.8.0",
     "grunt-text-replace": ">=0.4.0",
     "grunt-ts": ">=5.0.0",
-    "grunt-tslint": "^3.0.0",
+    "grunt-tslint": "^4.0.1",
     "grunt-typings": "^0.1.5",
     "lodash": "^4.15.0",
     "parse-git-config": "^0.4.2",
@@ -55,7 +55,7 @@
     "remap-istanbul": ">=0.6.3",
     "resolve-from": "^2.0.0",
     "shelljs": "^0.7.6",
-    "tslint": "~3.15.1",
+    "tslint": "^4.5.1",
     "typedoc": "^0.5.6",
     "umd-wrapper": "^0.1.0"
   },
