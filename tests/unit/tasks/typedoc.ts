@@ -12,7 +12,6 @@ import {
 	getOutputDirectory
 } from '../util';
 
-const cachedDeployDocsEnv = process.env.DEPLOY_DOCS;
 const outputPath = getOutputDirectory();
 const tsconfigPath = join(outputPath, 'tsconfig.json');
 const apiDocDirectory = join(outputPath, 'doc');
@@ -24,26 +23,24 @@ let write: SinonSpy;
 let readJSON: SinonStub;
 let expandMapping: SinonStub;
 let execSync: SinonSpy;
-let cp: SinonSpy;
-let rm: SinonSpy;
-let touch: SinonSpy;
-let shouldPush: SinonSpy;
-let shouldPushValue: boolean;
+const cp = stub();
+const rm = stub();
+const spawnStub = stub();
+const touch = stub();
+const publishModeStub = stub();
 let failInitialCheckout: boolean;
 let publisherConstructor: SinonSpy;
 let publisher: {
 	log?: any;
+	init: SinonStub;
+	commit: SinonStub;
 	publish: SinonStub;
-	skipPublish?: boolean;
 };
 
 registerSuite({
 	name: 'tasks/typedoc',
 
 	setup() {
-		cp = spy(() => {});
-		rm = spy(() => {});
-		touch = spy(() => {});
 		execSync = spy((command: string) => {
 			if (/git checkout/.test(command) && failInitialCheckout) {
 				failInitialCheckout = false;
@@ -51,7 +48,9 @@ registerSuite({
 			}
 		});
 		publisher = {
-			publish: stub()
+			init: stub(),
+			publish: stub(),
+			commit: stub()
 		};
 		publisherConstructor = spy(function () {
 			return publisher;
@@ -64,8 +63,9 @@ registerSuite({
 				rm,
 				touch
 			},
-			'./util/exec': {
-				'default': execSync
+			'./util/process': {
+				'exec': execSync,
+				'spawn': spawnStub
 			},
 			'./util/Publisher': {
 				'default': publisherConstructor
@@ -81,7 +81,7 @@ registerSuite({
 		readJSON = stub(grunt.file, 'readJSON', (filename: string) => {
 			return {};
 		});
-		shouldPush = spy(() => shouldPushValue);
+		publisher.commit.returns(true);
 
 		prepareOutputDirectory();
 	},
@@ -123,7 +123,7 @@ registerSuite({
 					logger: 'none',
 					publishOptions: {
 						subDirectory: 'api',
-						shouldPush
+						publishMode: publishModeStub
 					}
 				}
 			}
@@ -131,15 +131,19 @@ registerSuite({
 
 		write.reset();
 		execSync.reset();
-		shouldPush.reset();
+		spawnStub.reset();
+		publishModeStub.reset();
 		publisher.publish.reset();
+		publisher.commit.reset();
+		publisher.init.reset();
 		publisherConstructor.reset();
 
-		shouldPushValue = false;
+		spawnStub.returns({ stdout: '' });
 		failInitialCheckout = false;
 	},
 
 	default() {
+		publishModeStub.returns(false);
 		runGruntTask('typedoc');
 		const command = execSync.args[0][0];
 		const matcher = new RegExp(
@@ -147,45 +151,26 @@ registerSuite({
 			`--tsconfig "${join(outputPath, 'tsconfig.json')}" ` +
 			`--logger "none" --out "${apiDocDirectory}"`);
 		assert.match(command, matcher, 'Unexpected typedoc command line');
-		assert.strictEqual(shouldPush.callCount, 0, 'Push check should not have been called');
 		assert.strictEqual(write.callCount, 0, 'Nothing should have been written');
 		assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
 		assert.isFalse(publisherConstructor.called);
 	},
 
-	publish: {
-		setup() {
-			process.env.DEPLOY_DOCS = 'publish';
-		},
-
-		teardown() {
-			process.env.DEPLOY_DOCS = cachedDeployDocsEnv;
-		},
-
-		test() {
-			runGruntTask('typedoc');
-			assert.isTrue(publisherConstructor.calledOnce);
-			assert.isFalse(publisherConstructor.firstCall.args[2].skipPublish);
-			assert.isDefined(publisherConstructor.firstCall.args[2].log);
-			assert.isTrue(publisher.publish.calledOnce);
-		}
+	publish() {
+		publishModeStub.returns('publish');
+		runGruntTask('typedoc');
+		assert.isTrue(publisherConstructor.calledOnce);
+		assert.isDefined(publisherConstructor.firstCall.args[1].log);
+		assert.isTrue(publisher.commit.calledOnce);
+		assert.isTrue(publisher.publish.calledOnce);
 	},
 
-	commit: {
-		setup() {
-			process.env.DEPLOY_DOCS = 'commit';
-		},
-
-		teardown() {
-			process.env.DEPLOY_DOCS = cachedDeployDocsEnv;
-		},
-
-		test() {
-			runGruntTask('typedoc');
-			assert.isTrue(publisherConstructor.calledOnce);
-			assert.isTrue(publisherConstructor.firstCall.args[2].skipPublish);
-			assert.isDefined(publisherConstructor.firstCall.args[2].log);
-			assert.isTrue(publisher.publish.calledOnce);
-		}
+	commit() {
+		publishModeStub.returns('commit');
+		runGruntTask('typedoc');
+		assert.isTrue(publisherConstructor.calledOnce);
+		assert.isDefined(publisherConstructor.firstCall.args[1].log);
+		assert.isTrue(publisher.commit.calledOnce);
+		assert.isFalse(publisher.publish.called);
 	}
 });

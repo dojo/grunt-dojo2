@@ -13,8 +13,15 @@ export = function (_grunt: IGrunt) {
 			// publishOptions are only used when publishing the generate API docs
 			publishOptions: {
 				branch: 'gh-pages',
-				subdir: 'api',
-				deployKey: 'deploy_key'
+				deployKey: 'deploy_key',
+				subDirectory: 'api',
+				publishMode() {
+					// Require that the API doc deployment is explicitly requested in an environment variable
+					// this allows us to turn it off without needing to make a commit and allows forking repos
+					// to select their own settings without changing code
+					const deploy = process.env.DEPLOY_DOCS;
+					return process.env.TRAVIS_BRANCH === 'master' && deploy;
+				}
 			}
 		}
 	};

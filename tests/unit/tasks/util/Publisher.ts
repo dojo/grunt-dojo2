@@ -1,25 +1,19 @@
 import * as registerSuite from 'intern!object';
 import * as assert from 'intern/chai!assert';
-import { SinonStub, stub, spy } from 'sinon';
+import { SinonStub, SinonSpy, stub, spy } from 'sinon';
 import { Options, default as PublisherInstance } from 'grunt-dojo2/tasks/util/Publisher';
 import { unloadTasks, loadModule } from 'grunt-dojo2/tests/unit/util';
-import { existsSync } from 'fs';
 
-const cachedTravisBranchEnv = process.env.TRAVIS_BRANCH;
 const cloneDir = '_tests/cloneDir';
-const generatedDocsDir = '_tests/generatedDocsDir';
 const cpStub: SinonStub = stub();
 const rmStub: SinonStub = stub();
 const chmodStub: SinonStub = stub();
-const execStub: SinonStub = stub();
+const spawnStub = stub();
+const execStub = stub();
 const existsStub: SinonStub = stub();
+const log = { writeln: stub() };
 let Publisher: typeof PublisherInstance;
 
-function assertCommit() {
-	assert.isTrue(execStub.called);
-	assert.isTrue(rmStub.called);
-	assert.isTrue(cpStub.called);
-}
 registerSuite({
 	name: 'tasks/util/Publisher',
 
@@ -34,8 +28,9 @@ registerSuite({
 				chmodSync: chmodStub,
 				existsSync: existsStub
 			},
-			'./exec': {
-				'default': execStub
+			'./process': {
+				'exec': execStub,
+				'spawn': spawnStub
 			}
 		};
 		Publisher = loadModule('grunt-dojo2/tasks/util/Publisher', mocks);
@@ -44,9 +39,15 @@ registerSuite({
 	beforeEach() {
 		cpStub.reset();
 		execStub.reset();
+		spawnStub.reset();
 		rmStub.reset();
 		chmodStub.reset();
 		existsStub.reset();
+		log.writeln.reset();
+
+		spawnStub.returns({
+			stdout: 'result'
+		});
 	},
 
 	teardown() {
@@ -55,17 +56,13 @@ registerSuite({
 
 	construct: {
 		'no overrides'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			const publisher = new Publisher(cloneDir);
 
 			assert.strictEqual(publisher.branch, 'gh-pages');
-			assert.strictEqual(publisher.cloneDir, cloneDir);
-			assert.strictEqual(publisher.deployKey, false);
-			assert.strictEqual(publisher.generatedDocsDirectory, generatedDocsDir);
+			assert.strictEqual(publisher.cloneDirectory, cloneDir);
+			assert.strictEqual(publisher.deployKey, 'deploy_key');
 			assert.isDefined(publisher.log);
-			assert.isFalse(publisher.skipPublish);
-			assert.strictEqual(publisher.subDirectory, 'api');
 			assert.isTrue(publisher.url.indexOf('git@github.com') >= 0);
-			assert.strictEqual(publisher.shouldPush, Publisher.prototype.shouldPush);
 		},
 
 		'with overrides'() {
@@ -73,143 +70,106 @@ registerSuite({
 				branch: 'branch',
 				deployKey: 'deployKey',
 				log: { writeln: stub() },
-				skipPublish: true,
-				shouldPush: () => false,
-				subDirectory: 'subDirectory',
 				url: 'tacos'
 			};
-			const publisher = new Publisher(cloneDir, generatedDocsDir, overrides);
+			const publisher = new Publisher(cloneDir, overrides);
 
 			assert.strictEqual(publisher.branch, overrides.branch);
-			assert.strictEqual(publisher.cloneDir, cloneDir);
+			assert.strictEqual(publisher.cloneDirectory, cloneDir);
 			assert.strictEqual(publisher.deployKey, overrides.deployKey);
-			assert.strictEqual(publisher.generatedDocsDirectory, generatedDocsDir);
 			assert.deepEqual(publisher.log, overrides.log);
-			assert.isTrue(publisher.skipPublish);
-			assert.strictEqual(publisher.subDirectory, overrides.subDirectory);
 			assert.strictEqual(publisher.url, overrides.url);
-			assert.strictEqual(publisher.shouldPush, overrides.shouldPush);
 		},
 
 		'default logger'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
+			const publisher = new Publisher(cloneDir);
 			publisher.log.writeln('hi');
 		}
 	},
 
 	hasDeployCredentials: {
-		'deployKey false; returns false'() {
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				deployKey: false
-			});
-			assert.isFalse(publisher.hasDeployCredentials());
-		},
-
-		'missing deployKeyTag; returns false'() {
+		'missing deployKey; returns false'() {
 			existsStub.returns(false);
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				deployKey: 'does not exist'
-			});
+			const publisher = new Publisher(cloneDir);
 			assert.isFalse(publisher.hasDeployCredentials());
 		},
 
-		'missing keyFile; returns false'() {
+		'deployKey is present; returns true'() {
 			existsStub.returns(true);
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				deployKey: 'deploy_key'
-			});
+			const publisher = new Publisher(cloneDir);
 			assert.isTrue(publisher.hasDeployCredentials());
 		}
 	},
 
-	publish: {
-		beforeEach() {
-			existsStub.onFirstCall().returns(false);
+	init: {
+		checkout() {
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
+
+			assert.include(log.writeln.lastCall.args[0], 'Cloning');
+			assert.include(execStub.lastCall.args[0], 'git checkout');
 		},
 
-		'skipPublish; commit only'() {
-			const log = { writeln: stub() };
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				log,
-				skipPublish: true
-			});
-			const canPublishSpy = spy(publisher, 'canPublish');
-			publisher.publish();
+		'create new branch'() {
+			execStub.onCall(5).throws(new Error());
 
-			assertCommit();
-			assert.isFalse(canPublishSpy.called);
-			assert.strictEqual(log.writeln.lastCall.args[0], 'Only committing -- skipping push to repo');
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
+
+			assert.include(execStub.lastCall.args[0], 'git rm');
 		},
 
-		'shouldPush false; commit only'() {
-			const log = { writeln: stub() };
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				log,
-				shouldPush() { return false; }
-			});
-			const canPublishSpy = spy(publisher, 'canPublish');
-			publisher.publish();
+		'init without deploy key'() {
+			existsStub.returns(false);
 
-			assertCommit();
-			assert.isFalse(canPublishSpy.called);
-			assert.strictEqual(log.writeln.lastCall.args[0], 'Only committing -- skipping push to repo');
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
+
+			assert.isTrue(spawnStub.called);
 		},
 
-		'canPublish false; logs error'() {
-			const log = { writeln: stub() };
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				log,
-				shouldPush() { return true; }
-			});
-			const canPublish = stub(publisher, 'canPublish');
-			canPublish.returns(false);
-			publisher.publish();
+		'git config is present; does not set config values'() {
+			execStub.onCall(0).returns('user.name');
+			execStub.onCall(1).returns('user.email');
 
-			assertCommit();
-			assert.strictEqual(log.writeln.lastCall.args[0], 'Push check failed -- not publishing API docs');
-		},
+			const publisher = new Publisher(cloneDir, { log });
+			publisher.init();
 
-		'working case'() {
-			existsStub.returns(true);
-			const log = { writeln: stub() };
-			const publisher = new Publisher(cloneDir, generatedDocsDir, {
-				log,
-				shouldPush() { return true; },
-				deployKey: 'deploy_key'
-			});
-			publisher.publish();
-
-			assertCommit();
-			assert.strictEqual(log.writeln.lastCall.args[0], 'Pushed gh-pages to origin');
+			assert.include(execStub.getCall(0).args[0], 'git config user.name');
+			assert.include(execStub.getCall(1).args[0], 'git config user.email');
+			assert.include(execStub.lastCall.args[0], 'git checkout');
+			assert.strictEqual(execStub.callCount, 3);
 		}
 	},
 
-	shouldPush: {
-		setup() {
-			process.env.TRAVIS_BRANCH = '';
+	commit: {
+		'no changes; skips commit'() {
+			const publisher = new Publisher(cloneDir, { log });
+			execStub.onFirstCall().returns('');
+			publisher.commit();
+
+			assert.isTrue(execStub.calledOnce);
+			assert.include(execStub.getCall(0).args[0], 'git status');
 		},
 
-		teardown() {
-			process.env.TRAVIS_BRANCH = cachedTravisBranchEnv;
-		},
+		'changed files; exec commit'() {
+			const publisher = new Publisher(cloneDir, { log });
+			execStub.onFirstCall().returns('changes');
+			publisher.commit();
 
-		'not master; returns false'() {
-			execStub.returns('branch');
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
-			assert.isFalse(publisher.shouldPush());
-		},
-
-		'branch is master; returns true'() {
-			execStub.returns('master');
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
-			assert.isTrue(publisher.shouldPush());
-		},
-
-		'travis env is master; returns true'() {
-			process.env.TRAVIS_BRANCH = 'master';
-			execStub.returns('branch');
-			const publisher = new Publisher(cloneDir, generatedDocsDir);
-			assert.isTrue(publisher.shouldPush());
+			assert.isTrue(execStub.calledThrice);
+			assert.include(execStub.getCall(0).args[0], 'git status');
+			assert.include(execStub.getCall(1).args[0], 'git add');
+			assert.include(execStub.lastCall.args[0], 'git commit -m');
 		}
+	},
+
+	publish() {
+		existsStub.returns(true);
+		const log = { writeln: stub() };
+		const publisher = new Publisher(cloneDir, { log });
+		publisher.publish();
+
+		assert.strictEqual(log.writeln.lastCall.args[0], 'Pushed gh-pages to origin');
 	}
 });

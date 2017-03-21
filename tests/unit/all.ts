@@ -8,6 +8,6 @@ import './tasks/run';
 import './tasks/ts';
 import './tasks/typedoc';
 import './tasks/uploadCoverage';
-import './tasks/util/exec';
+import './tasks/util/process';
 import './tasks/util/Publisher';
 import './lib/load-dojo-loader';

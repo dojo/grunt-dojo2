@@ -1,7 +1,5 @@
-import { join } from 'path';
 import { existsSync, chmodSync } from 'fs';
-import exec from './exec';
-import { cp, rm } from 'shelljs';
+import { exec, spawn } from './process';
 import LogModule = grunt.log.LogModule;
 import { relative } from 'path';
 
@@ -9,9 +7,6 @@ export interface Options {
 	branch?: Publisher['branch'];
 	deployKey?: Publisher['deployKey'];
 	log?: Publisher['log'];
-	shouldPush?: Publisher['shouldPush'];
-	skipPublish?: Publisher['skipPublish'];
-	subDirectory?: Publisher['subDirectory'];
 	url?: Publisher['url'];
 }
 
@@ -26,30 +21,25 @@ const consoleLogger = {
 	}
 };
 
-export function setConfig(key: string, value: string, global: boolean = false) {
-	return exec(`git config ${ global ? '--global ' : '' }${ key } ${ value }`, { silent: true });
+export function setGlobalConfig(key: string, value: string) {
+	return exec(`git config --global ${ key } ${ value }`, { silent: true });
 }
 
 export default class Publisher {
 	/**
-	 * The branch to publish API documents
+	 * The branch to publish
 	 */
 	branch: string = 'gh-pages';
 
 	/**
 	 * The temporary directory for the local git clone
 	 */
-	cloneDir: string;
+	cloneDirectory: string;
 
 	/**
 	 * The deployment key to use
 	 */
-	deployKey: string | boolean = false;
-
-	/**
-	 * The directory where typedoc generates its docs
-	 */
-	generatedDocsDirectory: string;
+	deployKey: string = 'deploy_key';
 
 	/**
 	 * Logging utility
@@ -57,30 +47,17 @@ export default class Publisher {
 	log: Log = consoleLogger;
 
 	/**
-	 * If publishing should be skipped
-	 */
-	skipPublish: boolean = false;
-
-	/**
-	 * The directory to place API docs
-	 */
-	subDirectory: string = 'api';
-
-	/**
 	 * The repo location
 	 */
 	url: string;
 
-	constructor(cloneDir: string, generatedDocsDir: string, options: Options = {}) {
-		this.cloneDir = cloneDir;
-		this.generatedDocsDirectory = generatedDocsDir;
+	constructor(cloneDir: string, options: Options = {}) {
+		this.cloneDirectory = cloneDir;
 
 		// optional configuration values
 		options.branch && (this.branch = options.branch);
 		options.deployKey && (this.deployKey = options.deployKey);
 		options.log && (this.log = options.log);
-		typeof options.skipPublish === 'boolean' && (this.skipPublish = options.skipPublish);
-		options.subDirectory && (this.subDirectory = options.subDirectory);
 		if (options.url) {
 			this.url = options.url;
 		}
@@ -88,108 +65,65 @@ export default class Publisher {
 			const repo = process.env.TRAVIS_REPO_SLUG || ''; // TODO look up the repo information?
 			this.url = `git@github.com:${ repo }.git`;
 		}
-
-		// optional method overrides
-		options.shouldPush && (this.shouldPush = options.shouldPush);
 	}
 
 	/**
 	 * @return {boolean} if a deploy key exists in the file system
 	 */
 	hasDeployCredentials(): boolean {
-		if (typeof this.deployKey === 'boolean') {
-			return false;
-		}
 		return existsSync(this.deployKey);
 	}
 
 	/**
-	 * Publish the contents of { generatedDocsDirectory } in the clone at { cloneDir } in the directory
-	 * { subDirectory } and push to the { branch } branch.
+	 * Commit files to a fresh clone of the repository
 	 */
-	publish() {
-		if (!existsSync(this.cloneDir)) {
-			this.setup();
+	commit(): boolean {
+		if (exec('git status --porcelain', { silent: true, cwd: this.cloneDirectory }) === '') {
+			this.log.writeln('Nothing changed');
+			return false;
 		}
-		this.refreshTypeDoc();
-		this.commit();
 
-		if (!this.skipPublish && this.shouldPush()) {
-			if (this.canPublish()) {
-				this.push();
-			}
-			else {
-				this.log.writeln('Push check failed -- not publishing API docs');
-			}
-		}
-		else {
-			this.log.writeln('Only committing -- skipping push to repo');
-		}
+		exec(`git add --all .`, { silent: true, cwd: this.cloneDirectory });
+		exec('git commit -m "Update API docs"', { silent: true, cwd: this.cloneDirectory });
+		return true;
 	}
 
 	/**
-	 * Clone the target repository and switch to the deployment branch
+	 * Initialize the repo and prepare for it to check in
 	 */
-	setup() {
+	init() {
 		const publishBranch = this.branch;
 
 		// Prerequisites for using git
-		setConfig('user.name', 'Travis CI', true);
-		setConfig('user.email', 'support@sitepen.com', true);
+		if (!this.hasConifg('user.name')) {
+			setGlobalConfig('user.name', 'Travis CI');
+		}
+		if (!this.hasConifg('user.email')) {
+			setGlobalConfig('user.email', 'support@sitepen.com');
+		}
 
 		this.log.writeln(`Cloning ${ this.url }`);
-		this.execSSHAgent(`git clone ${ this.url } ${ this.cloneDir }`, { silent: true });
+		this.execSSHAgent('git', [ 'clone', this.url, this.cloneDirectory ], { silent: true });
 
 		try {
-			exec(`git checkout ${ publishBranch }`, { silent: true, cwd: this.cloneDir });
+			exec(`git checkout ${ publishBranch }`, { silent: true, cwd: this.cloneDirectory });
 		}
 		catch (error) {
 			// publish branch didn't exist, so create it
-			exec(`git checkout --orphan ${ publishBranch }`, { silent: true, cwd: this.cloneDir });
-			exec('git rm -rf .', { silent: true, cwd: this.cloneDir });
+			exec(`git checkout --orphan ${ publishBranch }`, { silent: true, cwd: this.cloneDirectory });
+			exec('git rm -rf .', { silent: true, cwd: this.cloneDirectory });
 			this.log.writeln(`Created ${publishBranch} branch`);
 		}
 	}
 
 	/**
-	 * @return {boolean} indicates whether doc updates should be pushed to the origin
+	 * Publish the contents of { sourceDirectory } in the clone at { cloneDir } in the directory
+	 * { subDirectory } and push to the { branch } branch.
 	 */
-	shouldPush() {
-		const branch = process.env.TRAVIS_BRANCH || exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim();
-		return branch === 'master';
-	}
-
-	/**
-	 * If configuration information exists for obtaining a deployment key and prerequisites have been met to publish
-	 */
-	private canPublish(): boolean {
-		const skipDeploymentCredentials = typeof this.deployKey === 'boolean' && !this.deployKey;
-		return (skipDeploymentCredentials || this.hasDeployCredentials()) && this.shouldPush();
-	}
-
-	/**
-	 * Remove everything in preparation for the typedoc
-	 */
-	private refreshTypeDoc() {
-		const publishDir = this.subDirectory;
-
-		rm('-rf', join(this.cloneDir, publishDir));
-		cp('-r', this.generatedDocsDirectory, join(this.cloneDir, publishDir));
-	}
-
-	/**
-	 * Commit (but do not push) everything the new documentation
-	 */
-	private commit() {
-		const publishDir = this.subDirectory;
-
-		if (exec('git status --porcelain', { silent: true, cwd: this.cloneDir }) === '') {
-			this.log.writeln('Nothing changed');
-			return;
-		}
-
-		exec(`git add ${publishDir}`, { silent: true, cwd: this.cloneDir });
-		exec('git commit -m "Update API docs"', { silent: true, cwd: this.cloneDir });
+	publish() {
+		this.log.writeln(`Publishing ${this.branch} to origin`);
+		this.execSSHAgent('git', [ 'push', 'origin', this.branch ], { silent: true, cwd: this.cloneDirectory });
+		this.log.writeln(`Pushed ${this.branch} to origin`);
 	}
 
 	/**
@@ -197,24 +131,30 @@ export default class Publisher {
 	 * @param command the command to execute
 	 * @param options execute options
 	 */
-	private execSSHAgent(command: string, options: any = {}): string {
+	private execSSHAgent(command: string, args: string[], options: any): string {
 		if (this.hasDeployCredentials()) {
 			const deployKey: string = <string> this.deployKey;
 			const relativeDeployKey = options.cwd ? relative(options.cwd, deployKey) : deployKey;
 			chmodSync(deployKey, '600');
-			return exec(`ssh-agent bash -c 'ssh-add ${ relativeDeployKey }; ${ command }'`, options);
+			return exec(`ssh-agent bash -c 'ssh-add ${ relativeDeployKey }; ${ command } ${ args.join(' ') }'`, options);
 		}
 		else {
-			return exec(command, options);
+			this.log.writeln(`Deploy Key "${ this.deployKey }" is not present. Using environment credentials.`);
+			const response = spawn(command, args, options);
+
+			if (response.stderr) {
+				this.log.writeln(response.stderr);
+			}
+			return response.stdout;
 		}
 	}
 
-	/**
-	 * Publish the document created by typedoc
-	 */
-	private push() {
-		this.log.writeln('Publishing API docs');
-		this.execSSHAgent(`git push origin ${this.branch}`, { silent: true, cwd: this.cloneDir });
-		this.log.writeln(`Pushed ${this.branch} to origin`);
+	private hasConifg(key: string): boolean {
+		try {
+			return !!exec(`git config ${ key }`, { silent: true });
+		}
+		catch (e) { }
+
+		return false;
 	}
 }

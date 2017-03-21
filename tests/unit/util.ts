@@ -81,7 +81,7 @@ function registerMockList(mocks: MockList) {
 	}
 }
 
-export function loadModule(mid: string, mocks: MockList = {}): any {
+export function loadModule(mid: string, mocks: MockList = {}, returnDefault = true): any {
 	mockery.enable({
 		warnOnReplace: false,
 		warnOnUnregistered: false,
@@ -92,7 +92,8 @@ export function loadModule(mid: string, mocks: MockList = {}): any {
 	registerMockList(mocks);
 
 	const loader = require.nodeRequire || require;
-	return loader(require.toUrl(mid)).default;
+	const module = loader(require.toUrl(mid));
+	return returnDefault ? module.default : module;
 }
 
 export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
