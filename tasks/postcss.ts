@@ -26,7 +26,7 @@ export = function init(grunt: IGrunt) {
 	function moduleFiles(dest: string) {
 		return [{
 			expand: true,
-			src: ['**/*.css', '!**/variables.css', '!**/widgets.css'],
+			src: ['**/*.m.css'],
 			dest: dest,
 			cwd: 'src'
 		}];
@@ -34,7 +34,7 @@ export = function init(grunt: IGrunt) {
 
 	const variableFiles = [{
 		expand: true,
-		src: '**/variables.css',
+		src: ['**/*.css', '!**/*.m.css'],
 		dest: distDirectory,
 		cwd: 'src'
 	}];
