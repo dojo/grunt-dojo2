@@ -94,7 +94,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/release')(grunt, packageJson);
 	require('./tasks/link')(grunt, packageJson);
 	require('./tasks/fixSourceMaps')(grunt, packageJson);
-	require('./tasks/postcss').init(grunt);
+	require('./tasks/postcss')(grunt);
 
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
