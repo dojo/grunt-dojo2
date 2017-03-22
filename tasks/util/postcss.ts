@@ -13,7 +13,7 @@ export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 				autoprefixer: {
 					browsers: [
 						'last 2 versions',
-						'ie >= 10'
+						'ie >= 11'
 					]
 				}
 			}
