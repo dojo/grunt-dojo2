@@ -1,42 +1,16 @@
-export = function(grunt: IGrunt) {
+import { createProcessors } from './util/postcss';
+
+export = function init(grunt: IGrunt) {
 	const path = require('path');
 	const fs = require('fs');
 	const postCssImport = require('postcss-import');
 	const postCssNext = require('postcss-cssnext');
 	const postCssModules = require('postcss-modules');
 	const umdWrapper = require('./util/umdWrapper');
-
 	grunt.loadNpmTasks('grunt-postcss');
 
 	const distDirectory = grunt.config.get<string>('distDirectory') || '';
 	const devDirectory = grunt.config.get<string>('devDirectory') || '';
-
-	function moduleProcessors(dest: string, cwd = '') {
-		const scopedName = dest === devDirectory ? '[name]__[local]__[hash:base64:5]' : '[hash:base64:8]';
-		return [
-			postCssImport,
-			postCssNext({
-				features: {
-					autoprefixer: {
-						browsers: [
-							'last 2 versions',
-							'ie >= 10'
-						]
-					}
-				}
-			}),
-			postCssModules({
-				generateScopedName: scopedName,
-				getJSON: function(cssFileName: string, json: any) {
-					const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
-					const newFilePath = outputPath + '.js';
-					const themeKey = ' _key';
-					json[themeKey] = 'dojo-' + path.basename(outputPath, '.css');
-					fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
-				}
-			})
-		];
-	}
 
 	const variablesProcessors: any = [
 		postCssImport,
@@ -52,7 +26,7 @@ export = function(grunt: IGrunt) {
 	function moduleFiles(dest: string) {
 		return [{
 			expand: true,
-			src: ['**/*.css', '!**/variables.css', '!common/styles/widgets.css'],
+			src: ['**/*.css', '!**/variables.css', '!**/widgets.css'],
 			dest: dest,
 			cwd: 'src'
 		}];
@@ -70,15 +44,15 @@ export = function(grunt: IGrunt) {
 			map: true
 		},
 		'modules-dev': {
-			files: moduleFiles(devDirectory),
+			files: moduleFiles(path.join(devDirectory, 'src')),
 			options: {
-				processors: moduleProcessors(devDirectory, 'src')
+				processors: createProcessors(devDirectory)
 			}
 		},
 		'modules-dist': {
 			files: moduleFiles(distDirectory),
 			options: {
-				processors: moduleProcessors(distDirectory, 'src')
+				processors: createProcessors(distDirectory, 'src', true)
 			}
 		},
 		variables: {
