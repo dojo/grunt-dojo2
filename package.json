@@ -63,7 +63,7 @@
     "@types/es6-shim": "^0.31.32",
     "@types/glob": "^5.0.30",
     "@types/grunt": "~0.4.20",
-    "@types/lodash": "^4.14.40",
+    "@types/lodash": "4.14.56",
     "@types/mockery": "~1.4.29",
     "@types/node": "^7.0.0",
     "@types/sinon": "~1.16.32",
