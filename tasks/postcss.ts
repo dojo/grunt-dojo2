@@ -30,7 +30,7 @@ export = function init(grunt: IGrunt) {
 		}];
 	}
 
-	const variableFiles = [{
+	const cssFiles = [{
 		expand: true,
 		src: ['**/*.css', '!**/*.m.css'],
 		dest: distDirectory,
@@ -54,7 +54,7 @@ export = function init(grunt: IGrunt) {
 			}
 		},
 		variables: {
-			files: variableFiles,
+			files: cssFiles,
 			options: {
 				processors: variablesProcessors
 			}
