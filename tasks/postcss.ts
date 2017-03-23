@@ -5,8 +5,6 @@ export = function init(grunt: IGrunt) {
 	const fs = require('fs');
 	const postCssImport = require('postcss-import');
 	const postCssNext = require('postcss-cssnext');
-	const postCssModules = require('postcss-modules');
-	const umdWrapper = require('./util/umdWrapper');
 	grunt.loadNpmTasks('grunt-postcss');
 
 	const distDirectory = grunt.config.get<string>('distDirectory') || '';
@@ -26,15 +24,15 @@ export = function init(grunt: IGrunt) {
 	function moduleFiles(dest: string) {
 		return [{
 			expand: true,
-			src: ['**/*.css', '!**/variables.css', '!**/widgets.css'],
+			src: ['**/*.m.css'],
 			dest: dest,
 			cwd: 'src'
 		}];
 	}
 
-	const variableFiles = [{
+	const cssFiles = [{
 		expand: true,
-		src: '**/variables.css',
+		src: ['**/*.css', '!**/*.m.css'],
 		dest: distDirectory,
 		cwd: 'src'
 	}];
@@ -56,7 +54,7 @@ export = function init(grunt: IGrunt) {
 			}
 		},
 		variables: {
-			files: variableFiles,
+			files: cssFiles,
 			options: {
 				processors: variablesProcessors
 			}
