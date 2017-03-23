@@ -32,7 +32,7 @@ export = function init(grunt: IGrunt) {
 
 	const variableFiles = [{
 		expand: true,
-		src: ['**/variables.css'],
+		src: ['**/*.css', '!**/*.m.css'],
 		dest: distDirectory,
 		cwd: 'src'
 	}];
