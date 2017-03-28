@@ -51,8 +51,6 @@ export = function(grunt: IGrunt, packageJson: any) {
 		packageJson.private = undefined;
 		packageJson.scripts = undefined;
 		packageJson.files = undefined;
-		packageJson.typings = undefined;
-		packageJson.main = 'main.js';
 		return packageJson;
 	}
 
