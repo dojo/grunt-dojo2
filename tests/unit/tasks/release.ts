@@ -229,6 +229,7 @@ registerSuite({
 
 			runGruntTask('release-publish', dfd.callback(() => {
 				assert.isTrue(shell.calledOnce);
+				assert.isTrue(shell.calledWith('npm publish .'));
 			})).catch(dfd.rejectOnError(() => {
 				assert(false, 'should have succeeded');
 			}));
@@ -246,6 +247,7 @@ registerSuite({
 
 			runGruntTask('release-publish', dfd.callback(() => {
 				assert.isTrue(shell.calledOnce);
+				assert.isTrue(shell.calledWith('npm publish . --tag test'));
 			})).catch(dfd.rejectOnError(() => {
 				assert(false, 'should have succeeded');
 			}));
