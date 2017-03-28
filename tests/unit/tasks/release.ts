@@ -577,8 +577,8 @@ registerSuite({
 				assert.isUndefined(newPackageJson.private);
 				assert.isUndefined(newPackageJson.scripts);
 				assert.isUndefined(newPackageJson.files);
-				assert.isUndefined(newPackageJson.typings);
-				assert.equal(newPackageJson.main, 'main.js');
+				assert.equal(newPackageJson.typings, 'index.d.ts');
+				assert.equal(newPackageJson.main, 'index.js');
 
 				assert.isTrue(grunt.file.exists('temp/README.md'));
 			},
