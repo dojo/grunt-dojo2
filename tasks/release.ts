@@ -135,10 +135,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('release-publish', 'publish the package to npm', function (this: ITask) {
 		const done = this.async();
 		const args = ['publish', '.'];
-		const promises = [command(npmBin, args, { cwd: temp }, false)];
 		if (tag) {
 			args.push('--tag', tag);
 		}
+		const promises = [command(npmBin, args, { cwd: temp }, false)];
 		grunt.log.subhead('publishing to npm...');
 		if (dryRun) {
 			promises.push(command(npmBin, ['pack', '../' + temp], { cwd: 'dist' }, true));
