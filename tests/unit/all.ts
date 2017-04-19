@@ -9,5 +9,6 @@ import './tasks/ts';
 import './tasks/typedoc';
 import './tasks/uploadCoverage';
 import './tasks/util/process';
+import './tasks/util/postcss';
 import './tasks/util/Publisher';
 import './lib/load-dojo-loader';
