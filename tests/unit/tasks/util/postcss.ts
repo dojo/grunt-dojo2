@@ -73,17 +73,32 @@ registerSuite({
 				}
 			}));
 		},
-		'generate localised scoped name for dev'() {
-			postCssUtil.createProcessors('', '', false);
-			assert.isTrue(postCssModulesStub.calledWithMatch({
-				generateScopedName: '[name]__[local]__[hash:base64:5]'
-			}));
+		'generate scoped name': {
+			'generate localised scoped name for dev'() {
+				postCssUtil.createProcessors('', '', false);
+				assert.isTrue(postCssModulesStub.calledWithMatch({
+					generateScopedName: '[name]__[local]__[hash:base64:5]'
+				}));
+			},
+			'generate hash only scoped name for dist'() {
+				postCssUtil.createProcessors('', '', true);
+				assert.isTrue(postCssModulesStub.calledWithMatch({
+					generateScopedName: '[hash:base64:8]'
+				}));
+			}
 		},
-		'generate hash only scoped name for dist'() {
-			postCssUtil.createProcessors('', '', true);
-			assert.isTrue(postCssModulesStub.calledWithMatch({
-				generateScopedName: '[hash:base64:8]'
-			}));
+		'getJSON': {
+			'should create output file with .js extension'() {
+				relativeStub.returns('');
+				resolveStub.returnsArg(0);
+				const getJSON = (<any> postCssModulesStub.args[0]).getJSON;
+				const cssFileName = 'testFileName.m.css';
+				const jsonParam = {};
+
+				getJSON(cssFileName, jsonParam);
+				assert.isTrue(writeFileStub.calledOnce);
+				assert.isTrue(writeFileStub.firstCall.calledWithMatch(cssFileName + '.js', {}));
+			}
 		}
 	}
 });
