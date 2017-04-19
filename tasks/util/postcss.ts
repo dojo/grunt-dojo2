@@ -24,7 +24,7 @@ export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 				const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 				const newFilePath = outputPath + '.js';
 				const themeKey = ' _key';
-				json[themeKey] = 'dojo-' + path.basename(outputPath, '.css');
+				json[themeKey] = 'dojo-' + path.basename(outputPath, '.m.css');
 				fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 			}
 		})
