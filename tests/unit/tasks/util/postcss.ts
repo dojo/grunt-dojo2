@@ -24,7 +24,7 @@ registerSuite({
 			'postcss-cssnext': postCssNextStub,
 			'path': {
 				'resolve': resolveStub,
-				'relativeStub': relativeStub,
+				'relative': relativeStub,
 				'basename': basenameStub
 			},
 			'./umdWrapper': umdWrapperStub,
@@ -44,6 +44,7 @@ registerSuite({
 		relativeStub.reset();
 		basenameStub.reset();
 		writeFileStub.reset();
+		umdWrapperStub.reset();
 	},
 
 	teardown() {
@@ -89,15 +90,43 @@ registerSuite({
 		},
 		'getJSON': {
 			'should create output file with .js extension'() {
-				relativeStub.returns('');
-				resolveStub.returnsArg(0);
-				const getJSON = (<any> postCssModulesStub.args[0]).getJSON;
 				const cssFileName = 'testFileName.m.css';
 				const jsonParam = {};
+
+				resolveStub.returns(cssFileName);
+				postCssUtil.createProcessors('', '');
+
+				const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
 
 				getJSON(cssFileName, jsonParam);
 				assert.isTrue(writeFileStub.calledOnce);
 				assert.isTrue(writeFileStub.firstCall.calledWithMatch(cssFileName + '.js', {}));
+			},
+			'should call basename to remove with `.m.css`'() {
+				const cssFileName = 'testFileName.m.css';
+				const jsonParam = {};
+
+				resolveStub.returns(cssFileName);
+				postCssUtil.createProcessors('', '');
+
+				const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
+
+				getJSON(cssFileName, jsonParam);
+				assert.isTrue(basenameStub.calledOnce);
+				assert.isTrue(basenameStub.firstCall.calledWith(cssFileName, '.m.css'));
+			},
+			'should call umdWrapper with `dojo-filename` _key in data'() {
+				const cssFileName = 'testFileName.m.css';
+				const jsonParam = {};
+
+				basenameStub.returns(cssFileName.replace('.m.css', ''));
+				postCssUtil.createProcessors('', '');
+
+				const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
+
+				getJSON(cssFileName, jsonParam);
+				assert.isTrue(umdWrapperStub.calledOnce);
+				assert.isTrue(umdWrapperStub.firstCall.calledWith(JSON.stringify({ ' _key': 'dojo-testFileName' })));
 			}
 		}
 	}
