@@ -14,7 +14,7 @@ function formatGlob(tsconfigGlob: string[]): string[] {
 	});
 }
 
-exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
+exports.initConfig = function (grunt: IGrunt, otherOptions?: any, initOverrides?: any) {
 	const tsconfigContent = grunt.file.read('tsconfig.json');
 	const tsconfig = JSON.parse(tsconfigContent);
 	if (tsconfig.filesGlob) {
@@ -77,6 +77,10 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		distESMTasks,
 		docTasks
 	});
+
+	if (initOverrides) {
+		grunt.config.merge(initOverrides);
+	}
 
 	const options: { [option: string]: any } = {};
 	glob.sync('*.js', {
