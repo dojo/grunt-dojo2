@@ -167,7 +167,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 				.then(() => {
 					initialPackageJson = packageJson;
 					grunt.log.subhead(`Committing update to ${tag} for @dojo dependencies`);
-					return command(gitBin, ['commit', '-am', 'Update tag for @dojo dependencies'], {}, false);
+					return command(gitBin, [ 'commit', '-am', 'Update tag for @dojo dependencies' ], {}, false);
 				}, () => {
 					grunt.file.write('package.json', JSON.stringify(initialPackageJson, null, '  ') + '\n');
 					grunt.fail.fatal(`${tag} is not available for one or more @dojo dependencies`);
