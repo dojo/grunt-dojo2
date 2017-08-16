@@ -8,7 +8,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		for (let name in peerDeps) {
 			grunt.log.write(`installing peer dependency ${name} with version ${peerDeps[name]}...`);
 			try {
-				let cmd = `${packageCmd} ${name}@"${peerDeps[name]}"`;
+				let cmd = `${packageCmd} ${name}@"${peerDeps[name]}" --no-save`;
 				exec(cmd, { stdio: 'ignore' });
 				grunt.log.ok('complete.');
 			} catch (error) {
