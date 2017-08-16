@@ -25,7 +25,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 	const initial = grunt.option<boolean>('initial');
 	const skipChecks = grunt.option<boolean>('skip-checks');
 
-	const initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
+	let initialPackageJson = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 	const commitMsg = '"Update package metadata"';
 
 	function matchesPreReleaseTag(preReleaseTag: string, version: string): string[] {
@@ -132,6 +132,52 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
+	function updateDojoDependency(dependencies: any): boolean {
+		let updatedDependency = false;
+		let regExp = new RegExp('@dojo\/.*');
+		Object.keys(dependencies).forEach((dependency) => {
+			if (regExp.test(dependency)) {
+				const version = dependencies[dependency];
+				if (version !== tag) {
+					dependencies[dependency] = tag;
+					updatedDependency = true;
+				}
+			}
+		});
+		return updatedDependency;
+	}
+
+	grunt.registerTask('update-dojo-dependency-tags', 'Update @dojo dependencies to the tag', function (this: ITask) {
+		const done = this.async();
+		const packageJson = {
+			...initialPackageJson,
+			peerDependencies: { ...initialPackageJson.peerDependencies },
+			dependencies: { ...initialPackageJson.dependencies },
+			devDependencies: { ...initialPackageJson.devDependencies }
+		};
+
+		const updatedPeerDependency = updateDojoDependency(packageJson.peerDependencies);
+		const updatedDependency = updateDojoDependency(packageJson.dependencies);
+		const updatedDevDependency = updateDojoDependency(packageJson.devDependencies);
+
+		if (updatedPeerDependency || updatedDependency || updatedDevDependency) {
+			grunt.log.subhead(`Outdated @dojo dependencies detected updating to ${tag} version`);
+			grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
+			return command(npmBin, [ 'install' ], { cwd: packagePath }, true)
+				.then(() => {
+					initialPackageJson = packageJson;
+					grunt.log.subhead(`Committing update to ${tag} for @dojo dependencies`);
+					return command(gitBin, ['commit', '-am', 'Update tag for @dojo dependencies'], {}, false);
+				}, () => {
+					grunt.file.write('package.json', JSON.stringify(initialPackageJson, null, '  ') + '\n');
+					grunt.fail.fatal(`${tag} is not available for one or more @dojo dependencies`);
+				})
+				.then(() => grunt.log.subhead('@dojo dependencies updated successfully to target tag'))
+				.then(done);
+		}
+		return Promise.resolve().then(done);
+	});
+
 	grunt.registerTask('release-publish', 'publish the package to npm', function (this: ITask) {
 		const done = this.async();
 		const args = ['publish', '.'];
@@ -225,6 +271,10 @@ export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('release', 'release', function () {
 		grunt.option('remove-links', true);
 		const tasks = ['dist'];
+
+		if (tag) {
+			tasks.unshift('update-dojo-dependency-tags');
+		}
 
 		if (skipChecks && !dryRun) {
 			grunt.fail.fatal('you can only skip-checks on a dry-run!');
