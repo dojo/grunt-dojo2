@@ -5,7 +5,7 @@ export = function (grunt: IGrunt) {
 		options: {
 			'reporters': [
 				{ name: 'runner' },
-				{ name: 'jsoncoverage' },
+				{ name: 'lcov', options: { filename: '../coverage-final.lcov' } },
 				{ name: 'htmlcoverage' }
 			]
 		},
