@@ -20,8 +20,8 @@ registerSuite({
 			mockShell = stub();
 
 			mockShell
-			.withArgs('npm install my-dep@"1.0"').returns(Promise.resolve({}))
-			.withArgs('npm install error-dep@"1.0"').throws();
+			.withArgs('npm install my-dep@"1.0" --no-save').returns(Promise.resolve({}))
+			.withArgs('npm install error-dep@"1.0" --no-save').throws();
 
 			loadTasks({
 				child_process: {
@@ -38,8 +38,8 @@ registerSuite({
 			runGruntTask('peerDepInstall');
 
 			assert.isTrue(mockShell.calledTwice);
-			assert.isTrue(mockShell.calledWith('npm install my-dep@"1.0"'));
-			assert.isTrue(mockShell.calledWith('npm install error-dep@"1.0"'));
+			assert.isTrue(mockShell.calledWith('npm install my-dep@"1.0" --no-save'));
+			assert.isTrue(mockShell.calledWith('npm install error-dep@"1.0" --no-save'));
 			assert.isTrue(mockLogger.called);
 			assert.isTrue(mockLogger.calledWith('failed.'));
 		}
