@@ -121,7 +121,7 @@ Where the `distDirectory` is defaulted to `dist/umd`.
 
 If you have other root level directories besides `src` and `tests`, you might want to exclude them from the `dist` build. Including them can cause unwanted output in your `dist/umd` directory. For example, if you wanted to exclude an `examples` directory, you would add:
 
-```json
+```js
 ts: {
 	dist: {
 		exclude: ['tests/**/*.ts', 'examples/**/*.ts'],
