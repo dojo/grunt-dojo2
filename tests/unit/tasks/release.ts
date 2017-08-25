@@ -40,6 +40,57 @@ function taskUnloader() {
 	unloadTasks();
 }
 
+const mockPackageJsonDojoDepsOutdatedPeerDeps = {
+	dependencies: {
+		'@dojo/a': 'a'
+	},
+	devDependencies: {
+		'@dojo/b': 'a'
+	},
+	peerDependencies: {
+		'@dojo/c': 'c'
+	}
+};
+
+const mockPackageJsonDojoDepsOutdatedDevDeps = {
+	dependencies: {
+		'@dojo/a': 'a'
+	},
+	devDependencies: {
+		'@dojo/b': 'c'
+	},
+	peerDependencies: {
+		'@dojo/c': 'a'
+	}
+};
+
+const mockPackageJsonDojoDepsOutdatedDeps = {
+	dependencies: {
+		'@dojo/a': 'c'
+	},
+	devDependencies: {
+		'@dojo/b': 'a'
+	},
+	peerDependencies: {
+		'@dojo/c': 'a'
+	}
+};
+
+const mockPackageJsonDojoDepsMatching = {
+	dependencies: {
+		'@dojo/a': 'a',
+		'other': 'other'
+	},
+	devDependencies: {
+		'@dojo/b': 'a'
+	},
+	peerDependencies: {
+		'@dojo/c': 'a'
+	}
+};
+
+let failureStub: SinonStub;
+
 registerSuite({
 	name: 'tasks/release',
 	'can-publish-check': (function () {
@@ -87,7 +138,7 @@ registerSuite({
 				shell.withArgs('npm whoami').returns(Promise.resolve({ stdout: 'test' })).withArgs('npm view . --json').returns(Promise.resolve({
 					stdout: JSON.stringify({
 						maintainers: [
-							"sitepen <labs@sitepen.com>"
+							'sitepen <labs@sitepen.com>'
 						]
 					})
 				}));
@@ -112,8 +163,8 @@ registerSuite({
 					.withArgs('npm view . --json')
 					.returns(Promise.resolve(JSON.stringify({
 						maintainers: [
-							"dojotoolkit <kitsonk@dojotoolkit.org>",
-							"sitepen <labs@sitepen.com>"
+							'dojotoolkit <kitsonk@dojotoolkit.org>',
+							'sitepen <labs@sitepen.com>'
 						]
 					})));
 
@@ -210,6 +261,133 @@ registerSuite({
 			}
 		};
 	})(),
+	'update-dojo-dependency-tags': {
+		beforeEach() {
+			failureStub = stub(grunt.fail, 'fatal').throws();
+			shell = stub();
+			grunt.file.copy('package.json', 'package.json.bak');
+		},
+
+		afterEach() {
+			taskUnloader();
+			failureStub.restore();
+			grunt.file.copy('package.json.bak', 'package.json');
+			grunt.file.delete('package.json.bak');
+		},
+
+		'all dojo dependency versions match release tag'(this: Test) {
+			const dfd = this.async();
+			grunt.file.write('package.json', JSON.stringify(mockPackageJsonDojoDepsMatching, null, '  ') + '\n');
+			taskLoader(undefined, {
+				tag: 'a'
+			});
+			runGruntTask('update-dojo-dependency-tags', dfd.callback(() => {
+				assert.isTrue(shell.notCalled);
+			})).catch(dfd.rejectOnError(() => {
+				assert.fail('should have succeeded');
+			}));
+		},
+		'dojo peer dependency versions do not match release tag'(this: Test) {
+			const dfd = this.async();
+			grunt.file.write('package.json', JSON.stringify(mockPackageJsonDojoDepsOutdatedPeerDeps, null, '  ') + '\n');
+
+			shell.withArgs('npm install')
+				.returns(Promise.resolve({ stdout: '' }));
+			shell.withArgs('git commit -am "Update tag for @dojo dependencies"')
+				.returns(Promise.resolve({ stdout: '' }));
+
+			taskLoader(undefined, {
+				tag: 'a'
+			});
+			runGruntTask('update-dojo-dependency-tags', dfd.callback(() => {
+				assert.isTrue(shell.calledTwice);
+				const updatedPackageJson = grunt.file.readJSON('package.json');
+				Object.keys(updatedPackageJson).forEach((key) => {
+					const dependencies = updatedPackageJson[key];
+					Object.keys(dependencies).forEach((depKey) => {
+						assert.strictEqual(dependencies[depKey], 'a');
+					});
+				});
+			})).catch(dfd.rejectOnError(() => {
+				assert.fail('should have succeeded');
+			}));
+		},
+		'dojo dev dependency versions do not match release tag'(this: Test) {
+			const dfd = this.async();
+			grunt.file.write('package.json', JSON.stringify(mockPackageJsonDojoDepsOutdatedDevDeps, null, '  ') + '\n');
+
+			shell.withArgs('npm install')
+				.returns(Promise.resolve({ stdout: '' }));
+			shell.withArgs('git commit -am "Update tag for @dojo dependencies"')
+				.returns(Promise.resolve({ stdout: '' }));
+
+			taskLoader(undefined, {
+				tag: 'a'
+			});
+			runGruntTask('update-dojo-dependency-tags', dfd.callback(() => {
+				assert.isTrue(shell.calledTwice);
+				const updatedPackageJson = grunt.file.readJSON('package.json');
+				Object.keys(updatedPackageJson).forEach((key) => {
+					const dependencies = updatedPackageJson[key];
+					Object.keys(dependencies).forEach((depKey) => {
+						assert.strictEqual(dependencies[depKey], 'a');
+					});
+				});
+			})).catch(dfd.rejectOnError(() => {
+				assert.fail('should have succeeded');
+			}));
+		},
+		'dojo dependency versions do not match release tag'(this: Test) {
+			const dfd = this.async();
+			grunt.file.write('package.json', JSON.stringify(mockPackageJsonDojoDepsOutdatedDeps, null, '  ') + '\n');
+
+			shell.withArgs('npm install')
+				.returns(Promise.resolve({ stdout: '' }));
+			shell.withArgs('git commit -am "Update tag for @dojo dependencies"')
+				.returns(Promise.resolve({ stdout: '' }));
+
+			taskLoader(undefined, {
+				tag: 'a'
+			});
+			runGruntTask('update-dojo-dependency-tags', dfd.callback(() => {
+				assert.isTrue(shell.calledTwice);
+				const updatedPackageJson = grunt.file.readJSON('package.json');
+				Object.keys(updatedPackageJson).forEach((key) => {
+					const dependencies = updatedPackageJson[key];
+					Object.keys(dependencies).forEach((depKey) => {
+						if (depKey === 'other') {
+							assert.strictEqual(dependencies[depKey], 'other');
+						}
+						else {
+							assert.strictEqual(dependencies[depKey], 'a');
+						}
+					});
+				});
+			})).catch(dfd.rejectOnError(() => {
+				assert.fail('should have succeeded');
+			}));
+		},
+		'dojo dependency do not exist for release tag'(this: Test) {
+			const dfd = this.async();
+			grunt.file.write('package.json', JSON.stringify(mockPackageJsonDojoDepsOutdatedDeps, null, '  ') + '\n');
+
+			shell.withArgs('npm install')
+				.returns(Promise.reject(new Error()));
+
+			taskLoader(undefined, {
+				tag: 'a'
+			});
+
+			runGruntTask('update-dojo-dependency-tags', dfd.rejectOnError(() => {
+				assert.fail('should not have succeeded');
+			})).catch(dfd.callback(() => {
+				assert.isTrue(shell.calledOnce);
+				assert.isTrue(failureStub.calledOnce);
+				const updatedPackageJson = grunt.file.readJSON('package.json');
+				assert.deepEqual(updatedPackageJson, mockPackageJsonDojoDepsOutdatedDeps);
+			}));
+		}
+	},
 	'release-publish': {
 		beforeEach() {
 			shell = stub();
@@ -364,8 +542,8 @@ registerSuite({
 							time: {
 								created: '1/1/2016',
 								modified: '1/2/2016',
-								[`${justTheVersion}-alpha.6`]: "2016-05-13T16:24:33.949Z",
-								[`${justTheVersion}-test.7`]: "2016-05-16T13:44:12.669Z",
+								[`${justTheVersion}-alpha.6`]: '2016-05-13T16:24:33.949Z',
+								[`${justTheVersion}-test.7`]: '2016-05-16T13:44:12.669Z'
 							}
 						})
 					}))
