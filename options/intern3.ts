@@ -16,7 +16,7 @@ export = function (grunt: IGrunt) {
 		remote: {},
 		local: {
 			options: {
-				config: '<%= devDirectory %>/tests/intern-local',
+				config: '<%= devDirectory %>/tests/intern-local'
 			}
 		},
 		node: {

@@ -14,6 +14,17 @@ function formatGlob(tsconfigGlob: string[]): string[] {
 	});
 }
 
+function injectInternConfig(grunt: IGrunt, o?: { config?: string }) {
+	if (o && o.config) {
+		try {
+			const config = require(path.resolve(process.cwd(), grunt.template.process(o.config, undefined)));
+			delete o.config;
+			Object.assign(o, config);
+		} catch (e) {
+		}
+	}
+}
+
 exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	const tsconfigContent = grunt.file.read('tsconfig.json');
 	const tsconfig = JSON.parse(tsconfigContent);
@@ -122,6 +133,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 			]);
 		}
 	}
+
 	setCombined(grunt.option<boolean>('combined'));
 
 	grunt.registerTask('test', <any> (function (this: ITask) {
@@ -134,11 +146,37 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		grunt.option('force', true);
 		grunt.task.run('clean:coverage');
 		grunt.task.run('dev');
-		setCombined(true);
-		flags.forEach((flag) => {
-			grunt.task.run('intern:' + flag);
+
+		const internVersion = grunt.config('intern.version') || 3;
+
+		grunt.registerTask('intern3', '', () => {
+			grunt.config('intern', options.intern3);
+
+			setCombined(true);
+
+			flags.forEach((flag) => {
+				grunt.task.run(`intern:${flag}`);
+			});
+			grunt.task.run('remapIstanbul:coverage');
 		});
-		grunt.task.run('remapIstanbul:coverage');
+
+		grunt.registerTask('intern4', '', () => {
+			// intern 4 doesn't support the config property anymore, so we need to
+			// manually read the config files and inject them into the intern config
+			Object.keys(options['intern4']).forEach(key => {
+				if (options.intern4[key].options) {
+					injectInternConfig(grunt, options.intern4[key].options);
+				}
+			});
+
+			grunt.config('intern', options.intern4);
+			flags.forEach((flag) => {
+				grunt.task.run(`intern:${flag}`);
+			});
+		});
+
+		grunt.task.run(`intern${internVersion}`);
+
 		grunt.task.run('clean:coverage');
 	}));
 
