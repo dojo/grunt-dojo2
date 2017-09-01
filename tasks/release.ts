@@ -134,6 +134,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	function updateDojoDependency(dependencies: any): boolean {
 		let updatedDependency = false;
+		if (!dependencies) {
+			return updatedDependency;
+		}
 		let regExp = new RegExp('@dojo\/.*');
 		Object.keys(dependencies).forEach((dependency) => {
 			if (regExp.test(dependency)) {
@@ -149,12 +152,17 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	grunt.registerTask('update-dojo-dependency-tags', 'Update @dojo dependencies to the tag', function (this: ITask) {
 		const done = this.async();
-		const packageJson = {
-			...initialPackageJson,
-			peerDependencies: { ...initialPackageJson.peerDependencies },
-			dependencies: { ...initialPackageJson.dependencies },
-			devDependencies: { ...initialPackageJson.devDependencies }
-		};
+		const packageJson = { ...initialPackageJson };
+
+		if (initialPackageJson.peerDependencies) {
+			packageJson.peerDependencies = { ...initialPackageJson.peerDependencies };
+		}
+		if (initialPackageJson.dependencies) {
+			packageJson.dependencies = { ...initialPackageJson.dependencies };
+		}
+		if (initialPackageJson.devDependencies) {
+			packageJson.devDependencies = { ...initialPackageJson.devDependencies };
+		}
 
 		const updatedPeerDependency = updateDojoDependency(packageJson.peerDependencies);
 		const updatedDependency = updateDojoDependency(packageJson.dependencies);
@@ -167,7 +175,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 				.then(() => {
 					initialPackageJson = packageJson;
 					grunt.log.subhead(`Committing update to ${tag} for @dojo dependencies`);
-					return command(gitBin, [ 'commit', '-am', 'Update tag for @dojo dependencies' ], {}, false);
+					return command(gitBin, [ 'commit', '-am', '"Update tag for @dojo dependencies"' ], {}, false);
 				}, () => {
 					grunt.file.write('package.json', JSON.stringify(initialPackageJson, null, '  ') + '\n');
 					grunt.fail.fatal(`${tag} is not available for one or more @dojo dependencies`);
