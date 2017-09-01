@@ -44,18 +44,12 @@ const mockPackageJsonDojoDepsOutdatedPeerDeps = {
 	dependencies: {
 		'@dojo/a': 'a'
 	},
-	devDependencies: {
-		'@dojo/b': 'a'
-	},
 	peerDependencies: {
 		'@dojo/c': 'c'
 	}
 };
 
 const mockPackageJsonDojoDepsOutdatedDevDeps = {
-	dependencies: {
-		'@dojo/a': 'a'
-	},
 	devDependencies: {
 		'@dojo/b': 'c'
 	},
@@ -70,9 +64,6 @@ const mockPackageJsonDojoDepsOutdatedDeps = {
 	},
 	devDependencies: {
 		'@dojo/b': 'a'
-	},
-	peerDependencies: {
-		'@dojo/c': 'a'
 	}
 };
 
