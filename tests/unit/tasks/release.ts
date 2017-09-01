@@ -386,6 +386,20 @@ registerSuite({
 				const updatedPackageJson = grunt.file.readJSON('package.json');
 				assert.deepEqual(updatedPackageJson, mockPackageJsonDojoDepsOutdatedDeps);
 			}));
+		},
+		'does not update or fail for outdated self dependency'(this: Test) {
+			const dfd = this.async();
+			const packageJson = { name: '@dojo/b', ...mockPackageJsonDojoDepsOutdatedDevDeps };
+			grunt.file.write('package.json', JSON.stringify(packageJson, null, '  ') + '\n');
+
+			taskLoader(undefined, {
+				tag: 'a'
+			});
+			runGruntTask('update-dojo-dependency-tags', dfd.callback(() => {
+				assert.isTrue(shell.notCalled);
+			})).catch(dfd.rejectOnError(() => {
+				assert.fail('should have succeeded');
+			}));
 		}
 	},
 	'release-publish': {

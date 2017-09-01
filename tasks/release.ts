@@ -138,7 +138,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		Object.keys(dependencies).forEach((dependency) => {
 			if (regExp.test(dependency)) {
 				const version = dependencies[dependency];
-				if (version !== tag) {
+				if (version !== tag && dependency !== initialPackageJson.name) {
 					dependencies[dependency] = tag;
 					updatedDependency = true;
 				}
