@@ -4,17 +4,27 @@ export = function(grunt: IGrunt, packageJson: any) {
 	grunt.registerTask('peerDepInstall', <any> function () {
 		const peerDeps = packageJson.peerDependencies;
 		let packageCmd = 'npm install';
+		let message = '';
+		let peerDepsFound = false;
 
 		for (let name in peerDeps) {
-			grunt.log.write(`installing peer dependency ${name} with version ${peerDeps[name]}...`);
+			packageCmd = `${packageCmd} ${name}@"${peerDeps[name]}"`;
+			message = `${message}installing peer dependency ${name} with version ${peerDeps[name]}\n`;
+			peerDepsFound = true;
+		}
+		if (peerDepsFound) {
+			packageCmd = `${packageCmd} --no-save`;
+			grunt.log.write(message);
 			try {
-				let cmd = `${packageCmd} ${name}@"${peerDeps[name]}" --no-save`;
-				exec(cmd, { stdio: 'ignore' });
+				exec(packageCmd, { stdio: 'ignore' });
 				grunt.log.ok('complete.');
 			} catch (error) {
 				grunt.log.verbose.error(error);
 				grunt.log.error('failed.');
 			}
+		}
+		else {
+			grunt.log.write('No peer dependencies detected.');
 		}
 	});
 };
