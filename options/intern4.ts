@@ -27,9 +27,9 @@ export = function (grunt: IGrunt) {
 				config: '<%= internConfig %>@local'
 			}
 		},
-		proxy: {
+		serve: {
 			options: {
-				proxyOnly: true
+				serveOnly: true
 			}
 		}
 	};
