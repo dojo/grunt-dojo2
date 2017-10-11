@@ -6,8 +6,8 @@ export = function (grunt: IGrunt) {
 			config: '<%= internConfig %>',
 			'reporters': [
 				{ name: 'runner' },
-				{ name: 'lcov', options: { filename: '../coverage-final.lcov' } },
-				{ name: 'htmlcoverage' }
+				{ name: 'lcov', options: { directory: '.', filename: 'coverage-final.lcov' } },
+				{ name: 'htmlcoverage', options: { directory: 'html-report' } }
 			]
 		},
 		browserstack: {

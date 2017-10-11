@@ -14,17 +14,6 @@ function formatGlob(tsconfigGlob: string[]): string[] {
 	});
 }
 
-function injectInternConfig(grunt: IGrunt, o?: { config?: string }) {
-	if (o && o.config) {
-		try {
-			const config = require(path.resolve(process.cwd(), grunt.template.process(o.config, undefined)));
-			delete o.config;
-			Object.assign(o, config);
-		} catch (e) {
-		}
-	}
-}
-
 exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	const tsconfigContent = grunt.file.read('tsconfig.json');
 	const tsconfig = JSON.parse(tsconfigContent);
