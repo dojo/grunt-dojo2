@@ -79,6 +79,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		staticTestFiles: 'tests/**/*.{html,css,json,xml,js,txt}',
 		staticDefinitionFiles: '**/*.d.ts',
 		devDirectory: '<%= tsconfig.compilerOptions.outDir %>',
+		internConfig: 'intern.json',
 		apiDocDirectory: '_apidoc',
 		apiPubDirectory: '_apipub',
 		distDirectory: 'dist/umd/',
@@ -134,8 +135,6 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 	}
 
-	setCombined(grunt.option<boolean>('combined'));
-
 	grunt.registerTask('test', <any> (function (this: ITask) {
 		const flags = Object.keys(this.flags);
 
@@ -161,15 +160,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		});
 
 		grunt.registerTask('intern4', '', () => {
-			// intern 4 doesn't support the config property anymore, so we need to
-			// manually read the config files and inject them into the intern config
-			Object.keys(options['intern4']).forEach(key => {
-				if (options.intern4[key].options) {
-					injectInternConfig(grunt, options.intern4[key].options);
-				}
-			});
-
 			grunt.config('intern', options.intern4);
+
 			flags.forEach((flag) => {
 				grunt.task.run(`intern:${flag}`);
 			});

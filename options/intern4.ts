@@ -3,6 +3,7 @@ export = function (grunt: IGrunt) {
 
 	return {
 		options: {
+			config: '<%= internConfig %>',
 			'reporters': [
 				{ name: 'runner' },
 				{ name: 'lcov', options: { filename: '../coverage-final.lcov' } },
@@ -11,28 +12,24 @@ export = function (grunt: IGrunt) {
 		},
 		browserstack: {
 			options: {
-				config: '<%= devDirectory %>/tests/intern-browserstack'
+				config: '<%= internConfig %>@browserstack'
 			}
 		},
 		saucelabs: {
 			options: {
-				config: '<%= devDirectory %>/tests/intern-saucelabs'
+				config: '<%= internConfig %>@saucelabs'
 			}
 		},
-		node: {
-			options: {
-				config: '<%= devDirectory %>/tests/intern'
-			}
-		},
+		node: {},
 		remote: {},
 		local: {
 			options: {
-				config: '<%= devDirectory %>/tests/intern-local'
+				config: '<%= internConfig %>@local'
 			}
 		},
-		proxy: {
+		serve: {
 			options: {
-				proxyOnly: true
+				serveOnly: true
 			}
 		}
 	};
