@@ -1,11 +1,13 @@
 export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('intern');
 
+	const progress = grunt.option<boolean>('progress');
+
 	return {
 		options: {
 			config: '<%= internConfig %>',
 			'reporters': [
-				{ name: 'runner' },
+				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } },
 				{ name: 'lcov', options: { directory: '.', filename: 'coverage-final.lcov' } },
 				{ name: 'htmlcoverage', options: { directory: 'html-report' } }
 			]

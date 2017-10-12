@@ -104,6 +104,11 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/ts')(grunt);
 	require('./tasks/typedoc')(grunt);
 
+	// Copy Intern properties from version-specific object to
+	// `intern` object
+	const internVersion = grunt.config('intern.version') || 3;
+	grunt.config('intern', options[`intern${internVersion}`]);
+
 	// Set some Intern-specific options if specified on the command line.
 	[ 'suites', 'functionalSuites', 'grep' ].forEach(function (option) {
 		const value = grunt.option<string>(option);
@@ -124,6 +129,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 	}
 
+	setCombined(grunt.option<boolean>('combined'));
+
 	grunt.registerTask('test', <any> (function (this: ITask) {
 		const flags = Object.keys(this.flags);
 
@@ -132,31 +139,18 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 
 		grunt.option('force', true);
+		setCombined(internVersion === 3);
+
 		grunt.task.run('clean:coverage');
 		grunt.task.run('dev');
 
-		const internVersion = grunt.config('intern.version') || 3;
+		flags.forEach((flag) => {
+			grunt.task.run(`intern:${flag}`);
+		});
 
-		grunt.registerTask('intern3', '', () => {
-			grunt.config('intern', options.intern3);
-
-			setCombined(true);
-
-			flags.forEach((flag) => {
-				grunt.task.run(`intern:${flag}`);
-			});
+		if (internVersion === 3) {
 			grunt.task.run('remapIstanbul:coverage');
-		});
-
-		grunt.registerTask('intern4', '', () => {
-			grunt.config('intern', options.intern4);
-
-			flags.forEach((flag) => {
-				grunt.task.run(`intern:${flag}`);
-			});
-		});
-
-		grunt.task.run(`intern${internVersion}`);
+		}
 
 		grunt.task.run('clean:coverage');
 	}));
