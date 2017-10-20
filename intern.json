@@ -1,0 +1,15 @@
+{
+	"suites": [
+		"./tests/unit/all.js"
+	],
+
+	"configs": {
+		"local": {
+			"coverage": [
+				"./lib/**/*.js",
+				"./options/**/*.js",
+				"./tasks/**/*.js"
+			]
+		}
+	}
+}

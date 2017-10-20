@@ -1,5 +1,6 @@
-import registerSuite = require('intern!object');
-import { assert } from 'chai';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import { join } from 'path';
 import { SinonSpy, spy, SinonStub, stub } from 'sinon';
@@ -37,10 +38,9 @@ let publisher: {
 	publish: SinonStub;
 };
 
-registerSuite({
-	name: 'tasks/typedoc',
+registerSuite('tasks/typedoc', {
 
-	setup() {
+	before() {
 		execSync = spy((command: string) => {
 			if (/git checkout/.test(command) && failInitialCheckout) {
 				failInitialCheckout = false;
@@ -86,7 +86,7 @@ registerSuite({
 		prepareOutputDirectory();
 	},
 
-	teardown() {
+	after() {
 		loadNpmTasks.restore();
 		write.restore();
 		run.restore();
@@ -142,35 +142,37 @@ registerSuite({
 		failInitialCheckout = false;
 	},
 
-	default() {
-		publishModeStub.returns(false);
-		runGruntTask('typedoc');
-		const command = execSync.args[0][0];
-		const matcher = new RegExp(
-			`node "[^"]+/typedoc" --mode "modules" --excludeExternals --excludeNotExported ` +
-			`--tsconfig "${join(outputPath, 'tsconfig.json')}" ` +
-			`--logger "none" --out "${apiDocDirectory}"`);
-		assert.match(command, matcher, 'Unexpected typedoc command line');
-		assert.strictEqual(write.callCount, 0, 'Nothing should have been written');
-		assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
-		assert.isFalse(publisherConstructor.called);
-	},
+	tests: {
+		default() {
+			publishModeStub.returns(false);
+			runGruntTask('typedoc');
+			const command = execSync.args[0][0];
+			const matcher = new RegExp(
+				`node "[^"]+/typedoc" --mode "modules" --excludeExternals --excludeNotExported ` +
+				`--tsconfig "${join(outputPath, 'tsconfig.json')}" ` +
+				`--logger "none" --out "${apiDocDirectory}"`);
+			assert.match(command, matcher, 'Unexpected typedoc command line');
+			assert.strictEqual(write.callCount, 0, 'Nothing should have been written');
+			assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
+			assert.isFalse(publisherConstructor.called);
+		},
 
-	publish() {
-		publishModeStub.returns('publish');
-		runGruntTask('typedoc');
-		assert.isTrue(publisherConstructor.calledOnce);
-		assert.isDefined(publisherConstructor.firstCall.args[1].log);
-		assert.isTrue(publisher.commit.calledOnce);
-		assert.isTrue(publisher.publish.calledOnce);
-	},
+		publish() {
+			publishModeStub.returns('publish');
+			runGruntTask('typedoc');
+			assert.isTrue(publisherConstructor.calledOnce);
+			assert.isDefined(publisherConstructor.firstCall.args[1].log);
+			assert.isTrue(publisher.commit.calledOnce);
+			assert.isTrue(publisher.publish.calledOnce);
+		},
 
-	commit() {
-		publishModeStub.returns('commit');
-		runGruntTask('typedoc');
-		assert.isTrue(publisherConstructor.calledOnce);
-		assert.isDefined(publisherConstructor.firstCall.args[1].log);
-		assert.isTrue(publisher.commit.calledOnce);
-		assert.isFalse(publisher.publish.called);
+		commit() {
+			publishModeStub.returns('commit');
+			runGruntTask('typedoc');
+			assert.isTrue(publisherConstructor.calledOnce);
+			assert.isDefined(publisherConstructor.firstCall.args[1].log);
+			assert.isTrue(publisher.commit.calledOnce);
+			assert.isFalse(publisher.publish.called);
+		}
 	}
 });

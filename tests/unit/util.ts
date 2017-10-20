@@ -2,9 +2,6 @@ import * as grunt from 'grunt';
 import * as path from 'path';
 import * as mockery from 'mockery';
 import * as _ from 'lodash';
-import { IRootRequire } from 'dojo/loader';
-
-declare const require: IRootRequire;
 
 export interface MockList {
 	[key: string]: any;
@@ -81,7 +78,7 @@ function registerMockList(mocks: MockList) {
 	}
 }
 
-export function loadModule(mid: string, mocks: MockList = {}, returnDefault = true): any {
+export function loadModule(mid: string, require: NodeRequire, mocks: MockList = {}, returnDefault = true): any {
 	mockery.enable({
 		warnOnReplace: false,
 		warnOnUnregistered: false,
@@ -91,8 +88,7 @@ export function loadModule(mid: string, mocks: MockList = {}, returnDefault = tr
 
 	registerMockList(mocks);
 
-	const loader = require.nodeRequire || require;
-	const module = loader(require.toUrl(mid));
+	const module = require(mid);
 	return returnDefault ? module.default : module;
 }
 
@@ -123,7 +119,7 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 	}
 
 	grunt.file.expand([ 'tasks/*.js' ]).forEach((fileName) => {
-		(<any> require).nodeRequire('../../' + fileName.substr(0, fileName.length - 3))(grunt, packageJson);
+		require('../../' + fileName.substr(0, fileName.length - 3))(grunt, packageJson);
 	});
 
 	// suppress grunt logging

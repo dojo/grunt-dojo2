@@ -6,10 +6,8 @@ export = function (grunt: IGrunt) {
 	return {
 		options: {
 			config: '<%= internConfig %>',
-			'reporters': [
-				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } },
-				{ name: 'lcov', options: { directory: '.', filename: 'coverage-final.lcov' } },
-				{ name: 'htmlcoverage', options: { directory: 'html-report' } }
+			reporters: [
+				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
 			]
 		},
 		browserstack: {

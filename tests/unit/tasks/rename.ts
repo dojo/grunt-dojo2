@@ -1,5 +1,6 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import {
 	getInputDirectory,
@@ -18,9 +19,8 @@ import {
 const inputDirectory = getInputDirectory();
 const outputPath = getOutputDirectory();
 
-registerSuite({
-	name: 'tasks/rename',
-	setup() {
+registerSuite('tasks/rename', {
+	before() {
 		grunt.initConfig({
 			rename: {
 				textFiles: {
@@ -34,33 +34,37 @@ registerSuite({
 
 		loadTasks();
 	},
-	teardown() {
+	after() {
 		unloadTasks();
 	},
-	basic: {
-		beforeEach() {
-			prepareInputDirectory();
-			prepareOutputDirectory();
-		},
+	tests: {
+		basic: {
+			beforeEach() {
+				prepareInputDirectory();
+				prepareOutputDirectory();
+			},
 
-		afterEach() {
-			cleanInputDirectory();
-			cleanOutputDirectory();
-		},
+			afterEach() {
+				cleanInputDirectory();
+				cleanOutputDirectory();
+			},
 
-		textFilesOnly() {
-			createDummyFile('file1.txt');
-			createDummyFile('file2');
-			createDummyDirectory('dir.txt');
+			tests: {
+				textFilesOnly() {
+					createDummyFile('file1.txt');
+					createDummyFile('file2');
+					createDummyDirectory('dir.txt');
 
-			runGruntTask('rename:textFiles');
+					runGruntTask('rename:textFiles');
 
-			assert.isFalse(fileExistsInInputDirectory('file1.txt'), 'file1.txt should not be in input directory');
-			assert.isTrue(fileExistsInOutputDirectory('file1.txt'), 'file1.txt should have been moved to output directory');
-			assert.isTrue(fileExistsInInputDirectory('file2'), 'file2 should still be in input directory');
-			assert.isFalse(fileExistsInOutputDirectory('file2'), 'file2 should not be in output directory');
-			assert.isFalse(fileExistsInInputDirectory('dir.txt'), 'dir.txt directory should not be in input directory');
-			assert.isTrue(fileExistsInOutputDirectory('dir.txt'), 'dir.txt directory should be in output directory');
+					assert.isFalse(fileExistsInInputDirectory('file1.txt'), 'file1.txt should not be in input directory');
+					assert.isTrue(fileExistsInOutputDirectory('file1.txt'), 'file1.txt should have been moved to output directory');
+					assert.isTrue(fileExistsInInputDirectory('file2'), 'file2 should still be in input directory');
+					assert.isFalse(fileExistsInOutputDirectory('file2'), 'file2 should not be in output directory');
+					assert.isFalse(fileExistsInInputDirectory('dir.txt'), 'dir.txt directory should not be in input directory');
+					assert.isTrue(fileExistsInOutputDirectory('dir.txt'), 'dir.txt directory should be in output directory');
+				}
+			}
 		}
 	}
 });
