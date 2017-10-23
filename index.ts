@@ -116,7 +116,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 	});
 
-	function setCoverage(coverage: boolean) {
+	function setTestReporter(coverage: boolean) {
 		if (coverage) {
 			grunt.config('intern.options.node.plugins', [
 				'grunt-dojo2/lib/intern/Reporter'
@@ -124,7 +124,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 	}
 
-	setCoverage(grunt.option<boolean>('coverage'));
+	setTestReporter(grunt.option<boolean>('test-reporter'));
 
 	grunt.registerTask('test', <any> (function (this: ITask) {
 		const flags = Object.keys(this.flags);
@@ -134,7 +134,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		}
 
 		grunt.option('force', true);
-		setCoverage(true);
+		setTestReporter(true);
 
 		grunt.task.run('clean:coverage');
 		grunt.task.run('dev');
