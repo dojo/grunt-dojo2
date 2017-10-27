@@ -1,5 +1,6 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import { stub } from 'sinon';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
@@ -7,9 +8,8 @@ import Test = require("intern/lib/Test");
 
 const requireStub = stub();
 
-registerSuite({
-	name: 'tasks/run',
-	setup() {
+registerSuite('tasks/run', {
+	before() {
 		grunt.initConfig({});
 
 		loadTasks({
@@ -22,34 +22,36 @@ registerSuite({
 			}
 		});
 	},
-	teardown() {
+	after() {
 		unloadTasks();
 	},
 	beforeEach() {
 		requireStub.reset();
 	},
-	runsDefault(this: Test) {
-		var dfd = this.async(1000);
+	tests: {
+		runsDefault() {
+			var dfd = this.async(1000);
 
-		runGruntTask('run', () => {
-		});
+			runGruntTask('run', () => {
+			});
 
-		setTimeout(dfd.callback(() => {
-			assert.isTrue(requireStub.calledOnce);
-			assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'src/main' ]);
-		}), 100);
-	},
-	runsArgument(this: Test) {
-		var dfd = this.async(1000);
+			setTimeout(dfd.callback(() => {
+				assert.isTrue(requireStub.calledOnce);
+				assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'src/main' ]);
+			}), 100);
+		},
+		runsArgument() {
+			var dfd = this.async(1000);
 
-		grunt.option('main', 'my-main');
+			grunt.option('main', 'my-main');
 
-		runGruntTask('run', () => {
-		});
+			runGruntTask('run', () => {
+			});
 
-		setTimeout(dfd.callback(() => {
-			assert.isTrue(requireStub.calledOnce);
-			assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'my-main' ]);
-		}), 100);
-	},
+			setTimeout(dfd.callback(() => {
+				assert.isTrue(requireStub.calledOnce);
+				assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'my-main' ]);
+			}), 100);
+		},
+	}
 });

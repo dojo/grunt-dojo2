@@ -1,5 +1,6 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import {
 	getInputDirectory, loadTasks, prepareInputDirectory, unloadTasks, cleanInputDirectory,
@@ -8,9 +9,8 @@ import {
 
 const inputDirectory = getInputDirectory();
 
-registerSuite({
-	name: 'tasks/fixSourceMaps',
-	setup() {
+registerSuite('tasks/fixSourceMaps', {
+	before() {
 		grunt.initConfig({
 			distDirectory: inputDirectory
 		});
@@ -18,34 +18,37 @@ registerSuite({
 		loadTasks();
 		prepareInputDirectory();
 	},
-	teardown() {
+	after() {
 		unloadTasks();
 		cleanInputDirectory();
 	},
 
-	sourcMaps() {
-		createDummyFile('test/sourcemap.js.map', JSON.stringify(
-			{
+	tests: {
+		sourceMaps() {
+			createDummyFile('test/sourcemap.js.map', JSON.stringify(
+				{
+					"version": 3,
+					"file": "global.js",
+					"sourceRoot": "",
+					"sources": [ "../../src/global.ts" ],
+					"names": []
+				}
+			));
+
+			debugger;
+			runGruntTask('fixSourceMaps');
+
+			assert.isTrue(fileExistsInInputDirectory('test/sourcemap.js.map'), 'Source map should still exist');
+
+			const sourceMap = grunt.file.readJSON(inputDirectory + '/test/sourcemap.js.map');
+
+			assert.deepEqual(sourceMap, {
 				"version": 3,
 				"file": "global.js",
 				"sourceRoot": "",
-				"sources": [ "../../src/global.ts" ],
+				"sources": [ "global.ts" ],
 				"names": []
-			}
-		));
-
-		runGruntTask('fixSourceMaps');
-
-		assert.isTrue(fileExistsInInputDirectory('test/sourcemap.js.map'), 'Source map should still exist');
-
-		const sourceMap = grunt.file.readJSON(inputDirectory + '/test/sourcemap.js.map');
-
-		assert.deepEqual(sourceMap, {
-			"version": 3,
-			"file": "global.js",
-			"sourceRoot": "",
-			"sources": [ "global.ts" ],
-			"names": []
-		});
+			});
+		}
 	}
 });

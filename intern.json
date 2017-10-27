@@ -1,0 +1,26 @@
+{
+	"suites": [
+		"./tests/unit/all.js"
+	],
+
+	"coverage": [
+		"./lib/**/*.js",
+		"./options/**/*.js",
+		"./tasks/**/*.js"
+	],
+
+	"reporters": [
+		"runner",
+		{ "name": "htmlcoverage", "options": { "directory": "html-report" } },
+		{ "name": "jsoncoverage", "options": { "directory": ".", "filename": "coverage-final.json" } }
+	],
+
+	"configs": {
+		"ci": {
+			"reporters": [
+				{ "name": "runner", "options": { "hidePassed": true, "hideSkipped": true } },
+				{ "name": "lcov", "options": { "directory": ".", "filename": "lcov.info" } }
+			]
+		}
+	}
+}

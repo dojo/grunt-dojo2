@@ -1,5 +1,6 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
 import Test = require("intern/lib/Test");
@@ -8,9 +9,8 @@ let fakeRepl: any = {};
 const fakeDojoRequire = function () {
 };
 
-registerSuite({
-	name: 'tasks/repl',
-	setup() {
+registerSuite('tasks/repl', {
+	before() {
 		grunt.initConfig({});
 
 		loadTasks({
@@ -44,26 +44,28 @@ registerSuite({
 			}
 		});
 	},
-	teardown() {
+	after() {
 		unloadTasks();
 	},
 
-	repl(this: Test) {
-		const dfd = this.async();
+	tests: {
+		repl() {
+			const dfd = this.async();
 
-		runGruntTask('repl');
+			runGruntTask('repl');
 
-		setTimeout(dfd.callback(() => {
-			assert.isNotNull(fakeRepl.require);
-			assert.isNotNull(fakeRepl.nodeRequire);
+			setTimeout(dfd.callback(() => {
+				assert.isNotNull(fakeRepl.require);
+				assert.isNotNull(fakeRepl.nodeRequire);
 
-			assert.equal(fakeRepl.require, fakeDojoRequire);
-			assert.notEqual(fakeRepl.nodeRequire, fakeDojoRequire);
+				assert.equal(fakeRepl.require, fakeDojoRequire);
+				assert.notEqual(fakeRepl.nodeRequire, fakeDojoRequire);
 
-			let testPackage = fakeRepl.nodeRequire('test-package');
-			assert.deepEqual(testPackage, { hello: 'world' });
-			assert.equal(fakeRepl.nodeRequire.resolve('test-package'), './base-url/test-package');
-		}), 10);
+				let testPackage = fakeRepl.nodeRequire('test-package');
+				assert.deepEqual(testPackage, { hello: 'world' });
+				assert.equal(fakeRepl.nodeRequire.resolve('test-package'), './base-url/test-package');
+			}), 10);
+		}
 	}
 });
 

@@ -1,5 +1,6 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
 import { SinonStub, stub } from 'sinon';
@@ -10,9 +11,8 @@ const coverageFileName = 'coverage-final.lcov';
 let sendCodeCov: SinonStub = stub().callsArgWith(1, 'error');
 let read: SinonStub;
 
-registerSuite({
-	name: 'tasks/uploadCoverage',
-	setup() {
+registerSuite('tasks/uploadCoverage', {
+	before() {
 		grunt.initConfig({});
 
 		loadTasks({
@@ -27,15 +27,17 @@ registerSuite({
 			})
 		);
 	},
-	teardown() {
+	after() {
 		unloadTasks();
 	},
-	propagatesReturnValue(this: Test) {
-		var dfd = this.async();
+	tests: {
+		propagatesReturnValue() {
+			var dfd = this.async();
 
-		runGruntTask('uploadCoverage', dfd.callback(() => {
-			assert.isTrue(sendCodeCov.calledOnce);
-			assert.deepEqual(JSON.parse(sendCodeCov.firstCall.args[ 0 ]), { hello: 'world' });
-		}));
+			runGruntTask('uploadCoverage', dfd.callback(() => {
+				assert.isTrue(sendCodeCov.calledOnce);
+				assert.deepEqual(JSON.parse(sendCodeCov.firstCall.args[ 0 ]), { hello: 'world' });
+			}));
+		}
 	}
 });

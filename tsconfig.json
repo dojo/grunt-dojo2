@@ -1,20 +1,26 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"experimentalDecorators": true,
 		"inlineSourceMap": true,
 		"inlineSources": true,
+		"lib": [
+			"es5",
+			"es2015",
+			"es2015.collection",
+			"es2015.promise",
+			"es2015.symbol",
+			"es2015.symbol.wellknown",
+			"es2015.iterable",
+			"dom"
+		],
 		"module": "umd",
 		"moduleResolution": "node",
 		"noImplicitAny": true,
 		"pretty": true,
 		"target": "es5",
 		"strictNullChecks": true,
-		"noImplicitThis": true,
-		"paths": {
-			"grunt-dojo2/*": [
-				"./*"
-			]
-		}
+		"noImplicitThis": true
 	},
 	"include": [
 		"./index.ts",

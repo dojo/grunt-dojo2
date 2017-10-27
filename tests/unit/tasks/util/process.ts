@@ -1,7 +1,8 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import { stub } from 'sinon';
-import { unloadTasks, loadModule } from 'grunt-dojo2/tests/unit/util';
+import { unloadTasks, loadModule } from '../../util';
 
 let process: any;
 const execStub = stub();
@@ -11,10 +12,9 @@ function assertDefaultOptions(options: any) {
 	assert.strictEqual(options.encoding, 'utf8');
 	assert.strictEqual(options.stdio, 'inherit');
 }
-registerSuite({
-	name: 'tasks/util/process',
+registerSuite('tasks/util/process', {
 
-	setup() {
+	before() {
 		const mocks = {
 			'child_process': {
 				'execSync': execStub,
@@ -22,7 +22,7 @@ registerSuite({
 			}
 		};
 
-		process = loadModule('grunt-dojo2/tasks/util/process', mocks, false);
+		process = loadModule('../../../../tasks/util/process', require, mocks, false);
 	},
 
 	beforeEach() {
@@ -31,69 +31,71 @@ registerSuite({
 		spawnStub.returns({ stdout: '' });
 	},
 
-	teardown() {
+	after() {
 		unloadTasks();
 	},
 
-	exec() {
-		const command = 'ls -al';
-		process.exec(command);
-		assert.strictEqual(execStub.lastCall.args[0], command);
-		const options = execStub.lastCall.args[1];
-		assertDefaultOptions(options);
-	},
-
-	spawn() {
-		const command = 'ls';
-		const args = [ '-al' ];
-		process.spawn(command, args);
-		assert.isTrue(spawnStub.calledOnce);
-		assert.strictEqual(spawnStub.lastCall.args[0], command);
-		assert.deepEqual(spawnStub.lastCall.args[1], args);
-		const options = spawnStub.lastCall.args[2];
-		assertDefaultOptions(options);
-	},
-
-	options: {
-		'default'() {
-			const command = 'cmd';
+	tests: {
+		exec() {
+			const command = 'ls -al';
 			process.exec(command);
 			assert.strictEqual(execStub.lastCall.args[0], command);
 			const options = execStub.lastCall.args[1];
 			assertDefaultOptions(options);
 		},
 
-		'set encoding'() {
-			const command = 'cmd';
-			process.exec(command, {
-				encoding: 'pizza'
-			});
-			assert.strictEqual(execStub.lastCall.args[0], command);
-			const options = execStub.lastCall.args[1];
-			assert.strictEqual(options.encoding, 'pizza');
-			assert.strictEqual(options.stdio, 'inherit');
+		spawn() {
+			const command = 'ls';
+			const args = [ '-al' ];
+			process.spawn(command, args);
+			assert.isTrue(spawnStub.calledOnce);
+			assert.strictEqual(spawnStub.lastCall.args[0], command);
+			assert.deepEqual(spawnStub.lastCall.args[1], args);
+			const options = spawnStub.lastCall.args[2];
+			assertDefaultOptions(options);
 		},
 
-		'silent true'() {
-			const command = 'cmd';
-			process.exec(command, {
-				silent: true
-			});
-			assert.strictEqual(execStub.lastCall.args[0], command);
-			const options = execStub.lastCall.args[1];
-			assert.strictEqual(options.encoding, 'utf8');
-			assert.strictEqual(options.stdio, 'pipe');
-		},
+		options: {
+			'default'() {
+				const command = 'cmd';
+				process.exec(command);
+				assert.strictEqual(execStub.lastCall.args[0], command);
+				const options = execStub.lastCall.args[1];
+				assertDefaultOptions(options);
+			},
 
-		'stdio set'() {
-			const command = 'cmd';
-			process.exec(command, {
-				stdio: 'pizza'
-			});
-			assert.strictEqual(execStub.lastCall.args[0], command);
-			const options = execStub.lastCall.args[1];
-			assert.strictEqual(options.encoding, 'utf8');
-			assert.strictEqual(options.stdio, 'pizza');
+			'set encoding'() {
+				const command = 'cmd';
+				process.exec(command, {
+					encoding: 'pizza'
+				});
+				assert.strictEqual(execStub.lastCall.args[0], command);
+				const options = execStub.lastCall.args[1];
+				assert.strictEqual(options.encoding, 'pizza');
+				assert.strictEqual(options.stdio, 'inherit');
+			},
+
+			'silent true'() {
+				const command = 'cmd';
+				process.exec(command, {
+					silent: true
+				});
+				assert.strictEqual(execStub.lastCall.args[0], command);
+				const options = execStub.lastCall.args[1];
+				assert.strictEqual(options.encoding, 'utf8');
+				assert.strictEqual(options.stdio, 'pipe');
+			},
+
+			'stdio set'() {
+				const command = 'cmd';
+				process.exec(command, {
+					stdio: 'pizza'
+				});
+				assert.strictEqual(execStub.lastCall.args[0], command);
+				const options = execStub.lastCall.args[1];
+				assert.strictEqual(options.encoding, 'utf8');
+				assert.strictEqual(options.stdio, 'pizza');
+			}
 		}
 	}
 });

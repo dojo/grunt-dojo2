@@ -46,6 +46,7 @@
     "grunt-ts": ">=5.0.0",
     "grunt-tslint": "^4.0.1",
     "grunt-typings": "^0.1.5",
+    "intern": "~4.0.2",
     "lodash": "^4.15.0",
     "parse-git-config": "^0.4.2",
     "pkg-dir": "^1.0.0",
@@ -60,7 +61,6 @@
     "umd-wrapper": "^0.1.0"
   },
   "devDependencies": {
-    "@types/es6-shim": "^0.31.32",
     "@types/glob": "^5.0.30",
     "@types/grunt": "~0.4.20",
     "@types/lodash": "4.14.56",
@@ -70,7 +70,6 @@
     "@types/shelljs": "^0.6.0",
     "dojo-loader": "latest",
     "grunt": "^1.0.1",
-    "intern": "~3.4.1",
     "mockery": "^2.0.0",
     "shx": ">=0.1.2",
     "sinon": "^1.17.6",

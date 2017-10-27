@@ -1,5 +1,6 @@
-import * as registerSuite from 'intern!object';
-import * as assert from 'intern/chai!assert';
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
 import * as grunt from 'grunt';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -16,9 +17,8 @@ let symlink: SinonStub;
 let shell: SinonStub = stub();
 let run: SinonStub;
 
-registerSuite({
-	name: 'tasks/link',
-	setup() {
+registerSuite('tasks/link', {
+	before() {
 		grunt.initConfig({
 			distDirectory: outputPath
 		});
@@ -43,7 +43,7 @@ registerSuite({
 			}
 		});
 	},
-	teardown() {
+	after() {
 		symlink.restore();
 		unloadTasks();
 	},
@@ -53,42 +53,46 @@ registerSuite({
 		shell.reset();
 	},
 
-	_link() {
-		runGruntTask('_link');
+	tests: {
+		_link() {
+			runGruntTask('_link');
 
-		assert.isTrue(symlink.calledTwice);
-		assert.isTrue(symlink.firstCall.calledWith(path.join(cwd, 'node_modules'), path.join(outputPath, 'node_modules'), 'junction'));
-		assert.isTrue(symlink.secondCall.calledWith(path.join(cwd, 'package.json'), path.join(outputPath, 'package.json'), 'file'));
-		assert.isTrue(shell.calledOnce);
-		assert.isTrue(shell.calledWith('npm link', { cwd: outputPath }));
-	},
-
-	link: {
-		beforeEach() {
-			run = stub(grunt.task, 'run');
-		},
-		afterEach() {
-			run.restore();
+			assert.isTrue(symlink.calledTwice);
+			assert.isTrue(symlink.firstCall.calledWith(path.join(cwd, 'node_modules'), path.join(outputPath, 'node_modules'), 'junction'));
+			assert.isTrue(symlink.secondCall.calledWith(path.join(cwd, 'package.json'), path.join(outputPath, 'package.json'), 'file'));
+			assert.isTrue(shell.calledOnce);
+			assert.isTrue(shell.calledWith('npm link', { cwd: outputPath }));
 		},
 
-		withDir() {
-			prepareOutputDirectory();
+		link: {
+			beforeEach() {
+				run = stub(grunt.task, 'run');
+			},
+			afterEach() {
+				run.restore();
+			},
 
-			runGruntTask('link');
+			tests: {
+				withDir() {
+					prepareOutputDirectory();
 
-			cleanOutputDirectory();
+					runGruntTask('link');
 
-			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ '_link' ]);
-		},
+					cleanOutputDirectory();
 
-		withoutDir() {
-			cleanOutputDirectory();
+					assert.isTrue(run.calledOnce);
+					assert.deepEqual(run.firstCall.args[ 0 ], [ '_link' ]);
+				},
 
-			runGruntTask('link');
+				withoutDir() {
+					cleanOutputDirectory();
 
-			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dist', '_link' ]);
+					runGruntTask('link');
+
+					assert.isTrue(run.calledOnce);
+					assert.deepEqual(run.firstCall.args[ 0 ], [ 'dist', '_link' ]);
+				}
+			}
 		}
 	}
 });
