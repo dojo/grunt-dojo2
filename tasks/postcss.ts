@@ -2,7 +2,6 @@ import { createProcessors } from './util/postcss';
 
 export = function init(grunt: IGrunt) {
 	const path = require('path');
-	const fs = require('fs');
 	const postCssImport = require('postcss-import');
 	const postCssNext = require('postcss-cssnext');
 	grunt.loadNpmTasks('grunt-postcss');

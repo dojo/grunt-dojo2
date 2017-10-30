@@ -3,7 +3,6 @@ const { assert } = intern.getPlugin('chai');
 
 import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
-import Test = require("intern/lib/Test");
 
 let fakeRepl: any = {};
 const fakeDojoRequire = function () {
@@ -68,4 +67,3 @@ registerSuite('tasks/repl', {
 		}
 	}
 });
-

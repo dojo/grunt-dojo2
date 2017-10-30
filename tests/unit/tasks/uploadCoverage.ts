@@ -4,7 +4,6 @@ const { assert } = intern.getPlugin('chai');
 import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
 import { SinonStub, stub } from 'sinon';
-import Test = require("intern/lib/Test");
 
 const coverageFileName = 'coverage-final.lcov';
 
@@ -32,7 +31,7 @@ registerSuite('tasks/uploadCoverage', {
 	},
 	tests: {
 		propagatesReturnValue() {
-			var dfd = this.async();
+			const dfd = this.async();
 
 			runGruntTask('uploadCoverage', dfd.callback(() => {
 				assert.isTrue(sendCodeCov.calledOnce);

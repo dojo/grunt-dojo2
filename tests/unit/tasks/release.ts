@@ -6,7 +6,6 @@ import * as grunt from 'grunt';
 import { stub, SinonStub } from 'sinon';
 import * as path from 'path';
 import { unloadTasks, loadTasks, runGruntTask } from '../util';
-import Test = require('intern/lib/Test');
 
 let shell: SinonStub = stub();
 let originalOptions: {
@@ -718,8 +717,6 @@ registerSuite('tasks/release', {
 
 			'next version'() {
 				const dfd = this.async();
-
-				const originalPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
 
 				taskLoader(undefined, {
 					'next-version': 'test-version'

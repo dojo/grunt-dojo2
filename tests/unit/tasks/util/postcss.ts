@@ -1,7 +1,6 @@
 const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
-import * as mockery from 'mockery';
 import { stub } from 'sinon';
 import { unloadTasks, loadModule } from '../../util';
 

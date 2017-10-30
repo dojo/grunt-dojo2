@@ -27,15 +27,14 @@ registerSuite('tasks/fixSourceMaps', {
 		sourceMaps() {
 			createDummyFile('test/sourcemap.js.map', JSON.stringify(
 				{
-					"version": 3,
-					"file": "global.js",
-					"sourceRoot": "",
-					"sources": [ "../../src/global.ts" ],
-					"names": []
+					'version': 3,
+					'file': 'global.js',
+					'sourceRoot': '',
+					'sources': [ '../../src/global.ts' ],
+					'names': []
 				}
 			));
 
-			debugger;
 			runGruntTask('fixSourceMaps');
 
 			assert.isTrue(fileExistsInInputDirectory('test/sourcemap.js.map'), 'Source map should still exist');
@@ -43,11 +42,11 @@ registerSuite('tasks/fixSourceMaps', {
 			const sourceMap = grunt.file.readJSON(inputDirectory + '/test/sourcemap.js.map');
 
 			assert.deepEqual(sourceMap, {
-				"version": 3,
-				"file": "global.js",
-				"sourceRoot": "",
-				"sources": [ "global.ts" ],
-				"names": []
+				'version': 3,
+				'file': 'global.js',
+				'sourceRoot': '',
+				'sources': [ 'global.ts' ],
+				'names': []
 			});
 		}
 	}

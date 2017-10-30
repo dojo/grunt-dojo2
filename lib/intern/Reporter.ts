@@ -1,7 +1,4 @@
-import * as fs from 'fs';
 import * as nodeUtil from 'util';
-import * as path from 'path';
-import { deepAssign } from '@dojo/core/lang';
 import { create, ReportType } from 'istanbul-reports';
 import {
 	CoverageMap,
@@ -10,15 +7,11 @@ import {
 } from 'istanbul-lib-coverage';
 import { createContext, summarizers, Watermarks } from 'istanbul-lib-report';
 
-import glob = require('glob');
-import 'istanbul/index';
-
 import Node, { Events } from 'intern/lib/executors/Node';
 import Test from 'intern/lib/Test';
 import Suite from 'intern/lib/Suite';
 import { CoverageProperties } from 'intern/lib/reporters/Coverage';
-import Runner, { RunnerProperties } from 'intern/lib/reporters/Runner';
-import BaseReporter from 'intern/lib/reporters/Reporter';
+import Runner from 'intern/lib/reporters/Runner';
 import { createEventHandler } from 'intern/lib/reporters/Reporter';
 
 const LIGHT_RED = '\x1b[91m';
@@ -183,8 +176,8 @@ export default class Reporter extends Runner {
 			const { charm } = this;
 
 			if (!session.coverage) {
-				charm.write('No unit test coverage for ' + suite.name)
-				charm.display('reset')
+				charm.write('No unit test coverage for ' + suite.name);
+				charm.display('reset');
 				charm.write('\n');
 			}
 
@@ -192,14 +185,14 @@ export default class Reporter extends Runner {
 
 			if (this._errors[suite.sessionId]) {
 				this._errors[suite.sessionId].forEach((test) => {
-					charm.write(LIGHT_RED)
-					charm.write('× ' + test.id)
-					charm.foreground('white')
-					charm.write(' (' + (test.timeElapsed / 1000) + 's)')
-					charm.write('\n')
-					charm.foreground('red')
-					charm.write(test.error)
-					charm.display('reset')
+					charm.write(LIGHT_RED);
+					charm.write('× ' + test.id);
+					charm.foreground('white');
+					charm.write(' (' + (test.timeElapsed / 1000) + 's)');
+					charm.write('\n');
+					charm.foreground('red');
+					charm.write(test.error);
+					charm.display('reset');
 					charm.write('\n\n');
 				});
 			}
@@ -219,9 +212,9 @@ export default class Reporter extends Runner {
 				summary += '; suite error occurred';
 			}
 
-			charm.write(numFailedTests || hasError > 0 ? LIGHT_RED : LIGHT_GREEN)
-			charm.write(summary)
-			charm.display('reset')
+			charm.write(numFailedTests || hasError > 0 ? LIGHT_RED : LIGHT_GREEN);
+			charm.write(summary);
+			charm.display('reset');
 			charm.write('\n\n');
 		}
 	}
