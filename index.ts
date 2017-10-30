@@ -118,7 +118,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 
 	function setTestReporter(coverage: boolean) {
 		if (coverage) {
-			grunt.config('intern.options.node.plugins', [
+			grunt.config('intern.options.node.plugins+', [
 				'grunt-dojo2/lib/intern/Reporter'
 			]);
 		}

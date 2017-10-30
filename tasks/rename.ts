@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import ITask = grunt.task.ITask;
 import IMultiTask = grunt.task.IMultiTask;
 
 export = function (grunt: IGrunt) {

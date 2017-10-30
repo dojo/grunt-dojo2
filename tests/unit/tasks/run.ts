@@ -4,7 +4,6 @@ const { assert } = intern.getPlugin('chai');
 import * as grunt from 'grunt';
 import { stub } from 'sinon';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
-import Test = require("intern/lib/Test");
 
 const requireStub = stub();
 
@@ -30,7 +29,7 @@ registerSuite('tasks/run', {
 	},
 	tests: {
 		runsDefault() {
-			var dfd = this.async(1000);
+			const dfd = this.async(1000);
 
 			runGruntTask('run', () => {
 			});
@@ -41,7 +40,7 @@ registerSuite('tasks/run', {
 			}), 100);
 		},
 		runsArgument() {
-			var dfd = this.async(1000);
+			const dfd = this.async(1000);
 
 			grunt.option('main', 'my-main');
 
@@ -52,6 +51,6 @@ registerSuite('tasks/run', {
 				assert.isTrue(requireStub.calledOnce);
 				assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'my-main' ]);
 			}), 100);
-		},
+		}
 	}
 });

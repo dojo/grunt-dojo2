@@ -8,7 +8,7 @@ import {
 	getOutputDirectory
 } from '../util';
 
-var outputPath = getOutputDirectory();
+const outputPath = getOutputDirectory();
 let run: SinonStub;
 let loadNpmTasks: SinonStub;
 let write: SinonStub;
@@ -36,14 +36,14 @@ registerSuite('tasks/ts', {
 		grunt.initConfig({
 			distDirectory: outputPath,
 			tsconfig: {
-				"compilerOptions": {
-					"inlineSourceMap": true,
-					"inlineSources": true,
-					"listFiles": true,
-					"module": "commonjs",
-					"noImplicitAny": true,
-					"pretty": true,
-					"target": "es6"
+				'compilerOptions': {
+					'inlineSourceMap': true,
+					'inlineSources': true,
+					'listFiles': true,
+					'module': 'commonjs',
+					'noImplicitAny': true,
+					'pretty': true,
+					'target': 'es6'
 				}
 			},
 			ts: {
@@ -110,14 +110,14 @@ registerSuite('tasks/ts', {
 			grunt.initConfig({
 				distDirectory: outputPath,
 				tsconfig: {
-					"compilerOptions": {
-						"inlineSourceMap": true,
-						"inlineSources": true,
-						"listFiles": true,
-						"module": "commonjs",
-						"noImplicitAny": true,
-						"pretty": true,
-						"target": "es6"
+					'compilerOptions': {
+						'inlineSourceMap': true,
+						'inlineSources': true,
+						'listFiles': true,
+						'module': 'commonjs',
+						'noImplicitAny': true,
+						'pretty': true,
+						'target': 'es6'
 					}
 				}
 			});

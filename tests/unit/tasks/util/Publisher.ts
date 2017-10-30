@@ -1,7 +1,7 @@
 const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
-import { SinonStub, SinonSpy, stub, spy } from 'sinon';
+import { SinonStub, stub } from 'sinon';
 import { Options, default as PublisherInstance } from '../../../../tasks/util/Publisher';
 import { unloadTasks, loadModule } from '../../util';
 

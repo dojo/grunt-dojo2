@@ -4,7 +4,7 @@ const { assert } = intern.getPlugin('chai');
 import * as grunt from 'grunt';
 import * as fs from 'fs';
 import * as path from 'path';
-import { SinonStub, stub } from "sinon";
+import { SinonStub, stub } from 'sinon';
 import {
 	getOutputDirectory, loadTasks, unloadTasks, runGruntTask, prepareOutputDirectory,
 	cleanOutputDirectory
