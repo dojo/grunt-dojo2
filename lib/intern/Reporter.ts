@@ -142,7 +142,7 @@ export default class Reporter extends Runner {
 			this.sessions[suite.sessionId || ''] = { suite: suite };
 			if (suite.sessionId) {
 				this.charm.write('\n');
-				this.charm.write(`\n‣ Created session ${suite.name} (${suite.sessionId}\n`);
+				this.charm.write(`\n‣ Created session ${suite.name} (${suite.sessionId})\n`);
 			}
 		}
 	}
@@ -166,12 +166,7 @@ export default class Reporter extends Runner {
 		if (suite.error) {
 			this.hasSuiteErrors = session.hasSuiteErrors = true;
 		}
-		else if (!suite.hasParent && this.executor.suites.length > 1) {
-			// Runner mode test with no sessionId was some failed test, not a bug
-			if (!suite.sessionId) {
-				return;
-			}
-
+		else if (!suite.hasParent) {
 			const session = this.sessions[suite.sessionId];
 			const { charm } = this;
 
@@ -195,6 +190,12 @@ export default class Reporter extends Runner {
 					charm.display('reset');
 					charm.write('\n\n');
 				});
+			}
+
+			if (this.executor.suites.length < 2) {
+				// If there's only one suite, skip outputting how many tests failed since
+				// it'll be the same as the number output in runEnd()
+				return;
 			}
 
 			const name = suite.name;
