@@ -93,6 +93,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/repl')(grunt, packageJson);
 	require('./tasks/run')(grunt, packageJson);
 	require('./tasks/release')(grunt, packageJson);
+	require('./tasks/tcm')(grunt);
 	require('./tasks/link')(grunt, packageJson);
 	require('./tasks/fixSourceMaps')(grunt, packageJson);
 	require('./tasks/postcss')(grunt);
