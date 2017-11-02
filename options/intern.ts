@@ -8,7 +8,10 @@ export = function (grunt: IGrunt) {
 			config: '<%= internConfig %>',
 			reporters: [
 				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
-			]
+			],
+			browser: {
+				loader: './node_modules/grunt-dojo2/lib/intern/internLoader.js'
+			}
 		},
 		browserstack: {
 			options: {
