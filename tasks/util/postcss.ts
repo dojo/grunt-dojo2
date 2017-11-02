@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const cssNano = require('cssnano');
 const postCssImport = require('postcss-import');
 const postCssNext = require('postcss-cssnext');
 const postCssModules = require('postcss-modules');
@@ -27,6 +28,8 @@ export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 				json[themeKey] = 'dojo-' + path.basename(outputPath, '.m.css');
 				fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 			}
-		})
+		}),
+		// autoprefixer included in cssnext
+		cssNano({ autoprefixer: false })
 	];
 };

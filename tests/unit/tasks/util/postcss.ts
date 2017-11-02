@@ -5,6 +5,7 @@ import { stub } from 'sinon';
 import { unloadTasks, loadModule } from '../../util';
 
 let postCssUtil: any;
+const cssNanoModuleStub = stub();
 const postCssModulesStub = stub();
 const postCssImportStub = stub();
 const postCssNextStub = stub();
@@ -18,6 +19,7 @@ registerSuite('tasks/util/postcss', {
 
 	before() {
 		const mocks = {
+			'cssnano': cssNanoModuleStub,
 			'postcss-modules': postCssModulesStub,
 			'postcss-import': postCssImportStub,
 			'postcss-cssnext': postCssNextStub,
@@ -36,6 +38,7 @@ registerSuite('tasks/util/postcss', {
 	},
 
 	beforeEach() {
+		cssNanoModuleStub.reset();
 		postCssModulesStub.reset();
 		postCssImportStub.reset();
 		postCssNextStub.reset();
@@ -53,12 +56,14 @@ registerSuite('tasks/util/postcss', {
 	tests: {
 		createProcessors: {
 			'order'() {
-				const processors = postCssUtil.createProcessors('', '');
-				assert.isTrue(processors.length === 3);
+				const processors = postCssUtil.createProcessors('');
+				assert.isTrue(processors.length === 4);
 				assert.equal(processors[0], postCssImportStub);
 				assert.isTrue(postCssNextStub.calledOnce);
 				assert.isTrue(postCssModulesStub.calledOnce);
+				assert.isTrue(cssNanoModuleStub.calledOnce);
 				assert.isTrue(postCssNextStub.calledBefore(postCssModulesStub));
+				assert.isTrue(postCssModulesStub.calledBefore(cssNanoModuleStub));
 			},
 			'auto prefixer browsers'() {
 				postCssUtil.createProcessors('', '');
@@ -72,6 +77,10 @@ registerSuite('tasks/util/postcss', {
 							]
 						}
 					}
+				}));
+				assert.isTrue(cssNanoModuleStub.calledOnce);
+				assert.isTrue(cssNanoModuleStub.calledWithMatch({
+					autoprefixer: false
 				}));
 			},
 			'generate scoped name': {
