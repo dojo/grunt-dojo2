@@ -13,3 +13,4 @@ import './tasks/util/postcss';
 import './tasks/util/Publisher';
 import './options/intern';
 import './lib/load-dojo-loader';
+import './lib/internLoader';
