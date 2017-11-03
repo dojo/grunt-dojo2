@@ -1,7 +1,13 @@
+import * as path from 'path';
+import * as fs from 'fs';
+
 export = function (grunt: IGrunt) {
 	grunt.loadNpmTasks('intern');
 
 	const progress = grunt.option<boolean>('progress');
+
+	// packages can override the built-in loader and provide their own
+	const customLoaderPath = path.resolve('./_build/tests/internLoader.js');
 
 	return {
 		options: {
@@ -10,7 +16,7 @@ export = function (grunt: IGrunt) {
 				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
 			],
 			browser: {
-				loader: './node_modules/grunt-dojo2/lib/intern/internLoader.js'
+				loader: `${fs.existsSync(customLoaderPath) ? './_build/tests' : './node_modules/grunt-dojo2/lib/intern'}/internLoader.js`
 			}
 		},
 		browserstack: {
