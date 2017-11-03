@@ -6,7 +6,7 @@ export = function (grunt: IGrunt) {
 	const progress = grunt.option<boolean>('progress');
 
 	// read the test config and find a loader. if no loader is specified, we need to add ours
-	const { browser: { loader = undefined } = {} } = require(path.resolve(grunt.config.get('internConfig')));
+	const { browser: { loader: browserLoader = undefined } = {}, loader } = require(path.resolve(grunt.config.get('internConfig')));
 
 	return {
 		options: {
@@ -14,7 +14,7 @@ export = function (grunt: IGrunt) {
 			reporters: [
 				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
 			],
-			browser: loader ? {} : {
+			browser: (loader || browserLoader) ? {} : {
 				loader: './node_modules/grunt-dojo2/lib/intern/internLoader.js'
 			}
 		},
