@@ -1,5 +1,7 @@
 declare const shimAmdDependencies: any;
 
+// this file is loaded directly by intern, thus coverage is not available.
+/* istanbul ignore next */
 intern.registerLoader((options) => {
 	return intern.loadScript('node_modules/@dojo/loader/loader.js')
 		.then(() => intern.loadScript('node_modules/@dojo/shim/util/amd.js'))
