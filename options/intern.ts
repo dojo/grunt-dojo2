@@ -6,7 +6,7 @@ export = function (grunt: IGrunt) {
 	const progress = grunt.option<boolean>('progress');
 
 	// read the test config and find a loader. if no loader is specified, we need to add ours
-	const { browser: { loader: browserLoader = undefined } = {}, loader } = require(path.resolve(grunt.config.get('internConfig')));
+	const { browser: { loader: browserLoader = undefined } = {}, loader } = grunt.file.readJSON(path.resolve(grunt.config.get('internConfig')));
 
 	return {
 		options: {
