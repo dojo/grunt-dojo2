@@ -7,18 +7,19 @@ import {
 } from 'istanbul-lib-coverage';
 import { createContext, summarizers, Watermarks } from 'istanbul-lib-report';
 
-import Node, { Events } from 'intern/lib/executors/Node';
+import Node, { NodeEvents } from 'intern/lib/executors/Node';
 import Test from 'intern/lib/Test';
 import Suite from 'intern/lib/Suite';
 import { CoverageProperties } from 'intern/lib/reporters/Coverage';
 import Runner from 'intern/lib/reporters/Runner';
 import { createEventHandler } from 'intern/lib/reporters/Reporter';
+import { InternError } from 'intern/lib/types';
 
 const LIGHT_RED = '\x1b[91m';
 const LIGHT_GREEN = '\x1b[92m';
 const LIGHT_MAGENTA = '\x1b[95m';
 
-const eventHandler = createEventHandler<Events>();
+const eventHandler = createEventHandler<NodeEvents>();
 
 interface ErrorObject {
 	id: string;
@@ -36,6 +37,13 @@ interface ReporterProperties extends CoverageProperties {
 	lcovFilename?: string;
 	htmlDirectory?: string;
 	watermarks?: Watermarks;
+}
+
+interface SuiteOrTest {
+	sessionId: string;
+	readonly id: string;
+	timeElapsed: number;
+	error: InternError | undefined;
 }
 
 export default class Reporter extends Runner {
@@ -75,7 +83,7 @@ export default class Reporter extends Runner {
 	}
 
 	@eventHandler()
-	error() {
+	error(_error: Error) {
 		this.hasRunErrors = true;
 	}
 
@@ -165,8 +173,9 @@ export default class Reporter extends Runner {
 
 		if (suite.error) {
 			this.hasSuiteErrors = session.hasSuiteErrors = true;
+			this._addError(suite);
 		}
-		else if (!suite.hasParent) {
+		if (!suite.hasParent) {
 			const session = this.sessions[suite.sessionId];
 			const { charm } = this;
 
@@ -224,16 +233,7 @@ export default class Reporter extends Runner {
 	testEnd(test: Test) {
 		const { charm } = this;
 		if (test.error) {
-			if (!this._errors[test.sessionId]) {
-				this._errors[test.sessionId] = [];
-			}
-
-			this._errors[test.sessionId].push({
-				id: test.id,
-				timeElapsed: test.timeElapsed,
-				error: this.executor.formatError(test.error)
-			});
-
+			this._addError(test);
 			charm.write(LIGHT_RED);
 			charm.write('×');
 		}
@@ -247,6 +247,18 @@ export default class Reporter extends Runner {
 		}
 		charm.display('reset');
 	}
+
+	private _addError(suiteOrTest: SuiteOrTest) {
+		if (!this._errors[suiteOrTest.sessionId]) {
+			this._errors[suiteOrTest.sessionId] = [];
+		}
+
+		this._errors[suiteOrTest.sessionId].push({
+			id: suiteOrTest.id,
+			timeElapsed: suiteOrTest.timeElapsed,
+			error: this.executor.formatError(suiteOrTest.error!)
+		});
+	}
 }
 
 function isCoverageMap(value: any): value is CoverageMap {
@@ -254,22 +266,5 @@ function isCoverageMap(value: any): value is CoverageMap {
 }
 
 intern.registerPlugin('grunt-dojo2', () => {
-	intern.registerReporter('grunt-dojo2', Reporter);
-	const reporters: any[] = (<any> intern)._reporters || [];
-
-	// Intern currently initializes reporters before plugins are
-	// loaded, so we need a default reporter to report errors until our
-	// reporter is initialized. The default reporters have their event
-	// handlers set to a noop function so they don't output anything
-	// afterwards.
-	reporters.forEach(reporter => {
-		Object.keys(reporter._eventHandlers).forEach(key => {
-			const property: string = reporter._eventHandlers[key];
-			reporter[property] = () => {};
-		});
-	});
-
-	(<any> intern)._reporters = [
-		new Reporter(intern)
-	];
+	intern.registerReporter('grunt-dojo2', options => new Reporter(intern, options));
 });

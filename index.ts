@@ -105,28 +105,26 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/typedoc')(grunt);
 
 	// Set some Intern-specific options if specified on the command line.
-	[ 'suites', 'functionalSuites', 'grep' ].forEach(function (option) {
+	[ 'suites', 'functionalSuites', 'grep', 'showConfig' ].forEach(function (option) {
 		const value = grunt.option<string>(option);
 		let splitValue: string[] | undefined;
 		if (value) {
-			if (option !== 'grep') {
+			if (option !== 'grep' && option !== 'showConfig') {
 				splitValue = value.split(',').map(function (string) { return string.trim(); });
 			}
 			grunt.config('intern.options.' + option, splitValue || value);
 		}
 	});
 
-	function setTestReporter(coverage: boolean) {
-		if (coverage) {
-			grunt.config('intern.options.node.plugins+', [
-				'grunt-dojo2/lib/intern/Reporter'
-			]);
+	function setTestReporter(testReporter: boolean) {
+		if (testReporter) {
+			grunt.config('intern.options.node.reporters', [ 'grunt-dojo2' ]);
 		}
 	}
 
 	setTestReporter(grunt.option<boolean>('test-reporter'));
 
-	grunt.registerTask('test', <any> (function (this: ITask) {
+	grunt.registerTask('test', function () {
 		const flags = Object.keys(this.flags);
 
 		if (!flags.length) {
@@ -144,7 +142,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		});
 
 		grunt.task.run('clean:coverage');
-	}));
+	});
 
 	grunt.registerTask('dev', grunt.config.get<string[]>('devTasks'));
 	grunt.registerTask('dist', grunt.config.get<string[]>('distTasks'));

@@ -11,9 +11,14 @@ export = function (grunt: IGrunt) {
 	return {
 		options: {
 			config: '<%= internConfig %>',
-			reporters: [
-				{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
-			],
+			node: {
+				'plugins+': [
+					{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }
+				],
+				reporters: [
+					{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
+				]
+			},
 			browser: (loader || browserLoader) ? {} : {
 				loader: './node_modules/grunt-dojo2/lib/intern/internLoader.js'
 			}
