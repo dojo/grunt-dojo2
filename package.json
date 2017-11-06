@@ -35,6 +35,7 @@
   "typings": "index.d.ts",
   "dependencies": {
     "codecov.io": ">=0.1.6",
+    "cssnano": "^3.10.0",
     "dts-generator": ">=1.7.0",
     "execa": "^0.4.0",
     "glob": "^7.0.0",
