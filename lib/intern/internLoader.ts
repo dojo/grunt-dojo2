@@ -4,11 +4,13 @@ intern.registerLoader((options) => {
 	return intern.loadScript('node_modules/@dojo/loader/loader.js')
 		.then(() => intern.loadScript('node_modules/@dojo/shim/util/amd.js'))
 		.then(() => {
+			const { packages = [], baseUrl = intern.config.basePath } = options;
+			packages.push({ 'name': 'sinon', 'location': 'node_modules/sinon/pkg', 'main': 'sinon' });
+
 			(<any> require).config(shimAmdDependencies({
-				baseUrl: options.baseUrl || intern.config.basePath,
-				packages: [
-					{'name': 'sinon', 'location': 'node_modules/sinon/pkg', 'main': 'sinon'}
-				]
+				baseUrl,
+				...options,
+				packages
 			}));
 
 			// load @dojo/shim/main to import the ts helpers
