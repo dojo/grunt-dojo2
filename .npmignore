@@ -3,9 +3,12 @@
 .travis.yml
 /tests
 /typings
+/html-report
 *.ts
 !/index.d.ts
 codecov.yml
+coverage-final.json
+intern.json
 lcov.info
 tsconfig.json
 tslint.json
