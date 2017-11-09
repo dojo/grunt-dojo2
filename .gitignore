@@ -6,3 +6,4 @@ lcov.info
 html-report
 coverage-final.json
 deploy_key
+/*.tgz

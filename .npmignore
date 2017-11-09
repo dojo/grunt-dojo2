@@ -10,3 +10,4 @@ lcov.info
 tsconfig.json
 tslint.json
 typings.json
+/*.tgz
