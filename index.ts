@@ -105,11 +105,11 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/typedoc')(grunt);
 
 	// Set some Intern-specific options if specified on the command line.
-	[ 'suites', 'functionalSuites', 'grep', 'showConfig' ].forEach(function (option) {
+	[ 'suites', 'functionalSuites', 'grep', 'showConfig', 'leaveRemoteOpen' ].forEach(function (option) {
 		const value = grunt.option<string>(option);
 		let splitValue: string[] | undefined;
 		if (value) {
-			if (option !== 'grep' && option !== 'showConfig') {
+			if (option === 'suites' || option === 'functionalSuites') {
 				splitValue = value.split(',').map(function (string) { return string.trim(); });
 			}
 			grunt.config('intern.options.' + option, splitValue || value);

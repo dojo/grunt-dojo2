@@ -23,10 +23,22 @@ registerSuite('options/intern', {
 				loadNpmTasks() {
 				},
 				file: {
-					readJSON() {
-						return {
-							loader: 'test'
-						};
+					read() {
+						return '{ "loader": "test" }';
+					}
+				}
+			});
+
+			assert.isTrue(config.options.browser.loader === undefined);
+		},
+		'uses loader specified in the intern config root containing comments'() {
+			const config = require('../../../options/intern')({
+				...grunt,
+				loadNpmTasks() {
+				},
+				file: {
+					read() {
+						return '{ "loader": "test"/*, "suites": []*/ }';
 					}
 				}
 			});
@@ -39,12 +51,8 @@ registerSuite('options/intern', {
 				loadNpmTasks() {
 				},
 				file: {
-					readJSON() {
-						return {
-							browser: {
-								loader: 'test'
-							}
-						};
+					read() {
+						return '{ "browser": { "loader": "test" } }';
 					}
 				}
 			});
@@ -57,8 +65,8 @@ registerSuite('options/intern', {
 				loadNpmTasks() {
 				},
 				file: {
-					readJSON() {
-						return {};
+					read() {
+						return '{}';
 					}
 				}
 			});
