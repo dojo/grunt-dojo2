@@ -57,9 +57,8 @@ registerSuite('tasks/link', {
 		_link() {
 			runGruntTask('_link');
 
-			assert.isTrue(symlink.calledTwice);
-			assert.isTrue(symlink.firstCall.calledWith(path.join(cwd, 'node_modules'), path.join(outputPath, 'node_modules'), 'junction'));
-			assert.isTrue(symlink.secondCall.calledWith(path.join(cwd, 'package.json'), path.join(outputPath, 'package.json'), 'file'));
+			assert.isTrue(symlink.calledOnce);
+			assert.isTrue(symlink.firstCall.calledWith(path.join(cwd, 'package.json'), path.join(outputPath, 'package.json'), 'file'));
 			assert.isTrue(shell.calledOnce);
 			assert.isTrue(shell.calledWith('npm link', { cwd: outputPath }));
 		},
