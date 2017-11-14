@@ -5,6 +5,7 @@ import './tasks/release';
 import './tasks/rename';
 import './tasks/repl';
 import './tasks/run';
+import './tasks/tcm';
 import './tasks/ts';
 import './tasks/typedoc';
 import './tasks/uploadCoverage';

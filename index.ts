@@ -29,6 +29,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings:dev',
 		'tslint',
 		'clean:dev',
+		'tcm',
 		'copy:staticDefinitionFiles-dev',
 		'dojo-ts:dev',
 		'copy:staticTestFiles'
@@ -39,6 +40,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'typings:dist',
 		'tslint',
 		'clean:dist',
+		'tcm',
 		'copy:staticDefinitionFiles-dist',
 		'dojo-ts:dist',
 		'fixSourceMaps'
@@ -93,6 +95,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/repl')(grunt, packageJson);
 	require('./tasks/run')(grunt, packageJson);
 	require('./tasks/release')(grunt, packageJson);
+	require('./tasks/tcm')(grunt);
 	require('./tasks/link')(grunt, packageJson);
 	require('./tasks/fixSourceMaps')(grunt, packageJson);
 	require('./tasks/postcss')(grunt);

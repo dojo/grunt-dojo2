@@ -38,7 +38,7 @@
     "cssnano": "^3.10.0",
     "dts-generator": ">=1.7.0",
     "execa": "^0.4.0",
-    "glob": "^7.0.0",
+    "glob": "^7.1.2",
     "grunt-contrib-clean": ">=1.0.0",
     "grunt-contrib-copy": ">=1.0.0",
     "grunt-contrib-watch": ">=1.0.0",
@@ -58,11 +58,12 @@
     "resolve-from": "^2.0.0",
     "shelljs": "^0.7.6",
     "tslint": "^4.5.1",
+    "typed-css-modules": "^0.3.1",
     "typedoc": "0.5.9",
     "umd-wrapper": "^0.1.0"
   },
   "devDependencies": {
-    "@types/glob": "^5.0.30",
+    "@types/glob": "^5.0.33",
     "@types/grunt": "~0.4.20",
     "@types/lodash": "4.14.56",
     "@types/mockery": "~1.4.29",
