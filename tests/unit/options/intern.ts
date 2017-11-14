@@ -17,61 +17,94 @@ registerSuite('options/intern', {
 		delete require.cache[require.resolve('../../../options/intern')];
 	},
 	tests: {
-		'uses loader specified in the intern config root'() {
+		'defaults'() {
 			const config = require('../../../options/intern')({
 				...grunt,
 				loadNpmTasks() {
+				}
+			});
+			assert.deepEqual(config, {
+				options: {
+					config: '<%= internConfig %>',
+					node: {
+						'plugins+': [
+							{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }
+						],
+						reporters: [
+							{ name: 'runner', options: { 'hideSkipped': true, 'hidePassed': true } }
+						]
+					}
 				},
-				file: {
-					read() {
-						return '{ "loader": "test" }';
+				browserstack: {
+					options: {
+						config: '<%= internConfig %>@browserstack'
+					}
+				},
+				saucelabs: {
+					options: {
+						config: '<%= internConfig %>@saucelabs'
+					}
+				},
+				node: {},
+				remote: {},
+				local: {
+					options: {
+						config: '<%= internConfig %>@local'
+					}
+				},
+				serve: {
+					options: {
+						serveOnly: true
 					}
 				}
 			});
-
-			assert.isTrue(config.options.browser.loader === undefined);
 		},
-		'uses loader specified in the intern config root containing comments'() {
+		'progress'() {
 			const config = require('../../../options/intern')({
 				...grunt,
 				loadNpmTasks() {
 				},
-				file: {
-					read() {
-						return '{ "loader": "test"/*, "suites": []*/ }';
+				option(name: string) {
+					if (name === 'progress') {
+						return true;
 					}
 				}
 			});
-
-			assert.isTrue(config.options.browser.loader === undefined);
-		},
-		'uses loader specified in the intern browser config'() {
-			const config = require('../../../options/intern')({
-				...grunt,
-				loadNpmTasks() {
+			assert.deepEqual(config, {
+				options: {
+					config: '<%= internConfig %>',
+					node: {
+						'plugins+': [
+							{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }
+						],
+						reporters: [
+							{ name: 'runner', options: { 'hideSkipped': false, 'hidePassed': false } }
+						]
+					}
 				},
-				file: {
-					read() {
-						return '{ "browser": { "loader": "test" } }';
+				browserstack: {
+					options: {
+						config: '<%= internConfig %>@browserstack'
 					}
-				}
-			});
-
-			assert.isTrue(config.options.browser.loader === undefined);
-		},
-		'injects loader if its empty'() {
-			const config = require('../../../options/intern')({
-				...grunt,
-				loadNpmTasks() {
 				},
-				file: {
-					read() {
-						return '{}';
+				saucelabs: {
+					options: {
+						config: '<%= internConfig %>@saucelabs'
+					}
+				},
+				node: {},
+				remote: {},
+				local: {
+					options: {
+						config: '<%= internConfig %>@local'
+					}
+				},
+				serve: {
+					options: {
+						serveOnly: true
 					}
 				}
 			});
-
-			assert.isTrue(config.options.browser.loader === './node_modules/grunt-dojo2/lib/intern/internLoader.js');
 		}
 	}
 });
