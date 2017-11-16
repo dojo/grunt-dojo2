@@ -9,7 +9,7 @@ export = function(grunt: IGrunt) {
 			searchDir: 'src',
 		});
 
-		glob('src/**/styles/*.m.css', (error: Error | null, files: string[]) => {
+		glob('src/**/*.m.css', (error: Error | null, files: string[]) => {
 			if (error) {
 				done(error);
 				return;
@@ -19,7 +19,7 @@ export = function(grunt: IGrunt) {
 				.then(dtsFilesContents => Promise.all(
 					dtsFilesContents.map(dtsFileContents => dtsFileContents.writeFile())
 				))
-				.then(done);
+				.then(done, done);
 		});
 	});
 };
