@@ -40,8 +40,8 @@ registerSuite('tasks/tcm', {
 						assert.isTrue(mockGlob.calledOnce);
 						assert.equal(
 							mockGlob.firstCall.args[0],
-							'src/**/styles/*.m.css',
-							'Should have searched for all .m.css files in style directories'
+							'src/**/*.m.css',
+							'Should have searched for all .m.css files in src directory'
 						);
 						assert.isTrue(mockCreator.calledOnce);
 						assert.deepEqual(mockCreator.firstCall.args,  [ {
@@ -70,8 +70,8 @@ registerSuite('tasks/tcm', {
 						assert.isTrue(mockGlob.calledOnce);
 						assert.equal(
 							mockGlob.firstCall.args[0],
-							'src/**/styles/*.m.css',
-							'Should have searched for all .m.css files in style directories'
+							'src/**/*.m.css',
+							'Should have searched for all .m.css files in src directory'
 						);
 						assert.isTrue(mockCreator.calledOnce);
 						assert.deepEqual(mockCreator.firstCall.args,  [ {
