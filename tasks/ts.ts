@@ -1,13 +1,12 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import * as glob from 'glob';
 import * as fs from 'fs';
 import ITask = grunt.task.ITask;
 
 export = function (grunt: IGrunt) {
 	const distDirectory = grunt.config.get<string>('distDirectory');
 	const defaultOptions: any = {
-		dist: {
+		umd: {
 			exclude: ['tests/**/*.ts', 'src/*/tests/**/*.ts', 'src/*/example/**/*.ts'],
 			compilerOptions: {
 				outDir: distDirectory,
@@ -32,15 +31,15 @@ export = function (grunt: IGrunt) {
 			function () {
 				grunt.task.registerTask('rename-mjs', () => {
 					// rename .js files to .mjs files
-					glob.sync(path.join(path.resolve('dist/esm'), '**/*.js'))
+					grunt.file.expand(['dist/esm/**/*.js'])
 						.forEach(file => fs.renameSync(file, file.replace(/\.js$/g, '.mjs')));
 
 					// rename .js.map files to .mjs.map files
-					glob.sync(path.join(path.resolve('dist/esm'), '**/*.js.map'))
+					grunt.file.expand(['dist/esm/**/*.js.map'])
 						.forEach(file => fs.renameSync(file, file.replace(/\.js\.map$/g, '.mjs.map')));
 
 					// change the .js files to .mjs files inside the map files
-					glob.sync(path.join(path.resolve('dist/esm'), '**/*.mjs.map'))
+					grunt.file.expand(['dist/esm/**/*.mjs.map'])
 						.forEach(file => {
 							const json = grunt.file.readJSON(file);
 							if (json.file) {
@@ -51,6 +50,23 @@ export = function (grunt: IGrunt) {
 						});
 				});
 				return 'rename-mjs';
+			}
+		],
+		dist: [
+			function () {
+				grunt.task.registerTask('merge-dist', () => {
+					grunt.file.mkdir(path.resolve('dist/all'));
+
+					grunt.file.expand(['dist/umd/**/*']).forEach((file: string) => {
+						grunt.file.copy(file, file.replace('dist/umd/', 'dist/all/'));
+					});
+
+					grunt.file.expand(['dist/esm/**/*']).forEach((file: string) => {
+						grunt.file.copy(file, file.replace('dist/esm/', 'dist/all/'));
+					});
+				});
+
+				return 'merge-dist';
 			}
 		]
 	};
@@ -72,21 +88,26 @@ export = function (grunt: IGrunt) {
 		flags.forEach((target: string) => {
 			let tsconfigFileName = 'tsconfig.json';
 
-			tasks.push(`ts:${target}`);
-			// dev task cannot be configured outside of projects tsconfig
-			if (target !== 'dev') {
-				const targetTsconfig = _.cloneDeep(tsconfig);
-				const targetDefaultOptions = defaultOptions[target] || {};
-				const targetTsOptions = tsOptions[target] || {};
+			if (target !== 'dist') {
+				tasks.push(`ts:${target}`);
+				// dev task cannot be configured outside of projects tsconfig
+				if (target !== 'dev') {
+					const targetTsconfig = _.cloneDeep(tsconfig);
+					const targetDefaultOptions = defaultOptions[target] || {};
+					const targetTsOptions = tsOptions[target] || {};
 
-				_.merge(targetTsconfig, targetDefaultOptions, targetTsOptions);
-				tsconfigFileName = `.tsconfig${target}.json`;
-				grunt.file.write(tsconfigFileName, JSON.stringify(targetTsconfig));
-				grunt.config.set(`clean.${target}Tsconfig`, { src: tsconfigFileName });
+					_.merge(targetTsconfig, targetDefaultOptions, targetTsOptions);
+					tsconfigFileName = `.tsconfig${target}.json`;
+					grunt.file.write(tsconfigFileName, JSON.stringify(targetTsconfig));
+					grunt.config.set(`clean.${target}Tsconfig`, { src: tsconfigFileName });
 
-				tasks.push(`clean:${target}Tsconfig`);
+					tasks.push(`clean:${target}Tsconfig`);
+				}
+				grunt.config.set(`ts.${target}`, { tsconfig: { passThrough: true, tsconfig: tsconfigFileName } });
+			} else {
+				tasks.push('dojo-ts:umd');
+				tasks.push('dojo-ts:esm');
 			}
-			grunt.config.set(`ts.${target}`, { tsconfig: { passThrough: true, tsconfig: tsconfigFileName } });
 
 			if (target in postTasks) {
 				postTasks[target].forEach((task: any) => {
