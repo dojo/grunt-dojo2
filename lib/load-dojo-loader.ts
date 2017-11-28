@@ -10,7 +10,7 @@ export default function loadDojoLoader ({ peerDependencies = {} }: any) {
 
 	for (const name in peerDependencies) {
 		if (/^dojo-/.test(name)) {
-			packages.push({ name, location: join('node_modules', name, 'dist', 'umd') });
+			packages.push({ name, location: join('node_modules', name, 'dist', 'all') });
 		}
 		else if (name === '@reactivex/rxjs') {
 			packages.push({ name: 'rxjs', location: join('node_modules', name, 'dist', 'amd') });

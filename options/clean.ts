@@ -6,7 +6,7 @@ export = function (grunt: IGrunt) {
 			src: [ 'typings/' ]
 		},
 		dist: {
-			src: [ 'dist/umd/*' ],
+			src: [ '<%= devDirectory %>/*' ],
 			filter: function (path: string) {
 				return grunt.option('remove-links') ? true : !grunt.file.isLink(path);
 			}

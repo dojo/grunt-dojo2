@@ -1,18 +1,14 @@
 export = function (grunt: IGrunt) {
 	require('../tasks/rename')(grunt);
 
+	const distDirectory = grunt.config.get<string>('distDirectory');
+
 	return {
 		sourceMaps: {
 			expand: true,
-			cwd: 'dist/umd',
+			cwd: distDirectory,
 			src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
 			dest: 'dist/umd/_debug/'
-		},
-		sourceMaps_esm: {
-			expand: true,
-			cwd: 'dist/esm',
-			src: [ '**/*.js.map', '!_debug/**/*.js.map' ],
-			dest: 'dist/esm/_debug/'
 		}
 	};
 };
