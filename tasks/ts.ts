@@ -9,7 +9,7 @@ export = function (grunt: IGrunt) {
 		umd: {
 			exclude: ['tests/**/*.ts', 'src/*/tests/**/*.ts', 'src/*/example/**/*.ts'],
 			compilerOptions: {
-				outDir: distDirectory,
+				outDir: 'dist/umd',
 				declaration: true,
 				sourceMap: true,
 				inlineSources: true
@@ -55,14 +55,12 @@ export = function (grunt: IGrunt) {
 		dist: [
 			function () {
 				grunt.task.registerTask('merge-dist', () => {
-					grunt.file.mkdir(path.resolve('dist/all'));
-
 					grunt.file.expand(['dist/umd/**/*']).forEach((file: string) => {
-						grunt.file.copy(file, file.replace('dist/umd/', 'dist/all/'));
+						grunt.file.copy(file, file.replace('dist/umd/', distDirectory));
 					});
 
 					grunt.file.expand(['dist/esm/**/*']).forEach((file: string) => {
-						grunt.file.copy(file, file.replace('dist/esm/', 'dist/all/'));
+						grunt.file.copy(file, file.replace('dist/esm/', distDirectory));
 					});
 				});
 

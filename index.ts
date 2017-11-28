@@ -73,7 +73,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		internConfig: 'intern.json',
 		apiDocDirectory: '_apidoc',
 		apiPubDirectory: '_apipub',
-		distDirectory: 'dist/umd/',
+		distDirectory: 'dist/all/',
 		otherOptions: otherOptions,
 		devTasks,
 		distTasks,
