@@ -54,7 +54,7 @@ registerSuite('lib/load-dojo-loader', {
 			assert.deepEqual(configPackages, [
 				{ name: 'src', location: '_build/src' },
 				{ name: 'test', location: 'node_modules/test' },
-				{ name: 'dojo-loader', location: 'node_modules/dojo-loader/dist/umd' },
+				{ name: 'dojo-loader', location: 'node_modules/dojo-loader/dist/all' },
 				{ name: 'rxjs', location: 'node_modules/@reactivex/rxjs/dist/amd' },
 				{ name: 'maquette', location: 'node_modules/maquette/dist' },
 				{ name: 'immutable', location: 'node_modules/immutable/dist' }

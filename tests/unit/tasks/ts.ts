@@ -92,18 +92,8 @@ registerSuite('tasks/ts', {
 		dist() {
 			runGruntTask('dojo-ts:dist');
 
-			assert.deepEqual(grunt.config('ts.dist'), {
-				tsconfig: {
-					passThrough: true,
-					tsconfig: '.tsconfigdist.json'
-				}
-			});
-
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:dist', 'clean:distTsconfig' ]);
-
-			assert.isTrue(write.calledOnce);
-			assert.isTrue(write.calledWith('.tsconfigdist.json'));
+			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dojo-ts:umd', 'dojo-ts:esm', 'merge-dist' ]);
 		},
 
 		esm() {
@@ -132,7 +122,7 @@ registerSuite('tasks/ts', {
 			});
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:esm', 'clean:esmTsconfig' ]);
+			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:esm', 'clean:esmTsconfig', 'rename-mjs' ]);
 
 			assert.isTrue(write.calledOnce);
 			assert.isTrue(write.calledWith('.tsconfigesm.json'));
