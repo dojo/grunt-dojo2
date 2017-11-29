@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
@@ -52,12 +54,12 @@ registerSuite('lib/load-dojo-loader', {
 
 			assert.equal(configBaseUrl, process.cwd());
 			assert.deepEqual(configPackages, [
-				{ name: 'src', location: '_build/src' },
-				{ name: 'test', location: 'node_modules/test' },
-				{ name: 'dojo-loader', location: 'node_modules/dojo-loader/dist/all' },
-				{ name: 'rxjs', location: 'node_modules/@reactivex/rxjs/dist/amd' },
-				{ name: 'maquette', location: 'node_modules/maquette/dist' },
-				{ name: 'immutable', location: 'node_modules/immutable/dist' }
+				{ name: 'src', location: path.join('_build', 'src') },
+				{ name: 'test', location: path.join('node_modules', 'test') },
+				{ name: 'dojo-loader', location: path.join('node_modules', 'dojo-loader', 'dist', 'all') },
+				{ name: 'rxjs', location: path.join('node_modules', '@reactivex', 'rxjs', 'dist', 'amd') },
+				{ name: 'maquette', location: path.join('node_modules', 'maquette', 'dist') },
+				{ name: 'immutable', location: path.join('node_modules', 'immutable', 'dist') }
 			]);
 
 			assert.equal(result.baseUrl, configBaseUrl);

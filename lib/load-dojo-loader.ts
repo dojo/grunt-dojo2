@@ -5,7 +5,7 @@ const resolveFrom = require('resolve-from');
 export default function loadDojoLoader ({ peerDependencies = {} }: any) {
 	const baseUrl = process.cwd();
 	const packages = [
-		{ name: 'src', location: '_build/src' }
+		{ name: 'src', location: join('_build', 'src') }
 	];
 
 	for (const name in peerDependencies) {
