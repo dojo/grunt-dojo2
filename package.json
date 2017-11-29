@@ -18,7 +18,8 @@
   "scripts": {
     "build": "tsc",
     "prepublish": "shx rm -rf ./typings && typings install && tsc -p .",
-    "test": "tsc -p . && intern"
+    "test": "tsc -p . && intern",
+    "ci": "rm -rf tmp && tsc -p . && intern config=@ci && cat ./lcov.info | ./node_modules/.bin/codecov"
   },
   "author": "Bryan Forbes <bryan@reigndropsfall.net>",
   "contributors": [
