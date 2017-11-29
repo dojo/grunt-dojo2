@@ -3,7 +3,7 @@ const { assert } = intern.getPlugin('chai');
 
 import * as grunt from 'grunt';
 import * as fs from 'fs';
-import { SinonStub, stub } from 'sinon';
+import { sandbox, SinonSandbox, SinonStub } from 'sinon';
 import {
 	cleanOutputDirectory,
 	getOutputDirectory,
@@ -14,6 +14,7 @@ import {
 } from '../util';
 
 const outputPath = getOutputDirectory();
+let mocks: SinonSandbox;
 let run: SinonStub;
 let loadNpmTasks: SinonStub;
 let write: SinonStub;
@@ -30,24 +31,10 @@ registerSuite('tasks/ts', {
 
 		loadTasks();
 
-		run = stub(grunt.task, 'run');
-		loadNpmTasks = stub(grunt, 'loadNpmTasks');
-		write = stub(grunt.file, 'write');
-		expand = stub(grunt.file, 'expand');
-		rename = stub(fs, 'renameSync');
-		readJSON = stub(grunt.file, 'readJSON');
-		copy = stub(grunt.file, 'copy');
-
 		prepareOutputDirectory();
 	},
 	after() {
-		run.restore();
-		loadNpmTasks.restore();
-		write.restore();
-		expand.restore();
-		rename.restore();
-		readJSON.restore();
-		copy.restore();
+		mocks.restore();
 
 		unloadTasks();
 		cleanOutputDirectory();
@@ -76,12 +63,19 @@ registerSuite('tasks/ts', {
 			}
 		});
 
-		run.reset();
-		write.reset();
-		expand.reset();
-		rename.reset();
-		readJSON.reset();
-		copy.reset();
+		mocks = sandbox.create();
+
+		run = mocks.stub(grunt.task, 'run');
+		loadNpmTasks = mocks.stub(grunt, 'loadNpmTasks');
+		write = mocks.stub(grunt.file, 'write');
+		expand = mocks.stub(grunt.file, 'expand');
+		rename = mocks.stub(fs, 'renameSync');
+		readJSON = mocks.stub(grunt.file, 'readJSON');
+		copy = mocks.stub(grunt.file, 'copy');
+	},
+
+	afterEach() {
+		mocks.restore();
 	},
 
 	tests: {
