@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as path from 'path';
 import * as fs from 'fs';
 import ITask = grunt.task.ITask;
 

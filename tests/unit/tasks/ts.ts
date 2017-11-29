@@ -2,24 +2,41 @@ const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
 import * as grunt from 'grunt';
+import * as fs from 'fs';
 import { SinonStub, stub } from 'sinon';
 import {
-	loadTasks, prepareOutputDirectory, unloadTasks, cleanOutputDirectory, runGruntTask,
-	getOutputDirectory
+	cleanOutputDirectory,
+	getOutputDirectory,
+	loadTasks,
+	prepareOutputDirectory,
+	runGruntTask,
+	unloadTasks,
 } from '../util';
 
 const outputPath = getOutputDirectory();
 let run: SinonStub;
 let loadNpmTasks: SinonStub;
 let write: SinonStub;
+let expand: SinonStub;
+let rename: SinonStub;
+let readJSON: SinonStub;
+let copy: SinonStub;
 
 registerSuite('tasks/ts', {
 	before() {
+		grunt.initConfig({
+			distDirectory: outputPath
+		});
+
 		loadTasks();
 
 		run = stub(grunt.task, 'run');
 		loadNpmTasks = stub(grunt, 'loadNpmTasks');
 		write = stub(grunt.file, 'write');
+		expand = stub(grunt.file, 'expand');
+		rename = stub(fs, 'renameSync');
+		readJSON = stub(grunt.file, 'readJSON');
+		copy = stub(grunt.file, 'copy');
 
 		prepareOutputDirectory();
 	},
@@ -27,6 +44,10 @@ registerSuite('tasks/ts', {
 		run.restore();
 		loadNpmTasks.restore();
 		write.restore();
+		expand.restore();
+		rename.restore();
+		readJSON.restore();
+		copy.restore();
 
 		unloadTasks();
 		cleanOutputDirectory();
@@ -57,6 +78,10 @@ registerSuite('tasks/ts', {
 
 		run.reset();
 		write.reset();
+		expand.reset();
+		rename.reset();
+		readJSON.reset();
+		copy.reset();
 	},
 
 	tests: {
@@ -94,6 +119,14 @@ registerSuite('tasks/ts', {
 
 			assert.isTrue(run.calledOnce);
 			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dojo-ts:umd', 'dojo-ts:esm', 'merge-dist' ]);
+
+			expand.onFirstCall().returns(['dist/umd/file1.js']);
+			expand.onSecondCall().returns(['dist/esm/file1.mjs']);
+
+			runGruntTask('merge-dist');
+
+			assert.isTrue(copy.calledWith('dist/umd/file1.js', `${outputPath}file1.js`));
+			assert.isTrue(copy.calledWith('dist/esm/file1.mjs', `${outputPath}file1.mjs`));
 		},
 
 		esm() {
@@ -122,10 +155,30 @@ registerSuite('tasks/ts', {
 			});
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:esm', 'clean:esmTsconfig', 'rename-mjs' ]);
+			assert.deepEqual(run.firstCall.args[0], ['ts:esm', 'clean:esmTsconfig', 'rename-mjs']);
 
 			assert.isTrue(write.calledOnce);
 			assert.isTrue(write.calledWith('.tsconfigesm.json'));
+
+			expand.onFirstCall().returns(['file.js']);
+			expand.onSecondCall().returns(['file.js.map']);
+			expand.onThirdCall().returns(['file.mjs.map']);
+
+			readJSON.returns({
+				file: 'file.js',
+				key: 'value'
+			});
+
+			runGruntTask('rename-mjs');
+
+			assert.isTrue(rename.calledWith('file.js', 'file.mjs'));
+			assert.isTrue(rename.calledWith('file.js.map', 'file.mjs.map'));
+			assert.isTrue(write.calledWith('file.mjs.map'));
+
+			assert.deepEqual(JSON.parse(write.args[1][1]), {
+				file: 'file.mjs',
+				key: 'value'
+			});
 		},
 
 		custom() {
