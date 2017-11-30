@@ -114,7 +114,7 @@ registerSuite('tasks/ts', {
 			runGruntTask('dojo-ts:dist');
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dojo-ts:umd', 'dojo-ts:esm', 'merge-dist' ]);
+			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dojo-ts:umd', 'merge-dist' ]);
 
 			expand.onFirstCall().returns(['dist/umd/file1.js']);
 			expand.onSecondCall().returns(['dist/esm/file1.mjs']);

@@ -115,7 +115,8 @@ export = function (grunt: IGrunt) {
 				grunt.config.set(`ts.${target}`, { tsconfig: { passThrough: true, tsconfig: tsconfigFileName } });
 			} else {
 				tasks.push('dojo-ts:umd');
-				tasks.push('dojo-ts:esm');
+				// commented out until we are ready to use es modules
+				// tasks.push('dojo-ts:esm');
 			}
 
 			if (target in postTasks) {
