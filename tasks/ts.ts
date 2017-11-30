@@ -37,6 +37,16 @@ export = function (grunt: IGrunt) {
 					grunt.file.expand(['dist/esm/**/*.js.map'])
 						.forEach(file => fs.renameSync(file, file.replace(/\.js\.map$/g, '.mjs.map')));
 
+					// fix the source map comments in the .mjs files
+					grunt.file.expand(['dist/esm/**/*.mjs'])
+						.forEach(file => {
+							let contents = grunt.file.read(file);
+
+							contents = contents.replace(/(\/\/.*sourceMappingURL=.*?)(\.js\.map)/g, '$1.mjs.map');
+
+							grunt.file.write(file, contents);
+						});
+
 					// change the .js files to .mjs files inside the map files
 					grunt.file.expand(['dist/esm/**/*.mjs.map'])
 						.forEach(file => {

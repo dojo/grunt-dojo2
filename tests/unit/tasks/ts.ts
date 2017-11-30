@@ -22,6 +22,7 @@ let expand: SinonStub;
 let rename: SinonStub;
 let readJSON: SinonStub;
 let copy: SinonStub;
+let read: SinonStub;
 
 registerSuite('tasks/ts', {
 	before() {
@@ -72,6 +73,7 @@ registerSuite('tasks/ts', {
 		rename = mocks.stub(fs, 'renameSync');
 		readJSON = mocks.stub(grunt.file, 'readJSON');
 		copy = mocks.stub(grunt.file, 'copy');
+		read = mocks.stub(grunt.file, 'read');
 	},
 
 	afterEach() {
@@ -156,7 +158,11 @@ registerSuite('tasks/ts', {
 
 			expand.onFirstCall().returns(['file.js']);
 			expand.onSecondCall().returns(['file.js.map']);
-			expand.onThirdCall().returns(['file.mjs.map']);
+			expand.onThirdCall().returns(['file.mjs']);
+			expand.onCall(3).returns(['file.mjs.map']);
+
+			read.returns(`some file
+//# sourceMappingURL=RouterInjector.js.map`);
 
 			readJSON.returns({
 				file: 'file.js',
@@ -169,7 +175,10 @@ registerSuite('tasks/ts', {
 			assert.isTrue(rename.calledWith('file.js.map', 'file.mjs.map'));
 			assert.isTrue(write.calledWith('file.mjs.map'));
 
-			assert.deepEqual(JSON.parse(write.args[1][1]), {
+			assert.deepEqual(write.args[1][1], `some file
+//# sourceMappingURL=RouterInjector.mjs.map`);
+
+			assert.deepEqual(JSON.parse(write.args[2][1]), {
 				file: 'file.mjs',
 				key: 'value'
 			});
