@@ -117,6 +117,16 @@ export = function (grunt: IGrunt) {
 				tasks.push('dojo-ts:umd');
 				// commented out until we are ready to use es modules
 				// tasks.push('dojo-ts:esm');
+
+				// merge dist config into umd and esm
+				const distConfig = grunt.config.get('ts.dist') || {};
+
+				grunt.config.merge({
+					ts: {
+						umd: distConfig,
+						esm: distConfig
+					}
+				});
 			}
 
 			if (target in postTasks) {
