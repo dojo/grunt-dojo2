@@ -2,11 +2,13 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 import ITask = grunt.task.ITask;
 
+const excludes = ['tests/**/*.ts', 'tests/**/*.tsx', 'src/*/tests/**/*.ts', 'src/*/example/**/*.ts'];
+
 export = function (grunt: IGrunt) {
 	const distDirectory = grunt.config.get<string>('distDirectory');
 	const defaultOptions: any = {
 		umd: {
-			exclude: ['tests/**/*.ts', 'src/*/tests/**/*.ts', 'src/*/example/**/*.ts'],
+			exclude: excludes,
 			compilerOptions: {
 				outDir: 'dist/umd',
 				declaration: true,
@@ -15,9 +17,9 @@ export = function (grunt: IGrunt) {
 			}
 		},
 		esm: {
-			exclude: ['tests/**/*.ts', 'src/*/tests/**/*.ts', 'src/*/example/**/*.ts'],
+			exclude: excludes,
 			compilerOptions: {
-				target: 'es6',
+				target: 'esnext',
 				module: 'esnext',
 				sourceMap: true,
 				outDir: 'dist/esm',
