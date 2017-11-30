@@ -19,7 +19,7 @@ export = function (grunt: IGrunt) {
 		esm: {
 			exclude: excludes,
 			compilerOptions: {
-				target: 'esnext',
+				target: 'es6',
 				module: 'esnext',
 				sourceMap: true,
 				outDir: 'dist/esm',
@@ -116,7 +116,7 @@ export = function (grunt: IGrunt) {
 			} else {
 				tasks.push('dojo-ts:umd');
 				// commented out until we are ready to use es modules
-				// tasks.push('dojo-ts:esm');
+				tasks.push('dojo-ts:esm');
 
 				// merge dist config into umd and esm
 				const distConfig = grunt.config.get('ts.dist') || {};
