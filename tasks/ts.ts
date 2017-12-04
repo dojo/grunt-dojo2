@@ -115,8 +115,13 @@ export = function (grunt: IGrunt) {
 				grunt.config.set(`ts.${target}`, { tsconfig: { passThrough: true, tsconfig: tsconfigFileName } });
 			} else {
 				tasks.push('dojo-ts:umd');
-				// commented out until we are ready to use es modules
-				// tasks.push('dojo-ts:esm');
+
+				// only compile esm if we're not using commonjs (cli tools use commonjs)
+				const { compilerOptions: { module: moduleFormat = '' } = {} } = tsconfig;
+				if (moduleFormat !== 'commonjs') {
+					// commented out until we are ready to use es modules
+					// tasks.push('dojo-ts:esm');
+				}
 
 				// merge dist config into umd and esm
 				const distConfig = grunt.config.get('ts.dist') || {};
