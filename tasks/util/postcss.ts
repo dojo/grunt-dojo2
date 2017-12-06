@@ -5,9 +5,18 @@ const postCssImport = require('postcss-import');
 const postCssNext = require('postcss-cssnext');
 const postCssModules = require('postcss-modules');
 const umdWrapper = require('./umdWrapper');
-const pkgUp = require('pkg-up');
 
-export function createProcessors(dest: string, cwd = '', dist?: boolean) {
+export function createProcessors({
+	dest,
+	cwd = '',
+	dist,
+	packageJson
+}: {
+		dest: string,
+		cwd?: string,
+		dist?: boolean,
+		packageJson: any
+}) {
 	return [
 		postCssImport,
 		postCssNext({
@@ -26,7 +35,7 @@ export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 				const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 				const newFilePath = outputPath + '.js';
 				const themeKey = ' _key';
-				const packageName = require(pkgUp.sync()).name;
+				const packageName = packageJson.name;
 				json[themeKey] = path.join(packageName, path.basename(outputPath, '.m.css'));
 				fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 			}

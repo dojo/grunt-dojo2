@@ -1,6 +1,6 @@
 import { createProcessors } from './util/postcss';
 
-export = function init(grunt: IGrunt) {
+export = function init(grunt: IGrunt, packageJson: any) {
 	const path = require('path');
 	const postCssImport = require('postcss-import');
 	const postCssNext = require('postcss-cssnext');
@@ -43,13 +43,21 @@ export = function init(grunt: IGrunt) {
 		'modules-dev': {
 			files: moduleFiles(path.join(devDirectory, 'src')),
 			options: {
-				processors: createProcessors(devDirectory)
+				processors: createProcessors({
+					packageJson,
+					dest: devDirectory
+				})
 			}
 		},
 		'modules-dist': {
 			files: moduleFiles(distDirectory),
 			options: {
-				processors: createProcessors(distDirectory, 'src', true)
+				processors: createProcessors({
+					packageJson,
+					dest: distDirectory,
+					cwd: 'src',
+					dist: true
+				})
 			}
 		},
 		variables: {

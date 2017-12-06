@@ -16,8 +16,7 @@ const parseStub = stub().returns('');
 const dirnameStub = stub().returns('');
 const joinStub = stub().returns('');
 const umdWrapperStub = stub().returns('');
-const pkgUpStub = stub().returns('./package-metadata');
-const packageMetadataStub = stub().returns({ name: '@owner/widgets' });
+const packageJsonStub = stub().returns({name: '@owner/widgets'});
 const writeFileStub = stub();
 
 registerSuite('tasks/util/postcss', {
@@ -39,11 +38,7 @@ registerSuite('tasks/util/postcss', {
 			'./umdWrapper': umdWrapperStub,
 			'fs': {
 				'writeFileSync': writeFileStub
-			},
-			'pkg-up': {
-				'sync': pkgUpStub
-			},
-			'./package-metadata': packageMetadataStub()
+			}
 		};
 
 		postCssUtil = loadModule('../../../../tasks/util/postcss', require, mocks, false);
@@ -62,8 +57,7 @@ registerSuite('tasks/util/postcss', {
 		umdWrapperStub.reset();
 		parseStub.reset();
 		dirnameStub.reset();
-		pkgUpStub.reset();
-		packageMetadataStub.reset();
+		packageJsonStub.reset();
 	},
 
 	after() {
@@ -73,7 +67,11 @@ registerSuite('tasks/util/postcss', {
 	tests: {
 		createProcessors: {
 			'order'() {
-				const processors = postCssUtil.createProcessors('');
+				const processors = postCssUtil.createProcessors({
+					packageJson: packageJsonStub(),
+					dest: ''
+				});
+
 				assert.equal(processors.length, 4);
 				assert.equal(processors[0], postCssImportStub);
 				assert.isTrue(postCssNextStub.calledOnce);
@@ -83,7 +81,11 @@ registerSuite('tasks/util/postcss', {
 				assert.isTrue(postCssModulesStub.calledBefore(cssNanoModuleStub));
 			},
 			'auto prefixer browsers'() {
-				postCssUtil.createProcessors('', '');
+				postCssUtil.createProcessors({
+					packageJson: packageJsonStub(),
+					dest: '',
+					cwd: ''
+				});
 				assert.isTrue(postCssNextStub.calledOnce);
 				const [ autoPrefixrConfig ] = postCssNextStub.firstCall.args;
 
@@ -105,12 +107,22 @@ registerSuite('tasks/util/postcss', {
 			},
 			'generate scoped name': {
 				'generate localised scoped name for dev'() {
-					postCssUtil.createProcessors('', '', false);
+					postCssUtil.createProcessors({
+						packageJson: packageJsonStub(),
+						dest: '',
+						cwd: '',
+						dist: false
+					});
 					const [{generateScopedName}] = postCssModulesStub.firstCall.args;
 					assert.equal(generateScopedName, '[name]__[local]__[hash:base64:5]');
 				},
 				'generate hash only scoped name for dist'() {
-					postCssUtil.createProcessors('', '', true);
+					postCssUtil.createProcessors({
+						packageJson: packageJsonStub(),
+						dest: '',
+						cwd: '',
+						dist: true
+					});
 					const [{generateScopedName}] = postCssModulesStub.firstCall.args;
 					assert.equal(generateScopedName, '[hash:base64:8]');
 				}
@@ -121,7 +133,11 @@ registerSuite('tasks/util/postcss', {
 					const jsonParam = {};
 
 					resolveStub.returns(cssFileName);
-					postCssUtil.createProcessors('', '');
+					postCssUtil.createProcessors({
+						packageJson: packageJsonStub(),
+						dest: '',
+						cwd: ''
+					});
 
 					const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
 					getJSON(cssFileName, jsonParam);
@@ -134,7 +150,11 @@ registerSuite('tasks/util/postcss', {
 					const jsonParam = {};
 
 					resolveStub.returns(cssFileName);
-					postCssUtil.createProcessors('', '');
+					postCssUtil.createProcessors({
+						packageJson: packageJsonStub(),
+						dest: '',
+						cwd: ''
+					});
 
 					const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
 
@@ -149,14 +169,18 @@ registerSuite('tasks/util/postcss', {
 					const jsonParam = {};
 
 					basenameStub.returns(cssFileName.replace('.m.css', ''));
-					postCssUtil.createProcessors('', '');
+					postCssUtil.createProcessors({
+						packageJson: packageJsonStub(),
+						dest: '',
+						cwd: ''
+					});
 
 					const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
 
 					getJSON(cssFileName, jsonParam);
 					assert.isTrue(umdWrapperStub.calledOnce);
 
-					assert.equal(pkgUpStub.callCount, 1, 'The package.json path was retrieved once');
+					assert.equal(packageJsonStub.callCount, 1, 'package.json is accessed');
 					assert.equal(joinStub.callCount, 1, 'path.join is invoked once');
 					assert.equal(joinStub.firstCall.args[0], '@owner/widgets');
 					assert.equal(joinStub.firstCall.args[1], 'testFileName');
