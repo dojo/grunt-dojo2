@@ -5,6 +5,7 @@ const postCssImport = require('postcss-import');
 const postCssNext = require('postcss-cssnext');
 const postCssModules = require('postcss-modules');
 const umdWrapper = require('./umdWrapper');
+const pkgUp = require('pkg-up');
 
 export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 	return [
@@ -25,11 +26,12 @@ export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 				const outputPath = path.resolve(dest, path.relative(cwd, cssFileName));
 				const newFilePath = outputPath + '.js';
 				const themeKey = ' _key';
-				json[themeKey] = 'dojo-' + path.basename(outputPath, '.m.css');
+				const packageName = require(pkgUp.sync()).name;
+				json[themeKey] = path.join(packageName, path.basename(outputPath, '.m.css'));
 				fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 			}
 		}),
 		// autoprefixer included in cssnext
 		cssNano({ autoprefixer: false })
 	];
-};
+}

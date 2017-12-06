@@ -53,6 +53,7 @@
     "istanbul-reports": "~1.1.1",
     "lodash": "^4.15.0",
     "parse-git-config": "^0.4.2",
+    "pkg-up": "^2.0.0",
     "pkg-dir": "^1.0.0",
     "postcss-cssnext": "^2.9.0",
     "postcss-import": "^9.1.0",
