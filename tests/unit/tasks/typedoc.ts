@@ -2,7 +2,7 @@ const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
 import * as grunt from 'grunt';
-import { join } from 'path';
+import { join, sep } from 'path';
 import { SinonSpy, spy, SinonStub, stub } from 'sinon';
 import {
 	loadTasks,
@@ -37,6 +37,10 @@ let publisher: {
 	commit: SinonStub;
 	publish: SinonStub;
 };
+
+function escape(str: string): string {
+	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
 
 registerSuite('tasks/typedoc', {
 
@@ -148,9 +152,9 @@ registerSuite('tasks/typedoc', {
 			runGruntTask('typedoc');
 			const command = execSync.args[0][0];
 			const matcher = new RegExp(
-				`node "[^"]+/typedoc" --mode "modules" --excludeExternals --excludeNotExported ` +
-				`--tsconfig "${join(outputPath, 'tsconfig.json')}" ` +
-				`--logger "none" --out "${apiDocDirectory}"`);
+				`node "[^"]+${escape(sep)}typedoc" --mode "modules" --excludeExternals --excludeNotExported ` +
+				`--tsconfig "${escape(join(outputPath, 'tsconfig.json'))}" ` +
+				`--logger "none" --out "${escape(apiDocDirectory)}"`);
 			assert.match(command, matcher, 'Unexpected typedoc command line');
 			assert.strictEqual(write.callCount, 0, 'Nothing should have been written');
 			assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');

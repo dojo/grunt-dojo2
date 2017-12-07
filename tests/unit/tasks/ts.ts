@@ -2,31 +2,40 @@ const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
 import * as grunt from 'grunt';
-import { SinonStub, stub } from 'sinon';
+import * as fs from 'fs';
+import { sandbox, SinonSandbox, SinonStub } from 'sinon';
 import {
-	loadTasks, prepareOutputDirectory, unloadTasks, cleanOutputDirectory, runGruntTask,
-	getOutputDirectory
+	cleanOutputDirectory,
+	getOutputDirectory,
+	loadTasks,
+	prepareOutputDirectory,
+	runGruntTask,
+	unloadTasks,
 } from '../util';
 
 const outputPath = getOutputDirectory();
+let mocks: SinonSandbox;
 let run: SinonStub;
 let loadNpmTasks: SinonStub;
 let write: SinonStub;
+let expand: SinonStub;
+let rename: SinonStub;
+let readJSON: SinonStub;
+let copy: SinonStub;
+let read: SinonStub;
 
 registerSuite('tasks/ts', {
 	before() {
-		loadTasks();
+		grunt.initConfig({
+			distDirectory: outputPath
+		});
 
-		run = stub(grunt.task, 'run');
-		loadNpmTasks = stub(grunt, 'loadNpmTasks');
-		write = stub(grunt.file, 'write');
+		loadTasks();
 
 		prepareOutputDirectory();
 	},
 	after() {
-		run.restore();
-		loadNpmTasks.restore();
-		write.restore();
+		mocks.restore();
 
 		unloadTasks();
 		cleanOutputDirectory();
@@ -55,8 +64,20 @@ registerSuite('tasks/ts', {
 			}
 		});
 
-		run.reset();
-		write.reset();
+		mocks = sandbox.create();
+
+		run = mocks.stub(grunt.task, 'run');
+		loadNpmTasks = mocks.stub(grunt, 'loadNpmTasks');
+		write = mocks.stub(grunt.file, 'write');
+		expand = mocks.stub(grunt.file, 'expand');
+		rename = mocks.stub(fs, 'renameSync');
+		readJSON = mocks.stub(grunt.file, 'readJSON');
+		copy = mocks.stub(grunt.file, 'copy');
+		read = mocks.stub(grunt.file, 'read');
+	},
+
+	afterEach() {
+		mocks.restore();
 	},
 
 	tests: {
@@ -92,18 +113,16 @@ registerSuite('tasks/ts', {
 		dist() {
 			runGruntTask('dojo-ts:dist');
 
-			assert.deepEqual(grunt.config('ts.dist'), {
-				tsconfig: {
-					passThrough: true,
-					tsconfig: '.tsconfigdist.json'
-				}
-			});
-
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:dist', 'clean:distTsconfig' ]);
+			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dojo-ts:umd', 'merge-dist' ]);
 
-			assert.isTrue(write.calledOnce);
-			assert.isTrue(write.calledWith('.tsconfigdist.json'));
+			expand.onFirstCall().returns(['dist/umd/file1.js']);
+			expand.onSecondCall().returns(['dist/esm/file1.mjs']);
+
+			runGruntTask('merge-dist');
+
+			assert.isTrue(copy.calledWith('dist/umd/file1.js', `${outputPath}file1.js`));
+			assert.isTrue(copy.calledWith('dist/esm/file1.mjs', `${outputPath}file1.mjs`));
 		},
 
 		esm() {
@@ -132,10 +151,37 @@ registerSuite('tasks/ts', {
 			});
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:esm', 'clean:esmTsconfig' ]);
+			assert.deepEqual(run.firstCall.args[0], ['ts:esm', 'clean:esmTsconfig', 'rename-mjs']);
 
 			assert.isTrue(write.calledOnce);
 			assert.isTrue(write.calledWith('.tsconfigesm.json'));
+
+			expand.onFirstCall().returns(['file.js']);
+			expand.onSecondCall().returns(['file.js.map']);
+			expand.onThirdCall().returns(['file.mjs']);
+			expand.onCall(3).returns(['file.mjs.map']);
+
+			read.returns(`some file
+//# sourceMappingURL=RouterInjector.js.map`);
+
+			readJSON.returns({
+				file: 'file.js',
+				key: 'value'
+			});
+
+			runGruntTask('rename-mjs');
+
+			assert.isTrue(rename.calledWith('file.js', 'file.mjs'));
+			assert.isTrue(rename.calledWith('file.js.map', 'file.mjs.map'));
+			assert.isTrue(write.calledWith('file.mjs.map'));
+
+			assert.deepEqual(write.args[1][1], `some file
+//# sourceMappingURL=RouterInjector.mjs.map`);
+
+			assert.deepEqual(JSON.parse(write.args[2][1]), {
+				file: 'file.mjs',
+				key: 'value'
+			});
 		},
 
 		custom() {
