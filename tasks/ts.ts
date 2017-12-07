@@ -120,7 +120,7 @@ export = function (grunt: IGrunt) {
 				const { compilerOptions: { module: moduleFormat = '' } = {} } = tsconfig;
 				if (moduleFormat !== 'commonjs') {
 					// commented out until we are ready to use es modules
-					// tasks.push('dojo-ts:esm');
+					tasks.push('dojo-ts:esm');
 				}
 
 				// merge dist config into umd and esm
