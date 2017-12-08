@@ -36,7 +36,7 @@ export function createProcessors({
 				const newFilePath = outputPath + '.js';
 				const themeKey = ' _key';
 				const packageName = packageJson.name;
-				json[themeKey] = path.join(packageName, path.basename(outputPath, '.m.css'));
+				json[themeKey] = `${packageName}/${path.basename(outputPath, '.m.css')}`;
 				fs.writeFileSync(newFilePath, umdWrapper(JSON.stringify(json)));
 			}
 		}),

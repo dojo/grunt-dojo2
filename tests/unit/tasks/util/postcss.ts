@@ -163,8 +163,6 @@ registerSuite('tasks/util/postcss', {
 					assert.equal(basenameStub.firstCall.args[1], '.m.css');
 				},
 				'should call umdWrapper with the package name in the `_key` value'() {
-					joinStub.returns('@owner/widgets/widget-1');
-
 					const cssFileName = 'testFileName.m.css';
 					const jsonParam = {};
 
@@ -181,12 +179,9 @@ registerSuite('tasks/util/postcss', {
 					assert.isTrue(umdWrapperStub.calledOnce);
 
 					assert.equal(packageJsonStub.callCount, 1, 'package.json is accessed');
-					assert.equal(joinStub.callCount, 1, 'path.join is invoked once');
-					assert.equal(joinStub.firstCall.args[0], '@owner/widgets');
-					assert.equal(joinStub.firstCall.args[1], 'testFileName');
 
 					const expected = {
-						' _key': '@owner/widgets/widget-1'
+						' _key': '@owner/widgets/testFileName'
 					};
 
 					assert.equal(umdWrapperStub.firstCall.args[0], JSON.stringify(expected));
