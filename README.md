@@ -95,9 +95,9 @@ src: {
 }
 ```
 
-#### grunt ts
+#### grunt dojo-ts
 
-The `grunt ts` task runs a project through the TypeScript compiler using the project's `tsconfig.json`. It is preconfigured with two targets, `dev` and `dist`. 
+The `grunt dojo-ts` task runs a project through the TypeScript compiler using the project's `tsconfig.json`. It is preconfigured with two targets, `dev` and `dist`. 
 
 ##### dev
 
@@ -144,7 +144,7 @@ It is possible to create custom targets for the `ts` by adding an entry to the g
 }
 ```
 
-The custom ts config can be run using `grunt ts:custom`.
+The custom ts config can be run using `grunt grunt-ts:custom`.
 
 #### grunt intern
 
