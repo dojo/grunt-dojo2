@@ -30,6 +30,6 @@ export function createProcessors(dest: string, cwd = '', dist?: boolean) {
 			}
 		}),
 		// autoprefixer included in cssnext
-		cssNano({ autoprefixer: false })
+		cssNano({ autoprefixer: false, zindex: false })
 	];
 };
