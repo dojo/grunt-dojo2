@@ -102,7 +102,8 @@ registerSuite('tasks/util/postcss', {
 
 				assert.isTrue(cssNanoModuleStub.calledOnce);
 				assert.deepEqual(cssNanoModuleStub.firstCall.args[0], {
-					autoprefixer: false
+					autoprefixer: false,
+					zindex: false
 				});
 			},
 			'generate scoped name': {
