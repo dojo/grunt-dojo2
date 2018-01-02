@@ -98,7 +98,7 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/tcm')(grunt);
 	require('./tasks/link')(grunt, packageJson);
 	require('./tasks/fixSourceMaps')(grunt, packageJson);
-	require('./tasks/postcss')(grunt);
+	require('./tasks/postcss')(grunt, packageJson);
 
 	if (otherOptions) {
 		grunt.config.merge(otherOptions);
