@@ -236,7 +236,7 @@ registerSuite('tasks/release', {
 
 				runGruntTask('release-publish', dfd.callback(() => {
 					assert.isTrue(shell.calledOnce);
-					assert.isTrue(shell.calledWith('npm publish .'));
+					assert.isTrue(shell.calledWith('npm publish . --tag next'));
 				})).catch(dfd.rejectOnError(() => {
 					assert(false, 'should have succeeded');
 				}));
