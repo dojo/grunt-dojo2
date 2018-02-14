@@ -585,7 +585,7 @@ registerSuite('tasks/release', {
 					runGruntTask('release-publish-flat');
 
 					assert.isTrue(runStub.calledOnce);
-					assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [ 'copy:temp', 'release-publish', 'clean:temp' ]);
+					assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [ 'customise-dist-output', 'copy:temp', 'release-publish', 'clean:temp' ]);
 
 					const newPackageJson = grunt.file.readJSON(path.join('temp', 'package.json'));
 
