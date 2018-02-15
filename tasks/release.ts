@@ -205,7 +205,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		grunt.log.subhead('making flat package...');
 		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 		const dist = grunt.config('copy.staticDefinitionFiles-dist.dest');
-		const tasks = ['copy:temp', 'release-publish', 'clean:temp'];
+		const tasks = ['customise-dist-output', 'copy:temp', 'release-publish', 'clean:temp'];
 
 		grunt.config.merge({
 			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
@@ -221,6 +221,8 @@ export = function(grunt: IGrunt, packageJson: any) {
 		});
 		grunt.task.run(tasks);
 	});
+
+	grunt.registerTask('customise-dist-output', () => {});
 
 	grunt.registerTask('release', 'release', function () {
 		grunt.option('remove-links', true);
