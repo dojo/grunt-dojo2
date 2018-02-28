@@ -52,6 +52,11 @@ registerSuite('options/intern', {
 						config: '<%= internConfig %>@local'
 					}
 				},
+				headless: {
+					options: {
+						config: '<%= internConfig %>@headless'
+					}
+				},
 				serve: {
 					options: {
 						serveOnly: true
@@ -97,6 +102,11 @@ registerSuite('options/intern', {
 				local: {
 					options: {
 						config: '<%= internConfig %>@local'
+					}
+				},
+				headless: {
+					options: {
+						config: '<%= internConfig %>@headless'
 					}
 				},
 				serve: {
