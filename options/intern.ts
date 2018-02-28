@@ -34,6 +34,11 @@ export = function (grunt: IGrunt) {
 				config: '<%= internConfig %>@local'
 			}
 		},
+		headless: {
+			options: {
+				config: '<%= internConfig %>@headless'
+			}
+		},
 		serve: {
 			options: {
 				serveOnly: true
