@@ -18,6 +18,8 @@
   "scripts": {
     "build": "tsc",
     "prepublish": "shx rm -rf ./typings && typings install && tsc -p .",
+    "precommit": "lint-staged",
+    "prettier": "prettier --write '**/*.ts'",
     "test": "tsc -p . && intern",
     "ci": "rm -rf tmp && tsc -p . && intern config=@ci && cat ./lcov.info | ./node_modules/.bin/codecov"
   },
@@ -46,7 +48,6 @@
     "grunt-postcss": "^0.8.0",
     "grunt-text-replace": ">=0.4.0",
     "grunt-ts": ">=5.0.0",
-    "grunt-tslint": "^4.0.1",
     "grunt-typings": "^0.1.5",
     "intern": "~4.1.0",
     "istanbul-lib-coverage": "~1.1.1",
@@ -61,7 +62,6 @@
     "remap-istanbul": ">=0.6.3",
     "resolve-from": "^2.0.0",
     "shelljs": "^0.7.6",
-    "tslint": "^4.5.1",
     "typed-css-modules": "^0.3.1",
     "typedoc": "0.5.9",
     "umd-wrapper": "^0.1.0"
@@ -76,11 +76,30 @@
     "@types/sinon": "~1.16.32",
     "dojo-loader": "latest",
     "grunt": "^1.0.1",
+    "grunt-tslint": "5.0.1",
+    "husky": "0.14.3",
     "istanbul-lib-instrument": "^1.9.1",
+    "lint-staged": "6.0.0",
     "mockery": "^2.0.0",
+    "prettier": "1.9.2",
     "shx": ">=0.1.2",
     "sinon": "^1.17.6",
+    "tslint": "5.2.0",
     "typescript": "~2.6.1",
     "typings": "^1.3.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4,
+    "useTabs": true,
+    "parser": "typescript",
+    "printWidth": 120,
+    "arrowParens": "always"
   }
 }
