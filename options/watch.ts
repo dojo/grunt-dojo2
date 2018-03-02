@@ -1,4 +1,4 @@
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-ts');
 
 	return {
@@ -6,16 +6,14 @@ export = function (grunt: IGrunt) {
 			options: {
 				reload: true
 			},
-			files: [ 'Gruntfile.js', 'tsconfig.json' ]
+			files: ['Gruntfile.js', 'tsconfig.json']
 		},
 		src: {
 			options: {
 				atBegin: true
 			},
-			files: [ '<%= all %>', '<%= staticTestFiles %>' ],
-			tasks: [
-				'dev'
-			]
+			files: ['<%= all %>', '<%= staticTestFiles %>'],
+			tasks: ['dev']
 		}
 	};
 };

@@ -21,20 +21,24 @@ export = function init(grunt: IGrunt, packageJson: any) {
 	];
 
 	function moduleFiles(dest: string) {
-		return [{
-			expand: true,
-			src: ['**/*.m.css'],
-			dest: dest,
-			cwd: 'src'
-		}];
+		return [
+			{
+				expand: true,
+				src: ['**/*.m.css'],
+				dest: dest,
+				cwd: 'src'
+			}
+		];
 	}
 
-	const cssFiles = [{
-		expand: true,
-		src: ['**/*.css', '!**/*.m.css'],
-		dest: distDirectory,
-		cwd: 'src'
-	}];
+	const cssFiles = [
+		{
+			expand: true,
+			src: ['**/*.css', '!**/*.m.css'],
+			dest: distDirectory,
+			cwd: 'src'
+		}
+	];
 
 	grunt.config.set('postcss', {
 		options: {

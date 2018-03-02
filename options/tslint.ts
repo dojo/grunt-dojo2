@@ -1,4 +1,4 @@
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-tslint');
 
 	return {
@@ -6,12 +6,7 @@ export = function (grunt: IGrunt) {
 			configuration: grunt.file.readJSON('tslint.json')
 		},
 		src: {
-			src: [
-				'<%= all %>',
-				'!typings/**/*.ts',
-				'!tests/typings/**/*.ts',
-				'!node_modules/**/*.ts'
-			]
+			src: ['<%= all %>', '!typings/**/*.ts', '!tests/typings/**/*.ts', '!node_modules/**/*.ts']
 		}
 	};
 };

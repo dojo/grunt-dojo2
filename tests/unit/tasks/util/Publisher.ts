@@ -16,10 +16,9 @@ const log = { writeln: stub() };
 let Publisher: typeof PublisherInstance;
 
 registerSuite('tasks/util/Publisher', {
-
 	before() {
 		const mocks = {
-			'shelljs': {
+			shelljs: {
 				config: {},
 				cp: cpStub,
 				rm: rmStub
@@ -29,8 +28,8 @@ registerSuite('tasks/util/Publisher', {
 				existsSync: existsStub
 			},
 			'./process': {
-				'exec': execStub,
-				'spawn': spawnStub
+				exec: execStub,
+				spawn: spawnStub
 			}
 		};
 		Publisher = loadModule('../../../../tasks/util/Publisher', require, mocks);

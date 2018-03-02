@@ -1,9 +1,7 @@
 import 'intern';
 
 export const loaderOptions = {
-	packages: [
-		{name: 'grunt-dojo2', location: '.'}
-	]
+	packages: [{ name: 'grunt-dojo2', location: '.' }]
 };
 
 export const suites = ['grunt-dojo2/tests/unit/all'];

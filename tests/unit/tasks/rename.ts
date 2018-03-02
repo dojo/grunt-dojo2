@@ -13,7 +13,9 @@ import {
 	createDummyFile,
 	createDummyDirectory,
 	fileExistsInInputDirectory,
-	fileExistsInOutputDirectory, cleanInputDirectory, cleanOutputDirectory
+	fileExistsInOutputDirectory,
+	cleanInputDirectory,
+	cleanOutputDirectory
 } from '../util';
 
 const inputDirectory = getInputDirectory();
@@ -57,12 +59,24 @@ registerSuite('tasks/rename', {
 
 					runGruntTask('rename:textFiles');
 
-					assert.isFalse(fileExistsInInputDirectory('file1.txt'), 'file1.txt should not be in input directory');
-					assert.isTrue(fileExistsInOutputDirectory('file1.txt'), 'file1.txt should have been moved to output directory');
+					assert.isFalse(
+						fileExistsInInputDirectory('file1.txt'),
+						'file1.txt should not be in input directory'
+					);
+					assert.isTrue(
+						fileExistsInOutputDirectory('file1.txt'),
+						'file1.txt should have been moved to output directory'
+					);
 					assert.isTrue(fileExistsInInputDirectory('file2'), 'file2 should still be in input directory');
 					assert.isFalse(fileExistsInOutputDirectory('file2'), 'file2 should not be in output directory');
-					assert.isFalse(fileExistsInInputDirectory('dir.txt'), 'dir.txt directory should not be in input directory');
-					assert.isTrue(fileExistsInOutputDirectory('dir.txt'), 'dir.txt directory should be in output directory');
+					assert.isFalse(
+						fileExistsInInputDirectory('dir.txt'),
+						'dir.txt directory should not be in input directory'
+					);
+					assert.isTrue(
+						fileExistsInOutputDirectory('dir.txt'),
+						'dir.txt directory should be in output directory'
+					);
 				}
 			}
 		}

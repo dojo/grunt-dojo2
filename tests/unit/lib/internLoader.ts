@@ -26,7 +26,7 @@ const instrumentedCode = instrumenter.instrumentSync(loaderCode, sourceFile);
 
 function reportCoverage() {
 	intern.emit('coverage', {
-		coverage: (<any> context)['__coverage__'],
+		coverage: (<any>context)['__coverage__'],
 		source: '',
 		sessionId: intern.config.sessionId
 	});
@@ -49,7 +49,6 @@ function runTest(before: Function, after: Function) {
 				after();
 				resolve();
 			}, 100);
-
 		}
 	});
 }
@@ -58,7 +57,7 @@ registerSuite('lib/intern/internLoader', {
 	beforeEach() {
 		sandbox = sinon.sandbox.create();
 		requireMock = sandbox.stub().callsArg(1);
-		(<any> requireMock).config = sandbox.stub();
+		(<any>requireMock).config = sandbox.stub();
 
 		loaderPromise = undefined;
 
@@ -87,52 +86,66 @@ registerSuite('lib/intern/internLoader', {
 	},
 	tests: {
 		async 'registers the intern loader'() {
-			return runTest(() => {
-				sandbox.stub(internMock, 'registerLoader');
-			}, () => {
-				assert.isTrue(internMock.registerLoader.called);
-			});
+			return runTest(
+				() => {
+					sandbox.stub(internMock, 'registerLoader');
+				},
+				() => {
+					assert.isTrue(internMock.registerLoader.called);
+				}
+			);
 		},
 
 		async 'loads the AMD util'() {
-			return runTest(() => {
-			}, () => {
-				assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/loader/loader.js'));
-				assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/shim/util/amd.js'));
-			});
+			return runTest(
+				() => {},
+				() => {
+					assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/loader/loader.js'));
+					assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/shim/util/amd.js'));
+				}
+			);
 		},
 
 		async 'configures the loader with the baseurl from options'() {
-			return runTest(() => {
-			}, () => {
-				assert.equal(requireMock.config.args[0][0].baseUrl, '/options');
-			});
+			return runTest(
+				() => {},
+				() => {
+					assert.equal(requireMock.config.args[0][0].baseUrl, '/options');
+				}
+			);
 		},
 
 		async 'configures the loader with the baseurl from config'() {
-			return runTest(() => {
-				sandbox.stub(internMock, 'registerLoader').callsArgWith(0, {});
-			}, () => {
-				assert.equal(requireMock.config.args[0][0].baseUrl, '/config');
-			});
+			return runTest(
+				() => {
+					sandbox.stub(internMock, 'registerLoader').callsArgWith(0, {});
+				},
+				() => {
+					assert.equal(requireMock.config.args[0][0].baseUrl, '/config');
+				}
+			);
 		},
 
 		async 'loads shim/main'() {
-			return runTest(() => {
-			}, () => {
-				assert.equal(requireMock.args[0][0], '@dojo/shim/main');
-			});
+			return runTest(
+				() => {},
+				() => {
+					assert.equal(requireMock.args[0][0], '@dojo/shim/main');
+				}
+			);
 		},
 
 		async 'creates a loader that uses require'() {
 			return new Promise((resolve) => {
-				runTest(() => {
-				}, (result: any) => {
-					result(['some-module']).then(() => {
-						assert.isTrue(requireMock.calledWith(['some-module']));
-						resolve();
-					});
-				});
+				runTest(
+					() => {},
+					(result: any) => {
+						result(['some-module']).then(() => {
+							assert.isTrue(requireMock.calledWith(['some-module']));
+							resolve();
+						});
+					}
+				);
 			});
 		}
 	}

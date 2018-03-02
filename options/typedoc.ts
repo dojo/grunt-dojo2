@@ -1,4 +1,4 @@
-export = function (_grunt: IGrunt) {
+export = function(_grunt: IGrunt) {
 	return {
 		options: {
 			// All options but publishOptions are passed directly to the typedoc command line.

@@ -1,22 +1,22 @@
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	return {
 		typings: {
-			src: [ 'typings/' ]
+			src: ['typings/']
 		},
 		dist: {
-			src: [ '<%= devDirectory %>/*' ],
-			filter: function (path: string) {
+			src: ['<%= devDirectory %>/*'],
+			filter: function(path: string) {
 				return grunt.option('remove-links') ? true : !grunt.file.isLink(path);
 			}
 		},
 		dev: {
-			src: [ '<%= devDirectory %>' ]
+			src: ['<%= devDirectory %>']
 		},
 		src: {
-			src: [ '{src,tests}/**/*.js' ],
-			filter: function (path: string) {
+			src: ['{src,tests}/**/*.js'],
+			filter: function(path: string) {
 				// Only clean the .js file if a .js.map file also exists
 				const mapPath = path + '.map';
 				if (grunt.file.exists(mapPath)) {
@@ -27,13 +27,13 @@ export = function (grunt: IGrunt) {
 			}
 		},
 		coverage: {
-			src: [ 'coverage-unmapped.json', 'coverage' ]
+			src: ['coverage-unmapped.json', 'coverage']
 		},
 		typedoc: {
-			src: [ '<%= apiDocDirectory %>', '<%= apiPubDirectory %>' ]
+			src: ['<%= apiDocDirectory %>', '<%= apiPubDirectory %>']
 		},
 		ghpages: {
-			src: [ '<%= apiPubDirectory %>' ]
+			src: ['<%= apiPubDirectory %>']
 		}
 	};
 };

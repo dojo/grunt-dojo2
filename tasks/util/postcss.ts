@@ -12,20 +12,17 @@ export function createProcessors({
 	dist,
 	packageJson
 }: {
-		dest: string,
-		cwd?: string,
-		dist?: boolean,
-		packageJson: any
+	dest: string;
+	cwd?: string;
+	dist?: boolean;
+	packageJson: any;
 }) {
 	return [
 		postCssImport,
 		postCssNext({
 			features: {
 				autoprefixer: {
-					browsers: [
-						'last 2 versions',
-						'ie >= 11'
-					]
+					browsers: ['last 2 versions', 'ie >= 11']
 				}
 			}
 		}),

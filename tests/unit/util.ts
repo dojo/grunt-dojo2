@@ -49,17 +49,20 @@ export function cleanOutputDirectory() {
 }
 
 export function runGruntTask(taskName: string, callback?: () => void) {
-	const task = (<any> grunt.task)._taskPlusArgs(taskName);
+	const task = (<any>grunt.task)._taskPlusArgs(taskName);
 
-	return task.task.fn.apply({
-		nameArgs: task.nameArgs,
-		name: task.task.name,
-		args: task.args,
-		flags: task.flags,
-		async: function () {
-			return callback;
-		}
-	}, task.args);
+	return task.task.fn.apply(
+		{
+			nameArgs: task.nameArgs,
+			name: task.task.name,
+			args: task.args,
+			flags: task.flags,
+			async: function() {
+				return callback;
+			}
+		},
+		task.args
+	);
 }
 
 export function fileExistsInOutputDirectory(fileName: string) {
@@ -109,8 +112,7 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 		registerMockList(mocks);
 	}
 
-	grunt.registerTask('clean', 'Clean mock task', () => {
-	});
+	grunt.registerTask('clean', 'Clean mock task', () => {});
 
 	const packageJson = grunt.file.readJSON('package.json');
 
@@ -118,13 +120,12 @@ export function loadTasks(mocks?: MockList, options?: TaskLoadingOptions) {
 		packageJson.peerDependencies = options.peerDependencies;
 	}
 
-	grunt.file.expand([ 'tasks/*.js' ]).forEach((fileName) => {
+	grunt.file.expand(['tasks/*.js']).forEach((fileName) => {
 		require('../../' + fileName.substr(0, fileName.length - 3))(grunt, packageJson);
 	});
 
 	// suppress grunt logging
-	(<any> grunt.log)._write = () => {
-	};
+	(<any>grunt.log)._write = () => {};
 }
 
 export function unloadTasks() {

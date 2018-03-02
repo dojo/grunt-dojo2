@@ -1,7 +1,7 @@
 import { execSync as exec } from 'child_process';
 
 export = function(grunt: IGrunt, packageJson: any) {
-	grunt.registerTask('peerDepInstall', <any> function () {
+	grunt.registerTask('peerDepInstall', <any>function() {
 		const peerDeps = packageJson.peerDependencies;
 		let packageCmd = 'npm install';
 		let message = '';
@@ -22,8 +22,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 				grunt.log.verbose.error(error);
 				grunt.log.error('failed.');
 			}
-		}
-		else {
+		} else {
 			grunt.log.write('No peer dependencies detected.');
 		}
 	});

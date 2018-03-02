@@ -10,17 +10,14 @@ declare module 'typed-css-modules/index' {
 	}
 
 	class DtsCreator {
-		constructor(options?: {
-			rootDir?: string;
-			searchDir?: string;
-			outDir?: string;
-			camelCase?: boolean;
-		});
+		constructor(options?: { rootDir?: string; searchDir?: string; outDir?: string; camelCase?: boolean });
 
 		create(filePath: string, contents?: string): Promise<DtsContent>;
 	}
 
-	namespace DtsCreator { }
+	namespace DtsCreator {
+
+	}
 
 	export = DtsCreator;
 }

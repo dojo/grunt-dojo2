@@ -16,28 +16,27 @@ const parseStub = stub().returns('');
 const dirnameStub = stub().returns('');
 const joinStub = stub().returns('');
 const umdWrapperStub = stub().returns('');
-const packageJsonStub = stub().returns({name: '@owner/widgets'});
+const packageJsonStub = stub().returns({ name: '@owner/widgets' });
 const writeFileStub = stub();
 
 registerSuite('tasks/util/postcss', {
-
 	before() {
 		const mocks = {
-			'cssnano': cssNanoModuleStub,
+			cssnano: cssNanoModuleStub,
 			'postcss-modules': postCssModulesStub,
 			'postcss-import': postCssImportStub,
 			'postcss-cssnext': postCssNextStub,
-			'path': {
-				'resolve': resolveStub,
-				'relative': relativeStub,
-				'basename': basenameStub,
-				'parse': parseStub,
-				'dirname': dirnameStub,
-				'join': joinStub
+			path: {
+				resolve: resolveStub,
+				relative: relativeStub,
+				basename: basenameStub,
+				parse: parseStub,
+				dirname: dirnameStub,
+				join: joinStub
 			},
 			'./umdWrapper': umdWrapperStub,
-			'fs': {
-				'writeFileSync': writeFileStub
+			fs: {
+				writeFileSync: writeFileStub
 			}
 		};
 
@@ -66,7 +65,7 @@ registerSuite('tasks/util/postcss', {
 
 	tests: {
 		createProcessors: {
-			'order'() {
+			order() {
 				const processors = postCssUtil.createProcessors({
 					packageJson: packageJsonStub(),
 					dest: ''
@@ -87,15 +86,12 @@ registerSuite('tasks/util/postcss', {
 					cwd: ''
 				});
 				assert.isTrue(postCssNextStub.calledOnce);
-				const [ autoPrefixrConfig ] = postCssNextStub.firstCall.args;
+				const [autoPrefixrConfig] = postCssNextStub.firstCall.args;
 
 				assert.deepEqual(autoPrefixrConfig, {
 					features: {
 						autoprefixer: {
-							browsers: [
-							'last 2 versions',
-							'ie >= 11'
-							]
+							browsers: ['last 2 versions', 'ie >= 11']
 						}
 					}
 				});
@@ -114,7 +110,7 @@ registerSuite('tasks/util/postcss', {
 						cwd: '',
 						dist: false
 					});
-					const [{generateScopedName}] = postCssModulesStub.firstCall.args;
+					const [{ generateScopedName }] = postCssModulesStub.firstCall.args;
 					assert.equal(generateScopedName, '[name]__[local]__[hash:base64:5]');
 				},
 				'generate hash only scoped name for dist'() {
@@ -124,11 +120,11 @@ registerSuite('tasks/util/postcss', {
 						cwd: '',
 						dist: true
 					});
-					const [{generateScopedName}] = postCssModulesStub.firstCall.args;
+					const [{ generateScopedName }] = postCssModulesStub.firstCall.args;
 					assert.equal(generateScopedName, '[hash:base64:8]');
 				}
 			},
-			'getJSON': {
+			getJSON: {
 				'should create output file with .js extension'() {
 					const cssFileName = 'testFileName.m.css';
 					const jsonParam = {};
@@ -140,7 +136,7 @@ registerSuite('tasks/util/postcss', {
 						cwd: ''
 					});
 
-					const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
+					const getJSON = (<any>postCssModulesStub.firstCall.args[0]).getJSON;
 					getJSON(cssFileName, jsonParam);
 
 					assert.isTrue(writeFileStub.calledOnce);
@@ -157,7 +153,7 @@ registerSuite('tasks/util/postcss', {
 						cwd: ''
 					});
 
-					const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
+					const getJSON = (<any>postCssModulesStub.firstCall.args[0]).getJSON;
 
 					getJSON(cssFileName, jsonParam);
 					assert.isTrue(basenameStub.calledOnce);
@@ -174,7 +170,7 @@ registerSuite('tasks/util/postcss', {
 						cwd: ''
 					});
 
-					const getJSON = (<any> postCssModulesStub.firstCall.args[0]).getJSON;
+					const getJSON = (<any>postCssModulesStub.firstCall.args[0]).getJSON;
 
 					getJSON(cssFileName, jsonParam);
 					assert.isTrue(umdWrapperStub.calledOnce);

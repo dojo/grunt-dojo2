@@ -1,10 +1,6 @@
 import * as nodeUtil from 'util';
 import { create, ReportType } from 'istanbul-reports';
-import {
-	CoverageMap,
-	CoverageMapData,
-	createCoverageMap
-} from 'istanbul-lib-coverage';
+import { CoverageMap, CoverageMapData, createCoverageMap } from 'istanbul-lib-coverage';
 import { createContext, summarizers, Watermarks } from 'istanbul-lib-report';
 
 import Node, { NodeEvents } from 'intern/lib/executors/Node';
@@ -47,7 +43,7 @@ interface SuiteOrTest {
 }
 
 export default class Reporter extends Runner {
-	private _errors: { [sessionId: string ]: ErrorObject[] } = {};
+	private _errors: { [sessionId: string]: ErrorObject[] } = {};
 
 	directory: string;
 	lcovFilename: string;
@@ -97,7 +93,7 @@ export default class Reporter extends Runner {
 		const sessionIds = Object.keys(this.sessions);
 		const numEnvironments = sessionIds.length;
 
-		sessionIds.forEach(sessionId => {
+		sessionIds.forEach((sessionId) => {
 			const session = this.sessions[sessionId];
 			numTests += session.suite.numTests;
 			numPassedTests += session.suite.numPassedTests;
@@ -133,8 +129,7 @@ export default class Reporter extends Runner {
 
 		if (this.hasRunErrors) {
 			message += '; fatal error occurred';
-		}
-		else if (this.hasSuiteErrors) {
+		} else if (this.hasSuiteErrors) {
 			message += '; suite error occurred';
 		}
 
@@ -192,7 +187,7 @@ export default class Reporter extends Runner {
 					charm.write(LIGHT_RED);
 					charm.write('× ' + test.id);
 					charm.foreground('white');
-					charm.write(' (' + (test.timeElapsed / 1000) + 's)');
+					charm.write(' (' + test.timeElapsed / 1000 + 's)');
 					charm.write('\n');
 					charm.foreground('red');
 					charm.write(test.error);
@@ -236,12 +231,10 @@ export default class Reporter extends Runner {
 			this._addError(test);
 			charm.write(LIGHT_RED);
 			charm.write('×');
-		}
-		else if (test.skipped) {
+		} else if (test.skipped) {
 			charm.write(LIGHT_MAGENTA);
 			charm.write('~');
-		}
-		else {
+		} else {
 			charm.write(LIGHT_GREEN);
 			charm.write('✓');
 		}
@@ -266,5 +259,5 @@ function isCoverageMap(value: any): value is CoverageMap {
 }
 
 intern.registerPlugin('grunt-dojo2', () => {
-	intern.registerReporter('grunt-dojo2', options => new Reporter(intern, options));
+	intern.registerReporter('grunt-dojo2', (options) => new Reporter(intern, options));
 });

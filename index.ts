@@ -3,7 +3,7 @@ import * as glob from 'glob';
 import ITask = grunt.task.ITask;
 
 function formatGlob(tsconfigGlob: string[]): string[] {
-	return tsconfigGlob.map(function (glob: string) {
+	return tsconfigGlob.map(function(glob: string) {
 		if (/^\.\//.test(glob)) {
 			// Remove the leading './' from the glob because grunt-ts
 			// sees it and thinks it needs to create a .baseDir.ts which
@@ -14,7 +14,7 @@ function formatGlob(tsconfigGlob: string[]): string[] {
 	});
 }
 
-exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
+exports.initConfig = function(grunt: IGrunt, otherOptions: any) {
 	const tsconfigContent = grunt.file.read('tsconfig.json');
 	const tsconfig = JSON.parse(tsconfigContent);
 	if (tsconfig.filesGlob) {
@@ -46,17 +46,9 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		'fixSourceMaps'
 	];
 
-	const distESMTasks = [
-		'dojo-ts:esm'
-	];
+	const distESMTasks = ['dojo-ts:esm'];
 
-	const docTasks = [
-		'clean:typings',
-		'typings:dev',
-		'typedoc',
-		'clean:typedoc',
-		'clean:ghpages'
-	];
+	const docTasks = ['clean:typings', 'typings:dev', 'typedoc', 'clean:typedoc', 'clean:ghpages'];
 
 	grunt.initConfig({
 		name: packageJson.name,
@@ -64,8 +56,8 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 		tsconfig: tsconfig,
 		tsconfigContent: tsconfigContent,
 		filesGlob: tsconfig.filesGlob || tsconfig.include,
-		all: [ '<%= filesGlob %>' ],
-		skipTests: [ '<%= all %>' , '!tests/**/*.ts' ],
+		all: ['<%= filesGlob %>'],
+		skipTests: ['<%= all %>', '!tests/**/*.ts'],
 		testsGlob: ['./tests/**/*.ts', 'tests/**/*.ts'],
 		staticTestFiles: 'tests/**/*.{html,css,json,xml,js,txt}',
 		staticDefinitionFiles: '**/*.d.ts',
@@ -82,12 +74,14 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	});
 
 	const options: { [option: string]: any } = {};
-	glob.sync('*.js', {
-		cwd: path.join(__dirname, 'options')
-	}).forEach(function (filename) {
-		const optName = path.basename(filename, '.js');
-		options[optName] = require('./options/' + optName)(grunt);
-	});
+	glob
+		.sync('*.js', {
+			cwd: path.join(__dirname, 'options')
+		})
+		.forEach(function(filename) {
+			const optName = path.basename(filename, '.js');
+			options[optName] = require('./options/' + optName)(grunt);
+		});
 	grunt.config.merge(options);
 
 	require('./tasks/uploadCoverage')(grunt);
@@ -108,12 +102,14 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	require('./tasks/typedoc')(grunt);
 
 	// Set some Intern-specific options if specified on the command line.
-	[ 'suites', 'functionalSuites', 'grep', 'showConfig', 'leaveRemoteOpen' ].forEach(function (option) {
+	['suites', 'functionalSuites', 'grep', 'showConfig', 'leaveRemoteOpen'].forEach(function(option) {
 		const value = grunt.option<string>(option);
 		let splitValue: string[] | undefined;
 		if (value) {
 			if (option === 'suites' || option === 'functionalSuites') {
-				splitValue = value.split(',').map(function (string) { return string.trim(); });
+				splitValue = value.split(',').map(function(string) {
+					return string.trim();
+				});
 			}
 			grunt.config('intern.options.' + option, splitValue || value);
 		}
@@ -121,13 +117,13 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 
 	function setTestReporter(testReporter: boolean) {
 		if (testReporter) {
-			grunt.config('intern.options.node.reporters', [ 'grunt-dojo2' ]);
+			grunt.config('intern.options.node.reporters', ['grunt-dojo2']);
 		}
 	}
 
 	setTestReporter(grunt.option<boolean>('test-reporter'));
 
-	grunt.registerTask('test', function () {
+	grunt.registerTask('test', function() {
 		const flags = Object.keys(this.flags);
 
 		if (!flags.length) {
@@ -152,5 +148,5 @@ exports.initConfig = function (grunt: IGrunt, otherOptions: any) {
 	grunt.registerTask('dist_esm', grunt.config.get<string[]>('distESMTasks'));
 	grunt.registerTask('doc', grunt.config.get<string[]>('docTasks'));
 
-	grunt.registerTask('default', [ 'clean', 'dev' ]);
+	grunt.registerTask('default', ['clean', 'dev']);
 };

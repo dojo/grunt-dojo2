@@ -1,9 +1,9 @@
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	grunt.loadNpmTasks('grunt-text-replace');
 
 	return {
 		addIstanbulIgnore: {
-			src: [ '<%= devDirectory %>/**/*.js' ],
+			src: ['<%= devDirectory %>/**/*.js'],
 			overwrite: true,
 			replacements: [
 				{

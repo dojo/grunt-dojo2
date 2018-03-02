@@ -1,4 +1,4 @@
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	const path = require('path');
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
@@ -7,19 +7,19 @@ export = function (grunt: IGrunt) {
 		staticTestFiles: {
 			expand: true,
 			cwd: '.',
-			src: [ '<%= staticTestFiles %>' ],
+			src: ['<%= staticTestFiles %>'],
 			dest: '<%= devDirectory %>'
 		},
 		'staticDefinitionFiles-dev': {
 			expand: true,
 			cwd: '.',
-			src: [ path.join('src', '<%= staticDefinitionFiles %>') ],
+			src: [path.join('src', '<%= staticDefinitionFiles %>')],
 			dest: '<%= devDirectory %>'
 		},
 		'staticDefinitionFiles-dist': {
 			expand: true,
 			cwd: 'src',
-			src: [ '<%= staticDefinitionFiles %>' ],
+			src: ['<%= staticDefinitionFiles %>'],
 			dest: '<%= distDirectory %>'
 		}
 	};

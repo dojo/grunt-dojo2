@@ -2,11 +2,11 @@ import * as glob from 'glob';
 import * as DtsCreator from 'typed-css-modules';
 import ITask = grunt.task.ITask;
 export = function(grunt: IGrunt) {
-	grunt.registerTask('tcm', 'generate css modules', function (this: ITask) {
+	grunt.registerTask('tcm', 'generate css modules', function(this: ITask) {
 		const done = this.async();
 		const creator = new DtsCreator({
 			rootDir: process.cwd(),
-			searchDir: 'src',
+			searchDir: 'src'
 		});
 
 		glob('src/**/*.m.css', (error: Error | null, files: string[]) => {
@@ -15,10 +15,10 @@ export = function(grunt: IGrunt) {
 				return;
 			}
 
-			Promise.all(files.map(file => creator.create(file)))
-				.then(dtsFilesContents => Promise.all(
-					dtsFilesContents.map(dtsFileContents => dtsFileContents.writeFile())
-				))
+			Promise.all(files.map((file) => creator.create(file)))
+				.then((dtsFilesContents) =>
+					Promise.all(dtsFilesContents.map((dtsFileContents) => dtsFileContents.writeFile()))
+				)
 				.then(done, done);
 		});
 	});

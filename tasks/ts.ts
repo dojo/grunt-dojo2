@@ -4,7 +4,7 @@ import ITask = grunt.task.ITask;
 
 const excludes = ['tests/**/*.ts', 'tests/**/*.tsx', 'src/*/tests/**/*.ts', 'src/*/example/**/*.ts'];
 
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	const distDirectory = grunt.config.get<string>('distDirectory');
 	const defaultOptions: any = {
 		umd: {
@@ -29,42 +29,42 @@ export = function (grunt: IGrunt) {
 	};
 	const postTasks: any = {
 		esm: [
-			function () {
+			function() {
 				grunt.task.registerTask('rename-mjs', () => {
 					// rename .js files to .mjs files
-					grunt.file.expand(['dist/esm/**/*.js'])
-						.forEach(file => fs.renameSync(file, file.replace(/\.js$/g, '.mjs')));
+					grunt.file
+						.expand(['dist/esm/**/*.js'])
+						.forEach((file) => fs.renameSync(file, file.replace(/\.js$/g, '.mjs')));
 
 					// rename .js.map files to .mjs.map files
-					grunt.file.expand(['dist/esm/**/*.js.map'])
-						.forEach(file => fs.renameSync(file, file.replace(/\.js\.map$/g, '.mjs.map')));
+					grunt.file
+						.expand(['dist/esm/**/*.js.map'])
+						.forEach((file) => fs.renameSync(file, file.replace(/\.js\.map$/g, '.mjs.map')));
 
 					// fix the source map comments in the .mjs files
-					grunt.file.expand(['dist/esm/**/*.mjs'])
-						.forEach(file => {
-							let contents = grunt.file.read(file);
+					grunt.file.expand(['dist/esm/**/*.mjs']).forEach((file) => {
+						let contents = grunt.file.read(file);
 
-							contents = contents.replace(/(\/\/.*sourceMappingURL=.*?)(\.js\.map)/g, '$1.mjs.map');
+						contents = contents.replace(/(\/\/.*sourceMappingURL=.*?)(\.js\.map)/g, '$1.mjs.map');
 
-							grunt.file.write(file, contents);
-						});
+						grunt.file.write(file, contents);
+					});
 
 					// change the .js files to .mjs files inside the map files
-					grunt.file.expand(['dist/esm/**/*.mjs.map'])
-						.forEach(file => {
-							const json = grunt.file.readJSON(file);
-							if (json.file) {
-								json.file = json.file.replace(/\.js$/g, '.mjs');
-							}
+					grunt.file.expand(['dist/esm/**/*.mjs.map']).forEach((file) => {
+						const json = grunt.file.readJSON(file);
+						if (json.file) {
+							json.file = json.file.replace(/\.js$/g, '.mjs');
+						}
 
-							grunt.file.write(file, JSON.stringify(json));
-						});
+						grunt.file.write(file, JSON.stringify(json));
+					});
 				});
 				return 'rename-mjs';
 			}
 		],
 		dist: [
-			function () {
+			function() {
 				grunt.task.registerTask('merge-dist', () => {
 					grunt.file.expand(['dist/umd/**/*']).forEach((file: string) => {
 						grunt.file.copy(file, file.replace('dist/umd/', distDirectory));
@@ -80,7 +80,7 @@ export = function (grunt: IGrunt) {
 		]
 	};
 
-	grunt.registerTask('dojo-ts', <any> function (this: ITask) {
+	grunt.registerTask('dojo-ts', <any>function(this: ITask) {
 		grunt.loadNpmTasks('grunt-ts');
 
 		const flags = this.args && this.args.length ? this.args : ['dev'];

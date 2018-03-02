@@ -6,33 +6,32 @@ const { assert } = intern.getPlugin('chai');
 import * as mockery from 'mockery';
 
 registerSuite('lib/load-dojo-loader', {
-	before: function () {
+	before: function() {
 		mockery.enable({
 			warnOnReplace: false,
 			warnOnUnregistered: false,
 			useCleanCache: true
 		});
 	},
-	after: function () {
+	after: function() {
 		mockery.disable();
 	},
 
 	tests: {
-		run: function () {
-			mockery.registerMock('resolve-from', function (baseUrl: string, mid: string) {
+		run: function() {
+			mockery.registerMock('resolve-from', function(baseUrl: string, mid: string) {
 				return '/' + mid;
 			});
 
 			let configBaseUrl: string = '';
 			let configPackages: {
-				name: string,
-				location: string
+				name: string;
+				location: string;
 			}[] = [];
 
 			let fakeRequire = {
-				require: function () {
-				},
-				config: function (obj: any) {
+				require: function() {},
+				config: function(obj: any) {
 					configBaseUrl = obj.baseUrl;
 					configPackages = obj.packages;
 				}
@@ -44,11 +43,11 @@ registerSuite('lib/load-dojo-loader', {
 
 			let result = loader({
 				peerDependencies: {
-					'test': 'test',
+					test: 'test',
 					'dojo-loader': 'dojo-loader',
 					'@reactivex/rxjs': true,
-					'maquette': true,
-					'immutable': true
+					maquette: true,
+					immutable: true
 				}
 			});
 

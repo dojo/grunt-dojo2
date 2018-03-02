@@ -31,26 +31,30 @@ registerSuite('tasks/run', {
 		runsDefault() {
 			const dfd = this.async(1000);
 
-			runGruntTask('run', () => {
-			});
+			runGruntTask('run', () => {});
 
-			setTimeout(dfd.callback(() => {
-				assert.isTrue(requireStub.calledOnce);
-				assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'src/main' ]);
-			}), 100);
+			setTimeout(
+				dfd.callback(() => {
+					assert.isTrue(requireStub.calledOnce);
+					assert.deepEqual(requireStub.firstCall.args[0], ['src/main']);
+				}),
+				100
+			);
 		},
 		runsArgument() {
 			const dfd = this.async(1000);
 
 			grunt.option('main', 'my-main');
 
-			runGruntTask('run', () => {
-			});
+			runGruntTask('run', () => {});
 
-			setTimeout(dfd.callback(() => {
-				assert.isTrue(requireStub.calledOnce);
-				assert.deepEqual(requireStub.firstCall.args[ 0 ], [ 'my-main' ]);
-			}), 100);
+			setTimeout(
+				dfd.callback(() => {
+					assert.isTrue(requireStub.calledOnce);
+					assert.deepEqual(requireStub.firstCall.args[0], ['my-main']);
+				}),
+				100
+			);
 		}
 	}
 });
