@@ -14,17 +14,21 @@ let originalOptions: {
 
 const gitUrl = 'git@github.com:dojo/test';
 
-function taskLoader(config?: { [key: string]: any }, options?: { [key: string]: any }, mocks: { [key: string]: any } = {}) {
+function taskLoader(
+	config?: { [key: string]: any },
+	options?: { [key: string]: any },
+	mocks: { [key: string]: any } = {}
+) {
 	originalOptions = {};
 
 	if (options) {
 		Object.keys(options).forEach((option) => {
-			originalOptions[ option ] = grunt.option(option);
-			grunt.option(option, options[ option ]);
+			originalOptions[option] = grunt.option(option);
+			grunt.option(option, options[option]);
 		});
 	}
 
-	mocks[ 'execa' ] = {
+	mocks['execa'] = {
 		shell: shell
 	};
 
@@ -35,7 +39,7 @@ function taskLoader(config?: { [key: string]: any }, options?: { [key: string]: 
 
 function taskUnloader() {
 	Object.keys(originalOptions).forEach((option: string) => {
-		grunt.option(option, originalOptions[ option ]);
+		grunt.option(option, originalOptions[option]);
 	});
 
 	unloadTasks();
@@ -44,7 +48,7 @@ function taskUnloader() {
 let failureStub: SinonStub;
 
 registerSuite('tasks/release', {
-	'can-publish-check': (function (): ObjectSuiteDescriptor {
+	'can-publish-check': (function(): ObjectSuiteDescriptor {
 		let fail: SinonStub;
 
 		return {
@@ -64,22 +68,32 @@ registerSuite('tasks/release', {
 
 					taskLoader();
 
-					shell.withArgs('npm whoami')
+					shell
+						.withArgs('npm whoami')
 						.returns(Promise.reject(new Error()))
 						.withArgs('npm view . --json')
-						.returns(Promise.resolve(JSON.stringify({
-							maintainers: [
-								'dojotoolkit <kitsonk@dojotoolkit.org>',
-								'sitepen <labs@sitepen.com>'
-							]
-						})));
+						.returns(
+							Promise.resolve(
+								JSON.stringify({
+									maintainers: ['dojotoolkit <kitsonk@dojotoolkit.org>', 'sitepen <labs@sitepen.com>']
+								})
+							)
+						);
 
-					runGruntTask('can-publish-check', dfd.rejectOnError(() => {
-						assert(false, 'Should have failed');
-					})).catch(dfd.callback(() => {
-						assert.isTrue(fail.calledOnce, 'grunt.fail.fatal should have been called once');
-						assert.isTrue(fail.calledWith('not logged into npm'), 'grunt.fail.fatal should have been called with the error message');
-					}));
+					runGruntTask(
+						'can-publish-check',
+						dfd.rejectOnError(() => {
+							assert(false, 'Should have failed');
+						})
+					).catch(
+						dfd.callback(() => {
+							assert.isTrue(fail.calledOnce, 'grunt.fail.fatal should have been called once');
+							assert.isTrue(
+								fail.calledWith('not logged into npm'),
+								'grunt.fail.fatal should have been called with the error message'
+							);
+						})
+					);
 				},
 
 				'not a maintainer'() {
@@ -87,20 +101,32 @@ registerSuite('tasks/release', {
 
 					taskLoader();
 
-					shell.withArgs('npm whoami').returns(Promise.resolve({ stdout: 'test' })).withArgs('npm view . --json').returns(Promise.resolve({
-						stdout: JSON.stringify({
-							maintainers: [
-								'sitepen <labs@sitepen.com>'
-							]
-						})
-					}));
+					shell
+						.withArgs('npm whoami')
+						.returns(Promise.resolve({ stdout: 'test' }))
+						.withArgs('npm view . --json')
+						.returns(
+							Promise.resolve({
+								stdout: JSON.stringify({
+									maintainers: ['sitepen <labs@sitepen.com>']
+								})
+							})
+						);
 
-					runGruntTask('can-publish-check', dfd.rejectOnError(() => {
-						assert(false, 'Should have failed');
-					})).catch(dfd.callback((error: Error) => {
-						assert.isTrue(fail.calledOnce, 'grunt.fail.fatal should have been called once');
-						assert.isTrue(fail.calledWith('cannot publish this package with user test'), 'grunt.fail.fatal should have been called with the error message');
-					}));
+					runGruntTask(
+						'can-publish-check',
+						dfd.rejectOnError(() => {
+							assert(false, 'Should have failed');
+						})
+					).catch(
+						dfd.callback((error: Error) => {
+							assert.isTrue(fail.calledOnce, 'grunt.fail.fatal should have been called once');
+							assert.isTrue(
+								fail.calledWith('cannot publish this package with user test'),
+								'grunt.fail.fatal should have been called with the error message'
+							);
+						})
+					);
 				},
 
 				'dry run run commands anyways'() {
@@ -110,46 +136,62 @@ registerSuite('tasks/release', {
 						'dry-run': true
 					});
 
-					shell.withArgs('npm whoami')
+					shell
+						.withArgs('npm whoami')
 						.returns(Promise.reject(new Error()))
 						.withArgs('npm view . --json')
-						.returns(Promise.resolve(JSON.stringify({
-							maintainers: [
-								'dojotoolkit <kitsonk@dojotoolkit.org>',
-								'sitepen <labs@sitepen.com>'
-							]
-						})));
+						.returns(
+							Promise.resolve(
+								JSON.stringify({
+									maintainers: ['dojotoolkit <kitsonk@dojotoolkit.org>', 'sitepen <labs@sitepen.com>']
+								})
+							)
+						);
 
-					runGruntTask('can-publish-check', dfd.rejectOnError(() => {
-						assert(false, 'Should have failed');
-					})).catch(dfd.callback(() => {
-						assert.isTrue(fail.calledOnce, 'grunt.fail.fatal should have been called once');
-						assert.isTrue(fail.calledWith('not logged into npm'), 'grunt.fail.fatal should have been called with the error message');
-					}));
+					runGruntTask(
+						'can-publish-check',
+						dfd.rejectOnError(() => {
+							assert(false, 'Should have failed');
+						})
+					).catch(
+						dfd.callback(() => {
+							assert.isTrue(fail.calledOnce, 'grunt.fail.fatal should have been called once');
+							assert.isTrue(
+								fail.calledWith('not logged into npm'),
+								'grunt.fail.fatal should have been called with the error message'
+							);
+						})
+					);
 				},
 
 				'initial run uses default maintainers'() {
 					const dfd = this.async();
 
 					taskLoader(undefined, {
-						'initial': true
+						initial: true
 					});
 
-					shell.withArgs('npm whoami')
+					shell
+						.withArgs('npm whoami')
 						.returns(Promise.resolve({ stdout: 'dojo' }))
 						.withArgs('npm view . --json')
 						.throws();
 
-					runGruntTask('can-publish-check', dfd.callback(() => {
-						assert.isTrue(shell.calledOnce);
-					})).catch(dfd.rejectOnError(() => {
-						assert(false, 'Should have succeeded');
-					}));
+					runGruntTask(
+						'can-publish-check',
+						dfd.callback(() => {
+							assert.isTrue(shell.calledOnce);
+						})
+					).catch(
+						dfd.rejectOnError(() => {
+							assert(false, 'Should have succeeded');
+						})
+					);
 				}
 			}
 		};
 	})(),
-	'repo-is-clean-check': (function (): ObjectSuiteDescriptor {
+	'repo-is-clean-check': (function(): ObjectSuiteDescriptor {
 		let failStub: SinonStub;
 
 		return {
@@ -169,14 +211,18 @@ registerSuite('tasks/release', {
 					taskLoader();
 
 					// we need to mock the whole thing because
-					shell.withArgs('git status --porcelain')
-						.returns(Promise.resolve({ stdout: 'change' }));
+					shell.withArgs('git status --porcelain').returns(Promise.resolve({ stdout: 'change' }));
 
-					runGruntTask('repo-is-clean-check', dfd.rejectOnError(() => {
-						assert(false, 'should have failed');
-					})).catch(dfd.callback(() => {
-						assert.isTrue(failStub.calledWith('there are changes in the working tree'));
-					}));
+					runGruntTask(
+						'repo-is-clean-check',
+						dfd.rejectOnError(() => {
+							assert(false, 'should have failed');
+						})
+					).catch(
+						dfd.callback(() => {
+							assert.isTrue(failStub.calledWith('there are changes in the working tree'));
+						})
+					);
 				},
 
 				'not on default branch'() {
@@ -185,33 +231,41 @@ registerSuite('tasks/release', {
 					taskLoader();
 
 					// we need to mock the whole thing because
-					shell.withArgs('git status --porcelain')
+					shell
+						.withArgs('git status --porcelain')
 						.returns(Promise.resolve({ stdout: '' }))
 						.withArgs('git rev-parse --abbrev-ref HEAD')
 						.returns(Promise.resolve({ stdout: 'test' }));
 
-					runGruntTask('repo-is-clean-check', dfd.rejectOnError(() => {
-						assert(false, 'should have failed');
-					})).catch(dfd.callback(() => {
-						assert.isTrue(failStub.calledWith('not on master branch'));
-					}));
+					runGruntTask(
+						'repo-is-clean-check',
+						dfd.rejectOnError(() => {
+							assert(false, 'should have failed');
+						})
+					).catch(
+						dfd.callback(() => {
+							assert.isTrue(failStub.calledWith('not on master branch'));
+						})
+					);
 				},
 
-				'success'() {
+				success() {
 					const dfd = this.async();
 
 					taskLoader();
 
 					// we need to mock the whole thing because
-					shell.withArgs('git status --porcelain')
+					shell
+						.withArgs('git status --porcelain')
 						.returns(Promise.resolve({ stdout: '' }))
 						.withArgs('git rev-parse --abbrev-ref HEAD')
 						.returns(Promise.resolve({ stdout: 'master' }));
 
-					runGruntTask('repo-is-clean-check', dfd.callback(() => {
-					})).catch(dfd.rejectOnError(() => {
-						assert(false, 'should have succeeded');
-					}));
+					runGruntTask('repo-is-clean-check', dfd.callback(() => {})).catch(
+						dfd.rejectOnError(() => {
+							assert(false, 'should have succeeded');
+						})
+					);
 				}
 			}
 		};
@@ -231,15 +285,19 @@ registerSuite('tasks/release', {
 
 				taskLoader();
 
-				shell.withArgs('npm publish .')
-					.returns(Promise.resolve({ stdout: '' }));
+				shell.withArgs('npm publish .').returns(Promise.resolve({ stdout: '' }));
 
-				runGruntTask('release-publish', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
-					assert.isTrue(shell.calledWith('npm publish . --tag next'));
-				})).catch(dfd.rejectOnError(() => {
-					assert(false, 'should have succeeded');
-				}));
+				runGruntTask(
+					'release-publish',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
+						assert.isTrue(shell.calledWith('npm publish . --tag next'));
+					})
+				).catch(
+					dfd.rejectOnError(() => {
+						assert(false, 'should have succeeded');
+					})
+				);
 			},
 
 			'with a tag'() {
@@ -249,15 +307,19 @@ registerSuite('tasks/release', {
 					tag: 'test'
 				});
 
-				shell.withArgs('npm publish . --tag test')
-					.returns(Promise.resolve({ stdout: '' }));
+				shell.withArgs('npm publish . --tag test').returns(Promise.resolve({ stdout: '' }));
 
-				runGruntTask('release-publish', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
-					assert.isTrue(shell.calledWith('npm publish . --tag test'));
-				})).catch(dfd.rejectOnError(() => {
-					assert(false, 'should have succeeded');
-				}));
+				runGruntTask(
+					'release-publish',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
+						assert.isTrue(shell.calledWith('npm publish . --tag test'));
+					})
+				).catch(
+					dfd.rejectOnError(() => {
+						assert(false, 'should have succeeded');
+					})
+				);
 			},
 
 			'dry run'() {
@@ -267,21 +329,27 @@ registerSuite('tasks/release', {
 					'dry-run': true
 				});
 
-				shell.withArgs('npm publish .')
+				shell
+					.withArgs('npm publish .')
 					.returns(Promise.resolve({ stdout: '' }))
 					.withArgs('npm pack ../temp/')
 					.returns(Promise.resolve());
 
-				runGruntTask('release-publish', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
-					assert.isTrue(shell.calledWith('npm pack ../temp/'));
-				})).catch(dfd.rejectOnError(() => {
-					assert(false, 'should have succeeded');
-				}));
+				runGruntTask(
+					'release-publish',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
+						assert.isTrue(shell.calledWith('npm pack ../temp/'));
+					})
+				).catch(
+					dfd.rejectOnError(() => {
+						assert(false, 'should have succeeded');
+					})
+				);
 			}
 		}
 	},
-	'release-version-pre-release-tag': (function (): ObjectSuiteDescriptor {
+	'release-version-pre-release-tag': (function(): ObjectSuiteDescriptor {
 		let failStub: SinonStub;
 
 		return {
@@ -304,18 +372,22 @@ registerSuite('tasks/release', {
 						'pre-release-tag': 'test'
 					});
 
-					shell.onFirstCall()
-						.returns(Promise.resolve({}));
+					shell.onFirstCall().returns(Promise.resolve({}));
 
-					runGruntTask('release-version-pre-release-tag', dfd.callback(() => {
-						assert.isTrue(shell.calledOnce);
+					runGruntTask(
+						'release-version-pre-release-tag',
+						dfd.callback(() => {
+							assert.isTrue(shell.calledOnce);
 
-						let command = (<any> shell).getCalls()[ 0 ].args[ 0 ];
+							let command = (<any>shell).getCalls()[0].args[0];
 
-						assert.isTrue(/npm version [\d.]+-test\.1/.test(command));
-					})).catch(dfd.rejectOnError(() => {
-						assert(false, 'should have succeeded');
-					}));
+							assert.isTrue(/npm version [\d.]+-test\.1/.test(command));
+						})
+					).catch(
+						dfd.rejectOnError(() => {
+							assert(false, 'should have succeeded');
+						})
+					);
 				},
 
 				'initial, dry run'() {
@@ -327,18 +399,22 @@ registerSuite('tasks/release', {
 						'pre-release-tag': 'test'
 					});
 
-					shell.onFirstCall()
-						.returns(Promise.resolve({}));
+					shell.onFirstCall().returns(Promise.resolve({}));
 
-					runGruntTask('release-version-pre-release-tag', dfd.callback(() => {
-						assert.isTrue(shell.calledOnce);
+					runGruntTask(
+						'release-version-pre-release-tag',
+						dfd.callback(() => {
+							assert.isTrue(shell.calledOnce);
 
-						let command = (<any> shell).getCalls()[ 0 ].args[ 0 ];
+							let command = (<any>shell).getCalls()[0].args[0];
 
-						assert.isTrue(/npm --no-git-tag-version version [\d.]+-test\.1/.test(command));
-					})).catch(dfd.rejectOnError(() => {
-						assert(false, 'should have succeeded');
-					}));
+							assert.isTrue(/npm --no-git-tag-version version [\d.]+-test\.1/.test(command));
+						})
+					).catch(
+						dfd.rejectOnError(() => {
+							assert(false, 'should have succeeded');
+						})
+					);
 				},
 				'regular w/ bad output'() {
 					const dfd = this.async();
@@ -347,16 +423,20 @@ registerSuite('tasks/release', {
 						'pre-release-tag': 'test'
 					});
 
-					shell.withArgs('npm view . --json')
-						.returns(Promise.resolve({ stdout: '' }));
+					shell.withArgs('npm view . --json').returns(Promise.resolve({ stdout: '' }));
 
-					runGruntTask('release-version-pre-release-tag', dfd.rejectOnError(() => {
-						assert(false, 'should have failed');
-					})).catch(dfd.callback(() => {
-						assert.isTrue(shell.calledOnce);
-					}));
+					runGruntTask(
+						'release-version-pre-release-tag',
+						dfd.rejectOnError(() => {
+							assert(false, 'should have failed');
+						})
+					).catch(
+						dfd.callback(() => {
+							assert.isTrue(shell.calledOnce);
+						})
+					);
 				},
-				'regular'() {
+				regular() {
 					const dfd = this.async();
 
 					taskLoader(undefined, {
@@ -367,28 +447,36 @@ registerSuite('tasks/release', {
 					const fullVersion = packageJson.version;
 					const justTheVersion = fullVersion.replace(/^([^\-]+).*$/g, '$1');
 
-					shell.onCall(0)
-						.returns(Promise.resolve({
-							stdout: JSON.stringify({
-								time: {
-									created: '1/1/2016',
-									modified: '1/2/2016',
-									[`${justTheVersion}-alpha.6`]: '2016-05-13T16:24:33.949Z',
-									[`${justTheVersion}-test.7`]: '2016-05-16T13:44:12.669Z'
-								}
+					shell
+						.onCall(0)
+						.returns(
+							Promise.resolve({
+								stdout: JSON.stringify({
+									time: {
+										created: '1/1/2016',
+										modified: '1/2/2016',
+										[`${justTheVersion}-alpha.6`]: '2016-05-13T16:24:33.949Z',
+										[`${justTheVersion}-test.7`]: '2016-05-16T13:44:12.669Z'
+									}
+								})
 							})
-						}))
+						)
 						.onCall(1)
 						.returns(Promise.resolve({}));
 
-					runGruntTask('release-version-pre-release-tag', dfd.callback(() => {
-						assert.isTrue(shell.calledTwice);
-						assert.equal(shell.firstCall.args[ 0 ], 'npm view . --json');
-						assert.equal(shell.secondCall.args[ 0 ], `npm version ${justTheVersion}-test.8`);
-					})).catch(dfd.rejectOnError((error: any) => {
-						console.log('*** ERRROR *', error);
-						assert(false, 'should have succeeded');
-					}));
+					runGruntTask(
+						'release-version-pre-release-tag',
+						dfd.callback(() => {
+							assert.isTrue(shell.calledTwice);
+							assert.equal(shell.firstCall.args[0], 'npm view . --json');
+							assert.equal(shell.secondCall.args[0], `npm version ${justTheVersion}-test.8`);
+						})
+					).catch(
+						dfd.rejectOnError((error: any) => {
+							console.log('*** ERRROR *', error);
+							assert(false, 'should have succeeded');
+						})
+					);
 				}
 			}
 		};
@@ -409,26 +497,30 @@ registerSuite('tasks/release', {
 					'release-version': '2.0.0-test.1'
 				});
 
-				shell.withArgs('npm --no-git-tag-version version 2.0.0-test.1')
-					.returns(Promise.resolve());
+				shell.withArgs('npm --no-git-tag-version version 2.0.0-test.1').returns(Promise.resolve());
 
-				runGruntTask('release-version-specific', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
-				}));
+				runGruntTask(
+					'release-version-specific',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
+					})
+				);
 			},
-			'regular'() {
+			regular() {
 				const dfd = this.async();
 
 				taskLoader(undefined, {
 					'release-version': '2.0.0-test.1'
 				});
 
-				shell.withArgs('npm version 2.0.0-test.1')
-					.returns(Promise.resolve());
+				shell.withArgs('npm version 2.0.0-test.1').returns(Promise.resolve());
 
-				runGruntTask('release-version-specific', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
-				}));
+				runGruntTask(
+					'release-version-specific',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
+					})
+				);
 			}
 		}
 	},
@@ -456,80 +548,86 @@ registerSuite('tasks/release', {
 
 				taskLoader();
 
-				shell.withArgs('git commit -am "Update package metadata"')
-					.returns(Promise.resolve({}));
+				shell.withArgs('git commit -am "Update package metadata"').returns(Promise.resolve({}));
 
-				runGruntTask('post-release-version', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
+				runGruntTask(
+					'post-release-version',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
 
-					const newPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
+						const newPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
 
-					assert.equal(newPackageJson.version, originalPackageJson.version);
-				}));
+						assert.equal(newPackageJson.version, originalPackageJson.version);
+					})
+				);
 			},
 
 			'without next version'() {
 				const dfd = this.async();
 
-				taskLoader(undefined, {
-					'push-back': true
-				}, {
-					'parse-git-config': {
-						sync: function () {
-							return {
-								'remote "origin"': {
-									url: gitUrl
-								}
-							};
+				taskLoader(
+					undefined,
+					{
+						'push-back': true
+					},
+					{
+						'parse-git-config': {
+							sync: function() {
+								return {
+									'remote "origin"': {
+										url: gitUrl
+									}
+								};
+							}
 						}
 					}
-				});
-
-				shell.withArgs(
-					'git commit -am "Update package metadata"'
-				).returns(
-					Promise.resolve({})
-				).withArgs(
-					`git push ${gitUrl} master`
-				).returns(
-					Promise.resolve()
-				).withArgs(
-					`git push ${gitUrl} --tags`
-				).returns(
-					Promise.resolve()
 				);
 
-				runGruntTask('post-release-version', dfd.callback(() => {
-					assert.isTrue(shell.calledThrice);
-				}));
+				shell
+					.withArgs('git commit -am "Update package metadata"')
+					.returns(Promise.resolve({}))
+					.withArgs(`git push ${gitUrl} master`)
+					.returns(Promise.resolve())
+					.withArgs(`git push ${gitUrl} --tags`)
+					.returns(Promise.resolve());
+
+				runGruntTask(
+					'post-release-version',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledThrice);
+					})
+				);
 			},
 
 			'no remotes'() {
 				const dfd = this.async();
 
-				taskLoader(undefined, {
-					'push-back': true
-				}, {
-					'parse-git-config': {
-						sync: function () {
-							return {
-								'remote "origin"': {
-									url: 'test'
-								}
-							};
+				taskLoader(
+					undefined,
+					{
+						'push-back': true
+					},
+					{
+						'parse-git-config': {
+							sync: function() {
+								return {
+									'remote "origin"': {
+										url: 'test'
+									}
+								};
+							}
 						}
 					}
-				});
-
-				shell.withArgs(
-					'git commit -am "Update package metadata"'
-				).returns(
-					Promise.resolve({})
 				);
 
-				runGruntTask('post-release-version', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
-				}));
+				shell.withArgs('git commit -am "Update package metadata"').returns(Promise.resolve({}));
+
+				runGruntTask(
+					'post-release-version',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
+					})
+				);
 			},
 
 			'next version'() {
@@ -539,20 +637,22 @@ registerSuite('tasks/release', {
 					'next-version': 'test-version'
 				});
 
-				shell.withArgs('git commit -am "Update package metadata"')
-					.returns(Promise.resolve({}));
+				shell.withArgs('git commit -am "Update package metadata"').returns(Promise.resolve({}));
 
-				runGruntTask('post-release-version', dfd.callback(() => {
-					assert.isTrue(shell.calledOnce);
+				runGruntTask(
+					'post-release-version',
+					dfd.callback(() => {
+						assert.isTrue(shell.calledOnce);
 
-					const newPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
+						const newPackageJson = grunt.file.readJSON(path.join(process.cwd(), 'package.json'));
 
-					assert.equal(newPackageJson.version, 'test-version');
-				}));
+						assert.equal(newPackageJson.version, 'test-version');
+					})
+				);
 			}
 		}
 	},
-	'release-publish-flat': (function () {
+	'release-publish-flat': (function() {
 		let runStub: SinonStub;
 
 		return {
@@ -581,11 +681,16 @@ registerSuite('tasks/release', {
 			},
 
 			tests: {
-				'run'() {
+				run() {
 					runGruntTask('release-publish-flat');
 
 					assert.isTrue(runStub.calledOnce);
-					assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [ 'customise-dist-output', 'copy:temp', 'release-publish', 'clean:temp' ]);
+					assert.deepEqual((<any>runStub).getCalls()[0].args[0], [
+						'customise-dist-output',
+						'copy:temp',
+						'release-publish',
+						'clean:temp'
+					]);
 
 					const newPackageJson = grunt.file.readJSON(path.join('temp', 'package.json'));
 
@@ -609,7 +714,7 @@ registerSuite('tasks/release', {
 			}
 		};
 	})(),
-	release: (function () {
+	release: (function() {
 		let failStub: SinonStub;
 		let runStub: SinonStub;
 
@@ -668,7 +773,7 @@ registerSuite('tasks/release', {
 					runGruntTask('release');
 
 					assert.isTrue(runStub.calledOnce);
-					assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [
+					assert.deepEqual((<any>runStub).getCalls()[0].args[0], [
 						'can-publish-check',
 						'repo-is-clean-check',
 						'dist',
@@ -688,7 +793,7 @@ registerSuite('tasks/release', {
 					runGruntTask('release');
 
 					assert.isTrue(runStub.calledOnce);
-					assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [
+					assert.deepEqual((<any>runStub).getCalls()[0].args[0], [
 						'dist',
 						'release-version-pre-release-tag',
 						'release-publish-flat',
@@ -705,7 +810,7 @@ registerSuite('tasks/release', {
 					runGruntTask('release');
 
 					assert.isTrue(runStub.calledOnce);
-					assert.deepEqual((<any> runStub).getCalls()[ 0 ].args[ 0 ], [
+					assert.deepEqual((<any>runStub).getCalls()[0].args[0], [
 						'can-publish-check',
 						'repo-is-clean-check',
 						'dist',

@@ -13,12 +13,11 @@ function assertDefaultOptions(options: any) {
 	assert.strictEqual(options.stdio, 'inherit');
 }
 registerSuite('tasks/util/process', {
-
 	before() {
 		const mocks = {
-			'child_process': {
-				'execSync': execStub,
-				'spawnSync': spawnStub
+			child_process: {
+				execSync: execStub,
+				spawnSync: spawnStub
 			}
 		};
 
@@ -46,7 +45,7 @@ registerSuite('tasks/util/process', {
 
 		spawn() {
 			const command = 'ls';
-			const args = [ '-al' ];
+			const args = ['-al'];
 			process.spawn(command, args);
 			assert.isTrue(spawnStub.calledOnce);
 			assert.strictEqual(spawnStub.lastCall.args[0], command);
@@ -56,7 +55,7 @@ registerSuite('tasks/util/process', {
 		},
 
 		options: {
-			'default'() {
+			default() {
 				const command = 'cmd';
 				process.exec(command);
 				assert.strictEqual(execStub.lastCall.args[0], command);

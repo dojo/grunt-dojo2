@@ -17,7 +17,7 @@ registerSuite('tasks/installPeerDependencies', {
 		unloadTasks();
 	},
 	tests: {
-		'npm': {
+		npm: {
 			beforeEach() {
 				grunt.initConfig({});
 				mockErrorLogger = stub(grunt.log, 'error');
@@ -25,20 +25,25 @@ registerSuite('tasks/installPeerDependencies', {
 				mockShell = stub();
 
 				mockShell
-				.withArgs('npm install my-dep@"1.0" --no-save').returns(Promise.resolve({}))
-				.withArgs('npm install my-dep@"1.0" error-dep@"1.0" --no-save').throws();
+					.withArgs('npm install my-dep@"1.0" --no-save')
+					.returns(Promise.resolve({}))
+					.withArgs('npm install my-dep@"1.0" error-dep@"1.0" --no-save')
+					.throws();
 			},
 			tests: {
 				'sucessfully install peer dependencies'() {
-					loadTasks({
-						child_process: {
-							execSync: mockShell
+					loadTasks(
+						{
+							child_process: {
+								execSync: mockShell
+							}
+						},
+						{
+							peerDependencies: {
+								'my-dep': '1.0'
+							}
 						}
-					}, {
-						peerDependencies: {
-							'my-dep': '1.0'
-						}
-					});
+					);
 					runGruntTask('peerDepInstall');
 
 					assert.isTrue(mockShell.calledOnce);
@@ -47,16 +52,19 @@ registerSuite('tasks/installPeerDependencies', {
 					assert.isTrue(mockErrorLogger.notCalled);
 				},
 				'fail to install peer dependencies'() {
-					loadTasks({
-						child_process: {
-							execSync: mockShell
+					loadTasks(
+						{
+							child_process: {
+								execSync: mockShell
+							}
+						},
+						{
+							peerDependencies: {
+								'my-dep': '1.0',
+								'error-dep': '1.0'
+							}
 						}
-					}, {
-						peerDependencies: {
-							'my-dep': '1.0',
-							'error-dep': '1.0'
-						}
-					});
+					);
 					runGruntTask('peerDepInstall');
 
 					assert.isTrue(mockShell.calledOnce);
@@ -65,14 +73,16 @@ registerSuite('tasks/installPeerDependencies', {
 					assert.isTrue(mockErrorLogger.calledWith('failed.'));
 				},
 				'no peer deps found'() {
-					loadTasks({
-						child_process: {
-							execSync: mockShell
+					loadTasks(
+						{
+							child_process: {
+								execSync: mockShell
+							}
+						},
+						{
+							peerDependencies: {}
 						}
-					}, {
-						peerDependencies: {
-						}
-					});
+					);
 					runGruntTask('peerDepInstall');
 
 					assert.isTrue(mockShell.notCalled);

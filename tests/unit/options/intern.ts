@@ -17,22 +17,17 @@ registerSuite('options/intern', {
 		delete require.cache[require.resolve('../../../options/intern')];
 	},
 	tests: {
-		'defaults'() {
+		defaults() {
 			const config = require('../../../options/intern')({
 				...grunt,
-				loadNpmTasks() {
-				}
+				loadNpmTasks() {}
 			});
 			assert.deepEqual(config, {
 				options: {
 					config: '<%= internConfig %>',
 					node: {
-						'plugins+': [
-							{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }
-						],
-						reporters: [
-							{ name: 'runner', options: { 'hideSkipped': true, 'hidePassed': true } }
-						]
+						'plugins+': [{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }],
+						reporters: [{ name: 'runner', options: { hideSkipped: true, hidePassed: true } }]
 					}
 				},
 				browserstack: {
@@ -64,11 +59,10 @@ registerSuite('options/intern', {
 				}
 			});
 		},
-		'progress'() {
+		progress() {
 			const config = require('../../../options/intern')({
 				...grunt,
-				loadNpmTasks() {
-				},
+				loadNpmTasks() {},
 				option(name: string) {
 					if (name === 'progress') {
 						return true;
@@ -79,12 +73,8 @@ registerSuite('options/intern', {
 				options: {
 					config: '<%= internConfig %>',
 					node: {
-						'plugins+': [
-							{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }
-						],
-						reporters: [
-							{ name: 'runner', options: { 'hideSkipped': false, 'hidePassed': false } }
-						]
+						'plugins+': [{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }],
+						reporters: [{ name: 'runner', options: { hideSkipped: false, hidePassed: false } }]
 					}
 				},
 				browserstack: {

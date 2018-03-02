@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-export = function (grunt: IGrunt) {
+export = function(grunt: IGrunt) {
 	grunt.loadNpmTasks('intern');
 
 	const progress = grunt.option<boolean>('progress');
@@ -9,12 +9,8 @@ export = function (grunt: IGrunt) {
 		options: {
 			config: '<%= internConfig %>',
 			node: {
-				'plugins+': [
-					{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }
-				],
-				reporters: [
-					{ name: 'runner', options: { 'hideSkipped': !progress, 'hidePassed': !progress } }
-				]
+				'plugins+': [{ script: 'grunt-dojo2/lib/intern/Reporter.js', useLoader: true }],
+				reporters: [{ name: 'runner', options: { hideSkipped: !progress, hidePassed: !progress } }]
 			}
 		},
 		browserstack: {

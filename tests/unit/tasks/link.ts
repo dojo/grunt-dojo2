@@ -6,7 +6,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SinonStub, stub } from 'sinon';
 import {
-	getOutputDirectory, loadTasks, unloadTasks, runGruntTask, prepareOutputDirectory,
+	getOutputDirectory,
+	loadTasks,
+	unloadTasks,
+	runGruntTask,
+	prepareOutputDirectory,
 	cleanOutputDirectory
 } from '../util';
 
@@ -25,16 +29,15 @@ registerSuite('tasks/link', {
 
 		symlink = stub(fs, 'symlink');
 
-		shell.withArgs(
-			'npm link',
-			{
+		shell
+			.withArgs('npm link', {
 				cwd: outputPath
-			}
-		).returns(
-			Promise.resolve({
-				stdout: ''
 			})
-		);
+			.returns(
+				Promise.resolve({
+					stdout: ''
+				})
+			);
 
 		loadTasks({
 			fs: fs,
@@ -58,8 +61,20 @@ registerSuite('tasks/link', {
 			runGruntTask('_link');
 
 			assert.isTrue(symlink.calledTwice);
-			assert.isTrue(symlink.firstCall.calledWith(path.join(cwd, 'node_modules'), path.join(outputPath, 'node_modules'), 'junction'));
-			assert.isTrue(symlink.secondCall.calledWith(path.join(cwd, 'package.json'), path.join(outputPath, 'package.json'), 'file'));
+			assert.isTrue(
+				symlink.firstCall.calledWith(
+					path.join(cwd, 'node_modules'),
+					path.join(outputPath, 'node_modules'),
+					'junction'
+				)
+			);
+			assert.isTrue(
+				symlink.secondCall.calledWith(
+					path.join(cwd, 'package.json'),
+					path.join(outputPath, 'package.json'),
+					'file'
+				)
+			);
 			assert.isTrue(shell.calledOnce);
 			assert.isTrue(shell.calledWith('npm link', { cwd: outputPath }));
 		},
@@ -81,7 +96,7 @@ registerSuite('tasks/link', {
 					cleanOutputDirectory();
 
 					assert.isTrue(run.calledOnce);
-					assert.deepEqual(run.firstCall.args[ 0 ], [ '_link' ]);
+					assert.deepEqual(run.firstCall.args[0], ['_link']);
 				},
 
 				withoutDir() {
@@ -90,7 +105,7 @@ registerSuite('tasks/link', {
 					runGruntTask('link');
 
 					assert.isTrue(run.calledOnce);
-					assert.deepEqual(run.firstCall.args[ 0 ], [ 'dist', '_link' ]);
+					assert.deepEqual(run.firstCall.args[0], ['dist', '_link']);
 				}
 			}
 		}

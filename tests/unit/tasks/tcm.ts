@@ -17,14 +17,16 @@ registerSuite('tasks/tcm', {
 		unloadTasks();
 	},
 	tests: {
-		'npm': {
+		npm: {
 			beforeEach() {
 				grunt.initConfig({});
-				mockGlob = stub().callsArgWith(1, null,  [ 'one', 'two', 'three' ]);
+				mockGlob = stub().callsArgWith(1, null, ['one', 'two', 'three']);
 				mockWriteFile = stub().returns(Promise.resolve());
-				mockCreate = stub().returns(Promise.resolve({
-					writeFile: mockWriteFile
-				}));
+				mockCreate = stub().returns(
+					Promise.resolve({
+						writeFile: mockWriteFile
+					})
+				);
 				mockCreator = stub().returns({
 					create: mockCreate
 				});
@@ -36,27 +38,32 @@ registerSuite('tasks/tcm', {
 						glob: mockGlob,
 						'typed-css-modules': mockCreator
 					});
-					runGruntTask('tcm', deferred.callback(() => {
-						assert.isTrue(mockGlob.calledOnce);
-						assert.equal(
-							mockGlob.firstCall.args[0],
-							'src/**/*.m.css',
-							'Should have searched for all .m.css files in src directory'
-						);
-						assert.isTrue(mockCreator.calledOnce);
-						assert.deepEqual(mockCreator.firstCall.args,  [ {
-							rootDir: process.cwd(),
-							searchDir: 'src'
-						} ]);
+					runGruntTask(
+						'tcm',
+						deferred.callback(() => {
+							assert.isTrue(mockGlob.calledOnce);
+							assert.equal(
+								mockGlob.firstCall.args[0],
+								'src/**/*.m.css',
+								'Should have searched for all .m.css files in src directory'
+							);
+							assert.isTrue(mockCreator.calledOnce);
+							assert.deepEqual(mockCreator.firstCall.args, [
+								{
+									rootDir: process.cwd(),
+									searchDir: 'src'
+								}
+							]);
 
-						assert.equal(mockCreate.callCount, 3, 'Should have called create for each file');
-						assert.deepEqual(
-							mockCreate.args,
-							[ [ 'one' ], [ 'two' ], [ 'three' ] ],
-							'Should have called create for each file'
-						);
-						assert.equal(mockWriteFile.callCount, 3, 'Should have called writeFile for each file');
-					}));
+							assert.equal(mockCreate.callCount, 3, 'Should have called create for each file');
+							assert.deepEqual(
+								mockCreate.args,
+								[['one'], ['two'], ['three']],
+								'Should have called create for each file'
+							);
+							assert.equal(mockWriteFile.callCount, 3, 'Should have called writeFile for each file');
+						})
+					);
 				},
 
 				'should fail if there is an error'() {
@@ -66,23 +73,31 @@ registerSuite('tasks/tcm', {
 						glob: mockGlob,
 						'typed-css-modules': mockCreator
 					});
-					runGruntTask('tcm', deferred.callback((error: any) => {
-						assert.isTrue(mockGlob.calledOnce);
-						assert.equal(
-							mockGlob.firstCall.args[0],
-							'src/**/*.m.css',
-							'Should have searched for all .m.css files in src directory'
-						);
-						assert.isTrue(mockCreator.calledOnce);
-						assert.deepEqual(mockCreator.firstCall.args,  [ {
-							rootDir: process.cwd(),
-							searchDir: 'src'
-						} ]);
+					runGruntTask(
+						'tcm',
+						deferred.callback((error: any) => {
+							assert.isTrue(mockGlob.calledOnce);
+							assert.equal(
+								mockGlob.firstCall.args[0],
+								'src/**/*.m.css',
+								'Should have searched for all .m.css files in src directory'
+							);
+							assert.isTrue(mockCreator.calledOnce);
+							assert.deepEqual(mockCreator.firstCall.args, [
+								{
+									rootDir: process.cwd(),
+									searchDir: 'src'
+								}
+							]);
 
-						assert.isFalse(mockCreate.called, 'Should not have called create when there was an error');
-						assert.isFalse(mockWriteFile.called, 'Should not have called write file when there was an error');
-						assert.equal(error, 'error', 'Should have passed returned error to callback');
-					}));
+							assert.isFalse(mockCreate.called, 'Should not have called create when there was an error');
+							assert.isFalse(
+								mockWriteFile.called,
+								'Should not have called write file when there was an error'
+							);
+							assert.equal(error, 'error', 'Should have passed returned error to callback');
+						})
+					);
 				}
 			}
 		}

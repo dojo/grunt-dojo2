@@ -22,7 +22,7 @@ const consoleLogger = {
 };
 
 export function setGlobalConfig(key: string, value: string) {
-	return exec(`git config --global ${ key } ${ value }`, { silent: true });
+	return exec(`git config --global ${key} ${value}`, { silent: true });
 }
 
 export default class Publisher {
@@ -60,10 +60,9 @@ export default class Publisher {
 		options.log && (this.log = options.log);
 		if (options.url) {
 			this.url = options.url;
-		}
-		else {
+		} else {
 			const repo = process.env.TRAVIS_REPO_SLUG || ''; // TODO look up the repo information?
-			this.url = `git@github.com:${ repo }.git`;
+			this.url = `git@github.com:${repo}.git`;
 		}
 	}
 
@@ -102,15 +101,14 @@ export default class Publisher {
 			setGlobalConfig('user.email', 'support@sitepen.com');
 		}
 
-		this.log.writeln(`Cloning ${ this.url }`);
-		this.execSSHAgent('git', [ 'clone', this.url, this.cloneDirectory ], { silent: true });
+		this.log.writeln(`Cloning ${this.url}`);
+		this.execSSHAgent('git', ['clone', this.url, this.cloneDirectory], { silent: true });
 
 		try {
-			exec(`git checkout ${ publishBranch }`, { silent: true, cwd: this.cloneDirectory });
-		}
-		catch (error) {
+			exec(`git checkout ${publishBranch}`, { silent: true, cwd: this.cloneDirectory });
+		} catch (error) {
 			// publish branch didn't exist, so create it
-			exec(`git checkout --orphan ${ publishBranch }`, { silent: true, cwd: this.cloneDirectory });
+			exec(`git checkout --orphan ${publishBranch}`, { silent: true, cwd: this.cloneDirectory });
 			exec('git rm -rf .', { silent: true, cwd: this.cloneDirectory });
 			this.log.writeln(`Created ${publishBranch} branch`);
 		}
@@ -122,7 +120,7 @@ export default class Publisher {
 	 */
 	publish() {
 		this.log.writeln(`Publishing ${this.branch} to origin`);
-		this.execSSHAgent('git', [ 'push', 'origin', this.branch ], { silent: true, cwd: this.cloneDirectory });
+		this.execSSHAgent('git', ['push', 'origin', this.branch], { silent: true, cwd: this.cloneDirectory });
 		this.log.writeln(`Pushed ${this.branch} to origin`);
 	}
 
@@ -133,13 +131,12 @@ export default class Publisher {
 	 */
 	private execSSHAgent(command: string, args: string[], options: any): string {
 		if (this.hasDeployCredentials()) {
-			const deployKey: string = <string> this.deployKey;
+			const deployKey: string = <string>this.deployKey;
 			const relativeDeployKey = options.cwd ? relative(options.cwd, deployKey) : deployKey;
 			chmodSync(deployKey, '600');
-			return exec(`ssh-agent bash -c 'ssh-add ${ relativeDeployKey }; ${ command } ${ args.join(' ') }'`, options);
-		}
-		else {
-			this.log.writeln(`Deploy Key "${ this.deployKey }" is not present. Using environment credentials.`);
+			return exec(`ssh-agent bash -c 'ssh-add ${relativeDeployKey}; ${command} ${args.join(' ')}'`, options);
+		} else {
+			this.log.writeln(`Deploy Key "${this.deployKey}" is not present. Using environment credentials.`);
 			const response = spawn(command, args, options);
 
 			if (response.stderr) {
@@ -151,9 +148,8 @@ export default class Publisher {
 
 	private hasConifg(key: string): boolean {
 		try {
-			return !!exec(`git config ${ key }`, { silent: true });
-		}
-		catch (e) { }
+			return !!exec(`git config ${key}`, { silent: true });
+		} catch (e) {}
 
 		return false;
 	}

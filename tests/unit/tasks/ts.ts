@@ -10,7 +10,7 @@ import {
 	loadTasks,
 	prepareOutputDirectory,
 	runGruntTask,
-	unloadTasks,
+	unloadTasks
 } from '../util';
 
 const outputPath = getOutputDirectory();
@@ -45,14 +45,14 @@ registerSuite('tasks/ts', {
 		grunt.initConfig({
 			distDirectory: outputPath,
 			tsconfig: {
-				'compilerOptions': {
-					'inlineSourceMap': true,
-					'inlineSources': true,
-					'listFiles': true,
-					'module': 'commonjs',
-					'noImplicitAny': true,
-					'pretty': true,
-					'target': 'es6'
+				compilerOptions: {
+					inlineSourceMap: true,
+					inlineSources: true,
+					listFiles: true,
+					module: 'commonjs',
+					noImplicitAny: true,
+					pretty: true,
+					target: 'es6'
 				}
 			},
 			ts: {
@@ -92,11 +92,10 @@ registerSuite('tasks/ts', {
 			});
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:dev' ]);
+			assert.deepEqual(run.firstCall.args[0], ['ts:dev']);
 		},
 
 		dev() {
-
 			runGruntTask('dojo-ts:dev');
 
 			assert.deepEqual(grunt.config('ts.dev'), {
@@ -107,14 +106,14 @@ registerSuite('tasks/ts', {
 			});
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:dev' ]);
+			assert.deepEqual(run.firstCall.args[0], ['ts:dev']);
 		},
 
 		dist() {
 			runGruntTask('dojo-ts:dist');
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'dojo-ts:umd', 'merge-dist' ]);
+			assert.deepEqual(run.firstCall.args[0], ['dojo-ts:umd', 'merge-dist']);
 
 			expand.onFirstCall().returns(['dist/umd/file1.js']);
 			expand.onSecondCall().returns(['dist/esm/file1.mjs']);
@@ -129,14 +128,14 @@ registerSuite('tasks/ts', {
 			grunt.initConfig({
 				distDirectory: outputPath,
 				tsconfig: {
-					'compilerOptions': {
-						'inlineSourceMap': true,
-						'inlineSources': true,
-						'listFiles': true,
-						'module': 'commonjs',
-						'noImplicitAny': true,
-						'pretty': true,
-						'target': 'es6'
+					compilerOptions: {
+						inlineSourceMap: true,
+						inlineSources: true,
+						listFiles: true,
+						module: 'commonjs',
+						noImplicitAny: true,
+						pretty: true,
+						target: 'es6'
 					}
 				}
 			});
@@ -175,8 +174,11 @@ registerSuite('tasks/ts', {
 			assert.isTrue(rename.calledWith('file.js.map', 'file.mjs.map'));
 			assert.isTrue(write.calledWith('file.mjs.map'));
 
-			assert.deepEqual(write.args[1][1], `some file
-//# sourceMappingURL=RouterInjector.mjs.map`);
+			assert.deepEqual(
+				write.args[1][1],
+				`some file
+//# sourceMappingURL=RouterInjector.mjs.map`
+			);
 
 			assert.deepEqual(JSON.parse(write.args[2][1]), {
 				file: 'file.mjs',
@@ -195,7 +197,7 @@ registerSuite('tasks/ts', {
 			});
 
 			assert.isTrue(run.calledOnce);
-			assert.deepEqual(run.firstCall.args[ 0 ], [ 'ts:custom', 'clean:customTsconfig' ]);
+			assert.deepEqual(run.firstCall.args[0], ['ts:custom', 'clean:customTsconfig']);
 
 			assert.isTrue(write.calledOnce);
 			assert.isTrue(write.calledWith('.tsconfigcustom.json'));

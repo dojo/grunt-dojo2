@@ -54,7 +54,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return packageJson;
 	}
 
-	function getGitRemote(): string|boolean {
+	function getGitRemote(): string | boolean {
 		const gitConfig = parse.sync();
 		const remotes = Object.keys(gitConfig)
 			.filter((key) => key.indexOf('remote') === 0)
@@ -90,7 +90,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.resolve({});
 	}
 
-	grunt.registerTask('can-publish-check', 'check whether author can publish', function (this: ITask) {
+	grunt.registerTask('can-publish-check', 'check whether author can publish', function(this: ITask) {
 		const done = this.async();
 		const whoamiPromise = command(npmBin, ['whoami'], {}, true).then(
 			(result: any) => result.stdout,
@@ -101,21 +101,23 @@ export = function(grunt: IGrunt, packageJson: any) {
 			maintainersPromise = Promise.resolve(defaultMaintainers);
 		} else {
 			maintainersPromise = command(npmBin, ['view', '.', '--json'], {}, true)
-				.then((result: any) => <string[]> JSON.parse(result.stdout).maintainers)
+				.then((result: any) => <string[]>JSON.parse(result.stdout).maintainers)
 				.then((maintainers: string[]) => maintainers.map((maintainer) => maintainer.replace(/\s<.*/, '')));
 		}
 
-		return Promise.all([whoamiPromise, maintainersPromise]).then((results) => {
-			const user = results[0];
-			const maintainers = results[1];
-			const isMaintainer = maintainers.indexOf(user) > -1;
-			if (!isMaintainer) {
-				grunt.fail.fatal(`cannot publish this package with user ${user}`);
-			}
-		}).then(done);
+		return Promise.all([whoamiPromise, maintainersPromise])
+			.then((results) => {
+				const user = results[0];
+				const maintainers = results[1];
+				const isMaintainer = maintainers.indexOf(user) > -1;
+				if (!isMaintainer) {
+					grunt.fail.fatal(`cannot publish this package with user ${user}`);
+				}
+			})
+			.then(done);
 	});
 
-	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function (this: ITask) {
+	grunt.registerTask('repo-is-clean-check', 'check whether the repo is clean', function(this: ITask) {
 		const done = this.async();
 		return command(gitBin, ['status', '--porcelain'], {}, true)
 			.then((result: any) => {
@@ -132,7 +134,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
-	grunt.registerTask('release-publish', 'publish the package to npm', function (this: ITask) {
+	grunt.registerTask('release-publish', 'publish the package to npm', function(this: ITask) {
 		const done = this.async();
 		const args = ['publish', '.'];
 		if (tag) {
@@ -146,7 +148,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return Promise.all(promises).then(done);
 	});
 
-	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function (this: ITask) {
+	grunt.registerTask('release-version-pre-release-tag', 'auto version based on pre release tag', function(
+		this: ITask
+	) {
 		const done = this.async();
 		const versionInPackage = initialPackageJson.version.replace(/-.*/g, '');
 		if (initial) {
@@ -166,7 +170,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		}
 	});
 
-	grunt.registerTask('release-version-specific', 'set the version manually', function (this: ITask) {
+	grunt.registerTask('release-version-specific', 'set the version manually', function(this: ITask) {
 		const done = this.async();
 		const args = ['version', releaseVersion];
 		if (dryRun) {
@@ -176,7 +180,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 		return command(npmBin, args, {}, true).then(done);
 	});
 
-	grunt.registerTask('post-release-version', 'update the version post release', function (this: ITask) {
+	grunt.registerTask('post-release-version', 'update the version post release', function(this: ITask) {
 		const done = this.async();
 		const packageJson = Object.assign({}, initialPackageJson);
 		if (nextVersion) {
@@ -191,8 +195,9 @@ export = function(grunt: IGrunt, packageJson: any) {
 				}
 				const remote = getGitRemote();
 				if (remote) {
-					return command(gitBin, ['push', <string> remote, defaultBranch], {}, false)
-						.then(() => command(gitBin, ['push', <string> remote, '--tags'], {}, false));
+					return command(gitBin, ['push', <string>remote, defaultBranch], {}, false).then(() =>
+						command(gitBin, ['push', <string>remote, '--tags'], {}, false)
+					);
 				} else {
 					grunt.log.subhead('could not find remote to push back to. please push with tags back to remote');
 				}
@@ -201,7 +206,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 			.then(done);
 	});
 
-	grunt.registerTask('release-publish-flat', 'publish the flat package', function () {
+	grunt.registerTask('release-publish-flat', 'publish the flat package', function() {
 		grunt.log.subhead('making flat package...');
 		const pkg = grunt.file.readJSON(path.join(packagePath, 'package.json'));
 		const dist = grunt.config('copy.staticDefinitionFiles-dist.dest');
@@ -209,7 +214,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 		grunt.config.merge({
 			copy: { temp: { expand: true, cwd: dist, src: '**', dest: temp } },
-			clean: { temp: [ temp ] }
+			clean: { temp: [temp] }
 		});
 
 		grunt.file.write(path.join(temp, 'package.json'), JSON.stringify(preparePackageJson(pkg), null, '  ') + '\n');
@@ -224,7 +229,7 @@ export = function(grunt: IGrunt, packageJson: any) {
 
 	grunt.registerTask('customise-dist-output', () => {});
 
-	grunt.registerTask('release', 'release', function () {
+	grunt.registerTask('release', 'release', function() {
 		grunt.option('remove-links', true);
 		const tasks = ['dist'];
 

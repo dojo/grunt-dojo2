@@ -12,47 +12,54 @@ import { existsSync } from 'fs';
  */
 function typedocOptions(options: any) {
 	const args: string[] = [];
-	Object.keys(options).filter(key => {
-		return key !== 'publishOptions';
-	}).forEach(key => {
-		if (options[key]) {
-			args.push(`--${key}`);
+	Object.keys(options)
+		.filter((key) => {
+			return key !== 'publishOptions';
+		})
+		.forEach((key) => {
+			if (options[key]) {
+				args.push(`--${key}`);
 
-			if (typeof options[key] !== 'boolean') {
-				args.push(`"${options[key]}"`);
+				if (typeof options[key] !== 'boolean') {
+					args.push(`"${options[key]}"`);
+				}
 			}
-		}
-	});
+		});
 	return args;
 }
 
-export = function (grunt: IGrunt) {
-	grunt.registerTask('typedoc', function (this: ITask) {
+export = function(grunt: IGrunt) {
+	grunt.registerTask('typedoc', function(this: ITask) {
 		// Throw when any shelljs command fails
 		config.fatal = true;
 
 		const options: any = this.options({});
-		const publishOptions = Object.assign({
-			log: grunt.log,
-			subDirectory: ''
-		}, options.publishOptions || {});
+		const publishOptions = Object.assign(
+			{
+				log: grunt.log,
+				subDirectory: ''
+			},
+			options.publishOptions || {}
+		);
 		options.out = grunt.option<string>('doc-dir') || options.out || grunt.config.get<string>('apiDocDirectory');
 
 		// Use project-local typedoc
 		const typedoc = require.resolve('typedoc/bin/typedoc');
-		grunt.log.writeln(`Building API Docs to "${ options.out }"`);
-		exec(`node "${ typedoc }" ${ typedocOptions(options).join(' ') }`);
+		grunt.log.writeln(`Building API Docs to "${options.out}"`);
+		exec(`node "${typedoc}" ${typedocOptions(options).join(' ')}`);
 
 		// Publish
-		const publishMode = (typeof publishOptions.publishMode === 'function') ? publishOptions.publishMode() :
-			publishOptions.publishMode;
+		const publishMode =
+			typeof publishOptions.publishMode === 'function'
+				? publishOptions.publishMode()
+				: publishOptions.publishMode;
 		if (publishMode) {
 			const cloneDir = grunt.config.get<string>('apiPubDirectory');
 			const publisher = new Publisher(cloneDir, publishOptions);
 			publisher.init();
 
 			const apiDocTarget = join(cloneDir, publishOptions.subDirectory);
-			grunt.log.writeln(`copying ${ options.out } to ${ apiDocTarget }`);
+			grunt.log.writeln(`copying ${options.out} to ${apiDocTarget}`);
 			rm('-rf', apiDocTarget);
 			cp('-r', options.out, apiDocTarget);
 
@@ -66,8 +73,7 @@ export = function (grunt: IGrunt) {
 			if (publisher.commit()) {
 				if (publishMode === 'publish') {
 					publisher.publish();
-				}
-				else {
+				} else {
 					grunt.log.writeln('Only committing -- skipping push to repo');
 				}
 			}

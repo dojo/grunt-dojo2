@@ -5,8 +5,7 @@ import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
 
 let fakeRepl: any = {};
-const fakeDojoRequire = function () {
-};
+const fakeDojoRequire = function() {};
 
 registerSuite('tasks/repl', {
 	before() {
@@ -53,17 +52,20 @@ registerSuite('tasks/repl', {
 
 			runGruntTask('repl');
 
-			setTimeout(dfd.callback(() => {
-				assert.isNotNull(fakeRepl.require);
-				assert.isNotNull(fakeRepl.nodeRequire);
+			setTimeout(
+				dfd.callback(() => {
+					assert.isNotNull(fakeRepl.require);
+					assert.isNotNull(fakeRepl.nodeRequire);
 
-				assert.equal(fakeRepl.require, fakeDojoRequire);
-				assert.notEqual(fakeRepl.nodeRequire, fakeDojoRequire);
+					assert.equal(fakeRepl.require, fakeDojoRequire);
+					assert.notEqual(fakeRepl.nodeRequire, fakeDojoRequire);
 
-				let testPackage = fakeRepl.nodeRequire('test-package');
-				assert.deepEqual(testPackage, { hello: 'world' });
-				assert.equal(fakeRepl.nodeRequire.resolve('test-package'), './base-url/test-package');
-			}), 10);
+					let testPackage = fakeRepl.nodeRequire('test-package');
+					assert.deepEqual(testPackage, { hello: 'world' });
+					assert.equal(fakeRepl.nodeRequire.resolve('test-package'), './base-url/test-package');
+				}),
+				10
+			);
 		}
 	}
 });

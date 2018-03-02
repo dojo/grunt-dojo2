@@ -18,13 +18,13 @@ registerSuite('tasks/uploadCoverage', {
 			'codecov.io/lib/sendToCodeCov.io': sendCodeCov
 		});
 
-		read = stub(grunt.file, 'read').withArgs(
-			coverageFileName
-		).returns(
-			JSON.stringify({
-				hello: 'world'
-			})
-		);
+		read = stub(grunt.file, 'read')
+			.withArgs(coverageFileName)
+			.returns(
+				JSON.stringify({
+					hello: 'world'
+				})
+			);
 	},
 	after() {
 		unloadTasks();
@@ -33,10 +33,13 @@ registerSuite('tasks/uploadCoverage', {
 		propagatesReturnValue() {
 			const dfd = this.async();
 
-			runGruntTask('uploadCoverage', dfd.callback(() => {
-				assert.isTrue(sendCodeCov.calledOnce);
-				assert.deepEqual(JSON.parse(sendCodeCov.firstCall.args[ 0 ]), { hello: 'world' });
-			}));
+			runGruntTask(
+				'uploadCoverage',
+				dfd.callback(() => {
+					assert.isTrue(sendCodeCov.calledOnce);
+					assert.deepEqual(JSON.parse(sendCodeCov.firstCall.args[0]), { hello: 'world' });
+				})
+			);
 		}
 	}
 });

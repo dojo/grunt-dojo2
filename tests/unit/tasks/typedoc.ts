@@ -43,7 +43,6 @@ function escape(str: string): string {
 }
 
 registerSuite('tasks/typedoc', {
-
 	before() {
 		execSync = spy((command: string) => {
 			if (/git checkout/.test(command) && failInitialCheckout) {
@@ -56,23 +55,23 @@ registerSuite('tasks/typedoc', {
 			publish: stub(),
 			commit: stub()
 		};
-		publisherConstructor = spy(function () {
+		publisherConstructor = spy(function() {
 			return publisher;
 		});
 
 		loadTasks({
-			'shelljs': {
+			shelljs: {
 				config: {},
 				cp,
 				rm,
 				touch
 			},
 			'./util/process': {
-				'exec': execSync,
-				'spawn': spawnStub
+				exec: execSync,
+				spawn: spawnStub
 			},
 			'./util/Publisher': {
-				'default': publisherConstructor
+				default: publisherConstructor
 			}
 		});
 
@@ -80,7 +79,7 @@ registerSuite('tasks/typedoc', {
 		run = stub(grunt.task, 'run');
 		write = spy(grunt.file, 'write');
 		expandMapping = stub(grunt.file, 'expandMapping', (patterns: string[], base: string) => {
-			return [ 'foo' ];
+			return ['foo'];
 		});
 		readJSON = stub(grunt.file, 'readJSON', (filename: string) => {
 			return {};
@@ -153,8 +152,9 @@ registerSuite('tasks/typedoc', {
 			const command = execSync.args[0][0];
 			const matcher = new RegExp(
 				`node "[^"]+${escape(sep)}typedoc" --mode "modules" --excludeExternals --excludeNotExported ` +
-				`--tsconfig "${escape(join(outputPath, 'tsconfig.json'))}" ` +
-				`--logger "none" --out "${escape(apiDocDirectory)}"`);
+					`--tsconfig "${escape(join(outputPath, 'tsconfig.json'))}" ` +
+					`--logger "none" --out "${escape(apiDocDirectory)}"`
+			);
 			assert.match(command, matcher, 'Unexpected typedoc command line');
 			assert.strictEqual(write.callCount, 0, 'Nothing should have been written');
 			assert.strictEqual(execSync.callCount, 1, 'Unexpected number of exec calls');
