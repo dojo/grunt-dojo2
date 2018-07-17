@@ -16,7 +16,6 @@ import {
 const outputPath = getOutputDirectory();
 let mocks: SinonSandbox;
 let run: SinonStub;
-let loadNpmTasks: SinonStub;
 let write: SinonStub;
 let expand: SinonStub;
 let rename: SinonStub;
@@ -67,7 +66,7 @@ registerSuite('tasks/ts', {
 		mocks = sandbox.create();
 
 		run = mocks.stub(grunt.task, 'run');
-		loadNpmTasks = mocks.stub(grunt, 'loadNpmTasks');
+		mocks.stub(grunt, 'loadNpmTasks');
 		write = mocks.stub(grunt.file, 'write');
 		expand = mocks.stub(grunt.file, 'expand');
 		rename = mocks.stub(fs, 'renameSync');

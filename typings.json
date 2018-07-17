@@ -1,7 +1,0 @@
-{
-	"name": "grunt-dojo2",
-	"main": "index.d.ts",
-	"globalDependencies": {
-		"nashorn": "github:dojo/typings/custom/nashorn/nashorn.d.ts#19d40cae45320285bea5aad1a40dedaf22eea648"
-	}
-}

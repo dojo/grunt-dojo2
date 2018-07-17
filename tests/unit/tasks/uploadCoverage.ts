@@ -5,41 +5,31 @@ import * as grunt from 'grunt';
 import { loadTasks, unloadTasks, runGruntTask } from '../util';
 import { SinonStub, stub } from 'sinon';
 
-const coverageFileName = 'coverage-final.lcov';
-
-let sendCodeCov: SinonStub = stub().callsArgWith(1, 'error');
-let read: SinonStub;
+let execStub: SinonStub;
 
 registerSuite('tasks/uploadCoverage', {
 	before() {
+		execStub = stub();
 		grunt.initConfig({});
 
 		loadTasks({
-			'codecov.io/lib/sendToCodeCov.io': sendCodeCov
+			'./util/process': {
+				exec: execStub
+			}
 		});
-
-		read = stub(grunt.file, 'read')
-			.withArgs(coverageFileName)
-			.returns(
-				JSON.stringify({
-					hello: 'world'
-				})
-			);
+	},
+	beforeEach() {
+		execStub.reset();
 	},
 	after() {
 		unloadTasks();
 	},
 	tests: {
-		propagatesReturnValue() {
-			const dfd = this.async();
-
-			runGruntTask(
-				'uploadCoverage',
-				dfd.callback(() => {
-					assert.isTrue(sendCodeCov.calledOnce);
-					assert.deepEqual(JSON.parse(sendCodeCov.firstCall.args[0]), { hello: 'world' });
-				})
-			);
+		default() {
+			runGruntTask('uploadCoverage');
+			assert.isTrue(execStub.calledOnce);
+			const codecov = require.resolve('codecov/bin/codecov');
+			assert.isTrue(execStub.calledWithExactly(`node "${codecov}" --file=coverage/coverage.json`));
 		}
 	}
 });

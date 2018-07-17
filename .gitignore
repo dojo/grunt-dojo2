@@ -1,9 +1,7 @@
 /node_modules/
 /typings
+/coverage
 *.js
-lcov.info
 .tsConfig*.json
-html-report
-coverage-final.json
 deploy_key
 /*.tgz

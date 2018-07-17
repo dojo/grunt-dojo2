@@ -1,9 +1,12 @@
 .editorconfig
 .gitattributes
+.prettierignore
 .travis.yml
+/.github
 /tests
 /typings
 /html-report
+/coverage
 *.ts
 !/index.d.ts
 codecov.yml

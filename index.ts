@@ -1,6 +1,5 @@
 import * as path from 'path';
 import * as glob from 'glob';
-import ITask = grunt.task.ITask;
 
 function formatGlob(tsconfigGlob: string[]): string[] {
 	return tsconfigGlob.map(function(glob: string) {
@@ -74,14 +73,12 @@ exports.initConfig = function(grunt: IGrunt, otherOptions: any) {
 	});
 
 	const options: { [option: string]: any } = {};
-	glob
-		.sync('*.js', {
-			cwd: path.join(__dirname, 'options')
-		})
-		.forEach(function(filename) {
-			const optName = path.basename(filename, '.js');
-			options[optName] = require('./options/' + optName)(grunt);
-		});
+	glob.sync('*.js', {
+		cwd: path.join(__dirname, 'options')
+	}).forEach(function(filename) {
+		const optName = path.basename(filename, '.js');
+		options[optName] = require('./options/' + optName)(grunt);
+	});
 	grunt.config.merge(options);
 
 	require('./tasks/uploadCoverage')(grunt);
