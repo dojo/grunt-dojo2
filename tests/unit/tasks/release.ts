@@ -45,8 +45,6 @@ function taskUnloader() {
 	unloadTasks();
 }
 
-let failureStub: SinonStub;
-
 registerSuite('tasks/release', {
 	'can-publish-check': (function(): ObjectSuiteDescriptor {
 		let fail: SinonStub;

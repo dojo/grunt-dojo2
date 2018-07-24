@@ -11,15 +11,15 @@
 
 	"reporters": [
 		"runner",
-		{ "name": "htmlcoverage", "options": { "directory": "html-report" } },
-		{ "name": "jsoncoverage", "options": { "directory": ".", "filename": "coverage-final.json" } }
+		{ "name": "htmlcoverage", "options": { "directory": "coverage/html-report" } },
+		{ "name": "jsoncoverage", "options": { "directory": "coverage", "filename": "coverage.json" } }
 	],
 
 	"configs": {
 		"ci": {
 			"reporters": [
 				{ "name": "runner", "options": { "hidePassed": true, "hideSkipped": true } },
-				{ "name": "lcov", "options": { "directory": ".", "filename": "lcov.info" } }
+				{ "name": "jsoncoverage", "options": { "directory": "coverage", "filename": "coverage.json" } }
 			]
 		}
 	}

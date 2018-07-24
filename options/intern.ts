@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 export = function(grunt: IGrunt) {
 	grunt.loadNpmTasks('intern');
 

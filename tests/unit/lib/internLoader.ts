@@ -101,7 +101,7 @@ registerSuite('lib/intern/internLoader', {
 				() => {},
 				() => {
 					assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/loader/loader.js'));
-					assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/shim/util/amd.js'));
+					assert.isTrue(internMock.loadScript.calledWith('node_modules/@dojo/framework/shim/util/amd.js'));
 				}
 			);
 		},
@@ -130,7 +130,7 @@ registerSuite('lib/intern/internLoader', {
 			return runTest(
 				() => {},
 				() => {
-					assert.equal(requireMock.args[0][0], '@dojo/shim/main');
+					assert.equal(requireMock.args[0][0], '@dojo/framework/shim/main');
 				}
 			);
 		},

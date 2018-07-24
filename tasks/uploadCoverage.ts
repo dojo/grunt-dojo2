@@ -1,13 +1,9 @@
 import ITask = grunt.task.ITask;
-const sendToCodeCov = require('codecov.io/lib/sendToCodeCov.io');
+import { exec } from './util/process';
 
 export = function(grunt: IGrunt) {
 	grunt.registerTask('uploadCoverage', <any>function(this: ITask) {
-		const done = this.async();
-
-		const contents = grunt.file.read('coverage-final.lcov');
-		sendToCodeCov(contents, function(err: Error) {
-			done(err);
-		});
+		const codecov = require.resolve('codecov/bin/codecov');
+		exec(`node "${codecov}" --file=coverage/coverage.json`);
 	});
 };

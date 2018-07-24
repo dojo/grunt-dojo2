@@ -1,4 +1,5 @@
 import * as nodeUtil from 'util';
+import { join } from 'path';
 import { create, ReportType } from 'istanbul-reports';
 import { CoverageMap, CoverageMapData, createCoverageMap } from 'istanbul-lib-coverage';
 import { createContext, summarizers, Watermarks } from 'istanbul-lib-report';
@@ -30,7 +31,7 @@ interface ReportOptions {
 
 interface ReporterProperties extends CoverageProperties {
 	directory?: string;
-	lcovFilename?: string;
+	jsonFilename?: string;
 	htmlDirectory?: string;
 	watermarks?: Watermarks;
 }
@@ -38,7 +39,7 @@ interface ReporterProperties extends CoverageProperties {
 interface SuiteOrTest {
 	sessionId: string;
 	readonly id: string;
-	timeElapsed: number;
+	timeElapsed?: number;
 	error: InternError | undefined;
 }
 
@@ -46,14 +47,14 @@ export default class Reporter extends Runner {
 	private _errors: { [sessionId: string]: ErrorObject[] } = {};
 
 	directory: string;
-	lcovFilename: string;
+	jsonFilename: string;
 	htmlDirectory: string;
 
 	constructor(executor: Node, options: Partial<ReporterProperties> = {}) {
 		super(executor, options);
 
-		this.directory = options.directory || '.';
-		this.lcovFilename = options.lcovFilename || 'coverage-final.lcov';
+		this.directory = options.directory || 'coverage';
+		this.jsonFilename = options.jsonFilename || 'coverage.json';
 		this.htmlDirectory = options.htmlDirectory || 'html-report';
 	}
 
@@ -86,7 +87,6 @@ export default class Reporter extends Runner {
 	@eventHandler()
 	runEnd() {
 		let numTests = 0;
-		let numPassedTests = 0;
 		let numFailedTests = 0;
 		let numSkippedTests = 0;
 
@@ -95,10 +95,12 @@ export default class Reporter extends Runner {
 
 		sessionIds.forEach((sessionId) => {
 			const session = this.sessions[sessionId];
-			numTests += session.suite.numTests;
-			numPassedTests += session.suite.numPassedTests;
-			numFailedTests += session.suite.numFailedTests;
-			numSkippedTests += session.suite.numSkippedTests;
+
+			if (session.suite) {
+				numTests += session.suite.numTests;
+				numFailedTests += session.suite.numFailedTests;
+				numSkippedTests += session.suite.numSkippedTests;
+			}
 		});
 
 		const { charm } = this;
@@ -113,11 +115,12 @@ export default class Reporter extends Runner {
 			charm.display('reset');
 
 			this.createCoverageReport('text', map, {});
-			this.createCoverageReport('lcovonly', map, {
-				filename: this.lcovFilename
+			this.createCoverageReport('json', map, {
+				directory: this.directory,
+				filename: this.jsonFilename
 			});
 			this.createCoverageReport('html', map, {
-				directory: this.htmlDirectory
+				directory: join(this.directory, this.htmlDirectory)
 			});
 		}
 
@@ -248,7 +251,7 @@ export default class Reporter extends Runner {
 
 		this._errors[suiteOrTest.sessionId].push({
 			id: suiteOrTest.id,
-			timeElapsed: suiteOrTest.timeElapsed,
+			timeElapsed: suiteOrTest.timeElapsed || 0,
 			error: this.executor.formatError(suiteOrTest.error!)
 		});
 	}
