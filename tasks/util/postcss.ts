@@ -38,6 +38,6 @@ export function createProcessors({
 			}
 		}),
 		// autoprefixer included in cssnext
-		cssNano({ autoprefixer: false, zindex: false, reduceIdents: false })
+		cssNano({ autoprefixer: false, zindex: false, reduceIdents: false, urlOptimize: false })
 	];
 }
