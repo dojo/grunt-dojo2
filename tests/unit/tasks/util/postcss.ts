@@ -101,7 +101,7 @@ registerSuite('tasks/util/postcss', {
 					autoprefixer: false,
 					zindex: false,
 					reduceIdents: false,
-					urlOptimize: false
+					normalizeUrl: false
 				});
 			},
 			'generate scoped name': {
